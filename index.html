@@ -111,13 +111,22 @@
   .s-founding p{color:#CFE0D6;max-width:52ch;margin:0 auto 32px;font-size:clamp(16px,1.4vw,18px)}
   .s-founding .signup{margin:0 auto;justify-content:center}
   /* footer */
-  footer{background:var(--green-deep);color:#fff;padding:62px 0 38px}
-  .foot-grid{display:flex;justify-content:space-between;gap:34px;flex-wrap:wrap;align-items:flex-start}
-  .foot .brand .word{color:#fff}.foot .brand .word .e{color:var(--citron)}
-  .foot .blurb{color:var(--sage);font-size:14px;max-width:34ch;margin-top:15px}
-  .foot .contact .lab{color:#7E978A;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
-  .foot .contact a,.foot .contact span{color:#EAF2EC;font-size:14.5px;display:block;margin-bottom:7px}
-  .foot .meta{margin-top:42px;border-top:1px solid rgba(255,255,255,.1);padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:var(--sage);font-size:12.5px}
+  footer{background:var(--green-deep);color:#fff;padding:78px 0 40px}
+  .foot-grid{display:flex;justify-content:space-between;gap:56px;flex-wrap:wrap;align-items:flex-start}
+  .foot-brand{max-width:36ch}
+  .foot-brand .brand{display:inline-flex;margin-bottom:22px}
+  .foot-brand .word{color:#fff}
+  .foot-blurb{color:var(--sage);font-size:14.5px;line-height:1.65;margin:0}
+  .foot-contact{min-width:240px}
+  .foot-lab{color:#8AA597;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin-bottom:18px}
+  .foot-row{display:flex;align-items:center;gap:12px;margin-bottom:13px;color:#EAF2EC;font-size:14.5px}
+  .foot-row:last-child{margin-bottom:0}
+  .foot-row svg{color:var(--citron);flex-shrink:0}
+  a.foot-row{transition:color .15s ease}
+  a.foot-row:hover{color:#fff}
+  .foot-meta{margin-top:52px;border-top:1px solid rgba(255,255,255,.12);padding-top:26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;color:#8AA597;font-size:12.5px}
+  .foot-meta .lq{display:inline-flex;align-items:center;gap:8px;color:#C7D6CC}
+  .foot-meta .lq .dot{width:6px;height:6px;border-radius:99px;background:var(--citron)}
   /* reveal + hero entrance */
   .reveal{transition:opacity .7s ease,transform .7s ease}
   html.reveal-ready .reveal{opacity:0;transform:translateY(20px)}
@@ -155,6 +164,14 @@
     .btn{transition:none}
   }
 </style>
+<style>
+  .nav-right{display:flex;align-items:center;gap:24px}
+  .navlink{color:#EAF2EC;font-weight:500;font-size:15px;opacity:.9;transition:opacity .15s ease}
+  .navlink:hover{opacity:1}
+  #register{scroll-margin-top:200px}
+  section[id]{scroll-margin-top:20px}
+  @media(max-width:560px){.navlink{display:none}.nav-right{gap:0}}
+</style>
 </head>
 <body>
 <nav class="nav"><div class="nav-in">
@@ -162,7 +179,10 @@
     <span class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span>
     <span class="word">List<span class="e">Edge</span></span>
   </a>
-  <a class="btn btn-primary btn-sm" href="#register">Register interest</a>
+  <div class="nav-right">
+    <a class="navlink" href="#how">How it works</a>
+    <a class="btn btn-primary btn-sm js-to-form" href="#register">Register interest</a>
+  </div>
 </div></nav>
 
 <header class="hero" id="top"><div class="wrap"><div class="hero-grid">
@@ -199,7 +219,7 @@
   <p>ListEdge connects that demand and supply privately, across offices. No portals, no public listings, no client names — just licensed agents, the buyers they're working, and the properties that fit, found for each other.</p>
 </div></section>
 
-<section class="section bg-bone2 s-steps"><div class="wrap">
+<section class="section bg-bone2 s-steps" id="how"><div class="wrap">
   <div class="head reveal">
     <span class="eyebrow lead-eyebrow">How it works</span>
     <h2 class="display">One network, matched both ways.</h2>
@@ -241,16 +261,19 @@
         <span class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span>
         <span class="word">List<span class="e" style="color:var(--citron)">Edge</span></span>
       </a>
-      <p class="blurb">A private conjunctional network for licensed New Zealand real estate agents.</p>
+      <p class="foot-blurb">A private conjunctional network for licensed New Zealand real estate agents.</p>
     </div>
-    <div class="contact">
-      <div class="lab">Get in touch</div>
-      <a href="mailto:listedgenz@gmail.com">listedgenz@gmail.com</a>
-      <a href="tel:0273453219">027 345 3219</a>
-      <span>Christchurch, New Zealand</span>
+    <div class="foot-contact">
+      <div class="foot-lab">Get in touch</div>
+      <a class="foot-row" href="mailto:listedgenz@gmail.com"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>listedgenz@gmail.com</a>
+      <a class="foot-row" href="tel:0273453219"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>027 345 3219</a>
+      <div class="foot-row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Christchurch, New Zealand</div>
     </div>
   </div>
-  <div class="meta"><span>© 2026 ListEdge. For licensed real estate professionals only.</span><span> Launching 2026.</span></div>
+  <div class="foot-meta">
+    <span>© 2026 ListEdge. For licensed real estate professionals only.</span>
+    <span class="lq"><span class="dot"></span>Launching 2026</span>
+  </div>
 </div></footer>
 <script>
 (function(){
@@ -262,6 +285,19 @@
     R.forEach(function(el){io.observe(el);});
     setTimeout(function(){R.forEach(function(el){el.classList.add('in');});},2200);
   }
+
+  /* "Register interest" in the nav: smoothly bring the hero email field into a
+     comfortable spot in view (works whether you're at the top or scrolled down)
+     and focus it, ready to type. */
+  var reg=document.querySelector('.js-to-form');
+  var regInput=document.getElementById('register');
+  if(reg&&regInput){reg.addEventListener('click',function(e){
+    e.preventDefault();
+    var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+    var y=window.scrollY+regInput.getBoundingClientRect().top-Math.round(window.innerHeight*0.4);
+    window.scrollTo({top:y<0?0:y,behavior:rm?'auto':'smooth'});
+    setTimeout(function(){regInput.focus({preventScroll:true});},rm?0:520);
+  });}
 
   /* email capture.
      Works right now: opens the visitor's email pre-filled to you.
