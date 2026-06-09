@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ListEdge — The private conjunctional network for NZ agents</title>
+<meta name="description" content="ListEdge is a private, licence-verified network where New Zealand real estate agents share buyer demand and private listings — matched both ways. Launching 2026.">
+<meta name="theme-color" content="#0A4630">
+<link rel="icon" href="/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://listedge.co.nz">
+<meta property="og:title" content="ListEdge — Launching 2026">
+<meta property="og:description" content="The private, licence-verified network where NZ agents match buyers to listings — across every office.">
+<meta property="og:image" content="https://listedge.co.nz/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --green:#0E5A3C; --green-dk:#0A4630; --green-deep:#063225; --citron:#C8F24A;
+    --bone:#F2EFE7; --bone-2:#ECE8DD; --ink:#16191A; --sub:#5C6760; --sage:#A6C0B1;
+    --line:#E2DCCE; --card:#FFFFFF;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Instrument Sans',system-ui,sans-serif;color:var(--ink);background:var(--bone);line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+  .display{font-family:'Bricolage Grotesque','Instrument Sans',sans-serif;letter-spacing:-.025em;line-height:1.02}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 28px}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:inherit;font-weight:600;font-size:15.5px;border:none;border-radius:999px;padding:15px 26px;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;white-space:nowrap}
+  .btn-primary{background:var(--citron);color:var(--ink);box-shadow:0 1px 0 rgba(0,0,0,.04)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px rgba(200,242,74,.55)}
+  .btn-dark{background:var(--green);color:#fff}
+  .btn-dark:hover{transform:translateY(-2px);box-shadow:0 12px 30px -10px rgba(14,90,60,.5)}
+  .btn-sm{padding:11px 19px;font-size:14px}
+  /* nav */
+  .nav{position:absolute;top:0;left:0;right:0;z-index:40}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;padding:22px 28px;max-width:1140px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .tile{width:34px;height:34px;border-radius:9px;background:var(--citron);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .brand .word{font-family:'Bricolage Grotesque';font-weight:800;font-size:21px;letter-spacing:-.02em}
+  .nav .brand .word{color:#fff}
+  .nav .brand .word .e{color:var(--citron)}
+  /* hero */
+  .hero{position:relative;background:linear-gradient(168deg,#0E5A3C 0%,#0A3F2B 58%,#06301F 100%);color:#fff;overflow:hidden;padding:148px 0 96px}
+  .hero::before{content:"";position:absolute;top:-25%;right:-10%;width:60%;height:80%;background:radial-gradient(closest-side,rgba(200,242,74,.16),transparent 70%);pointer-events:none}
+  .hero::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px;opacity:.5;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,#000,transparent 75%);mask-image:linear-gradient(180deg,#000,transparent 75%)}
+  .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+  .hero .eyebrow{color:var(--citron);display:inline-flex;align-items:center;gap:9px;margin-bottom:24px}
+  .hero .eyebrow .dot{width:7px;height:7px;border-radius:99px;background:var(--citron);box-shadow:0 0 0 4px rgba(200,242,74,.18)}
+  .hero h1{font-size:clamp(38px,5.6vw,68px);font-weight:700;margin-bottom:22px}
+  .hero h1 .hl{color:var(--citron)}
+  .hero .lede{font-size:clamp(16.5px,1.5vw,19px);color:#D7E5DC;max-width:33ch;margin-bottom:34px}
+  .hero .trust{margin-top:18px;font-size:13px;color:var(--sage);display:flex;align-items:center;gap:8px}
+</style>
+<style>
+  /* signup form (on green) */
+  .signup{display:flex;gap:10px;max-width:450px;flex-wrap:wrap}
+  .signup input{flex:1;min-width:210px;font-family:inherit;font-size:15.5px;color:#fff;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:15px 20px;outline:none;transition:border .18s,background .18s}
+  .signup input::placeholder{color:#9FB8AA}
+  .signup input:focus{border-color:var(--citron);background:rgba(255,255,255,.12)}
+  .note{margin-top:13px;font-size:13.5px;min-height:19px}
+  .note.ok{color:var(--citron);font-weight:600}
+  .note.err{color:#FFCBB4}
+  /* match tableau */
+  .tableau{display:flex;flex-direction:column;align-items:center;max-width:382px;margin:0 auto;width:100%}
+  .mcard{width:100%;background:var(--card);color:var(--ink);border-radius:18px;padding:20px 20px;box-shadow:0 34px 64px -30px rgba(0,0,0,.55);border:1px solid rgba(0,0,0,.04)}
+  .mcard .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+  .mc-tag{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sub)}
+  .mc-tag .ic{color:var(--green);display:inline-flex}
+  .lock{font-size:11px;color:#9AA69E;display:inline-flex;align-items:center;gap:5px}
+  .mc-price{font-family:'Bricolage Grotesque';font-weight:700;font-size:27px;letter-spacing:-.02em}
+  .mc-title{font-family:'Bricolage Grotesque';font-weight:700;font-size:19px;letter-spacing:-.01em}
+  .mc-sub{color:var(--sub);font-size:13.5px;margin-top:3px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+  .chip{font-size:12.5px;font-weight:500;color:var(--ink);background:var(--bone);border-radius:8px;padding:5px 11px}
+  .chip.sub{color:var(--green);background:#E7F0EA}
+  .connector{position:relative;height:62px;width:2px;background:linear-gradient(var(--citron),rgba(200,242,74,.3));transform-origin:top}
+  .match-pill{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--citron);color:var(--ink);font-weight:700;font-size:12.5px;padding:7px 14px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;box-shadow:0 10px 26px -8px rgba(200,242,74,.7)}
+  /* generic sections */
+  .section{padding:clamp(74px,9vw,116px) 0}
+  .bg-bone{background:var(--bone)} .bg-bone2{background:var(--bone-2)}
+  .lead-eyebrow{color:var(--green);margin-bottom:20px;display:block}
+  /* insight */
+  .s-insight h2{font-family:'Bricolage Grotesque';font-weight:600;font-size:clamp(27px,3.6vw,42px);letter-spacing:-.02em;line-height:1.12;max-width:20ch}
+  .s-insight h2 .mut{color:#8C998F}
+  .s-insight p{margin-top:24px;max-width:50ch;color:var(--sub);font-size:clamp(16px,1.4vw,18px)}
+  /* steps */
+  .s-steps .head h2,.s-why .head h2{font-family:'Bricolage Grotesque';font-weight:700;font-size:clamp(25px,3.2vw,37px);letter-spacing:-.02em;max-width:16ch}
+  .s-steps .head p,.s-why .head p{color:var(--sub);margin-top:14px;max-width:46ch;font-size:16.5px}
+  .head{margin-bottom:54px}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:34px}
+  .step .divider{height:2px;background:var(--ink);width:26px;margin-bottom:20px;opacity:.85}
+  .step .num{font-family:'Bricolage Grotesque';font-weight:700;font-size:13px;color:var(--green);letter-spacing:.12em}
+  .step h3{font-family:'Bricolage Grotesque';font-weight:700;font-size:21px;letter-spacing:-.01em;margin:10px 0 10px}
+  .step p{color:var(--sub);font-size:15px}
+  /* why trio */
+  .why{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:6px}
+  .why .ic{width:44px;height:44px;border-radius:12px;background:#E7F0EA;display:flex;align-items:center;justify-content:center;color:var(--green);margin-bottom:16px}
+  .why h3{font-family:'Bricolage Grotesque';font-weight:700;font-size:18.5px;margin-bottom:8px;letter-spacing:-.01em}
+  .why p{color:var(--sub);font-size:14.5px}
+  /* founding band */
+  .s-founding{background:linear-gradient(162deg,#0E5A3C 0%,#083728 100%);color:#fff;text-align:center;position:relative;overflow:hidden}
+  .s-founding::after{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:26px 26px;opacity:.4;-webkit-mask-image:radial-gradient(closest-side,#000,transparent);mask-image:radial-gradient(closest-side,#000,transparent)}
+  .s-founding>*{position:relative;z-index:2}
+  .s-founding .eyebrow{color:var(--citron);display:inline-flex;margin-bottom:20px}
+  .s-founding h2{font-family:'Bricolage Grotesque';font-weight:700;font-size:clamp(29px,4vw,46px);letter-spacing:-.025em;max-width:17ch;margin:0 auto 18px;line-height:1.05}
+  .s-founding p{color:#CFE0D6;max-width:52ch;margin:0 auto 32px;font-size:clamp(16px,1.4vw,18px)}
+  .s-founding .signup{margin:0 auto;justify-content:center}
+  /* footer */
+  footer{background:var(--green-deep);color:#fff;padding:62px 0 38px}
+  .foot-grid{display:flex;justify-content:space-between;gap:34px;flex-wrap:wrap;align-items:flex-start}
+  .foot .brand .word{color:#fff}.foot .brand .word .e{color:var(--citron)}
+  .foot .blurb{color:var(--sage);font-size:14px;max-width:34ch;margin-top:15px}
+  .foot .contact .lab{color:#7E978A;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+  .foot .contact a,.foot .contact span{color:#EAF2EC;font-size:14.5px;display:block;margin-bottom:7px}
+  .foot .meta{margin-top:42px;border-top:1px solid rgba(255,255,255,.1);padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:var(--sage);font-size:12.5px}
+  /* reveal + hero entrance */
+  .reveal{transition:opacity .7s ease,transform .7s ease}
+  html.reveal-ready .reveal{opacity:0;transform:translateY(20px)}
+  html.reveal-ready .reveal.in{opacity:1;transform:none}
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  .hero .anim{opacity:0;animation:rise .85s cubic-bezier(.2,.7,.2,1) forwards}
+  .hero .a1{animation-delay:.05s}.hero .a2{animation-delay:.16s}.hero .a3{animation-delay:.28s}.hero .a4{animation-delay:.4s}
+  .tableau{opacity:0;animation:rise .9s cubic-bezier(.2,.7,.2,1) .34s forwards}
+  .connector{animation:grow .55s .95s both}
+  @keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  .match-pill{animation:pop .42s 1.35s both}
+  @keyframes pop{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  /* responsive */
+  @media(max-width:880px){
+    .hero{padding:120px 0 74px}
+    .hero-grid{grid-template-columns:1fr;gap:50px}
+    .hero .lede{max-width:none}
+    .steps,.why{grid-template-columns:1fr;gap:0}
+    .step{padding:26px 0;border-top:1px solid var(--line)}
+    .step .divider{display:none}
+    .why .item{padding:24px 0;border-top:1px solid var(--line)}
+  }
+  @media(max-width:560px){
+    .wrap{padding:0 20px}
+    .nav-in{padding:18px 20px}
+    .signup{flex-direction:column}
+    .signup .btn{width:100%}
+    .signup input{width:100%}
+    .foot-grid{flex-direction:column;gap:26px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .reveal,.hero .anim,.tableau{opacity:1;transform:none;animation:none;transition:none}
+    .connector,.match-pill{animation:none}
+    html{scroll-behavior:auto}
+    .btn{transition:none}
+  }
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="#top" aria-label="ListEdge home">
+    <span class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span>
+    <span class="word">List<span class="e">Edge</span></span>
+  </a>
+  <a class="btn btn-primary btn-sm" href="#register">Register interest</a>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap"><div class="hero-grid">
+  <div class="hero-copy">
+    <span class="eyebrow anim a1"><span class="dot"></span> Launching 2026 · New Zealand</span>
+    <h1 class="display anim a2">The match for your listing is already in <span class="hl">another office</span>.</h1>
+    <p class="lede anim a3">A private, licence-verified network where New Zealand agents share buyer demand and private listings — matched both ways. Post a buyer and it works like a listing for them. Add a listing and meet the buyers already waiting.</p>
+    <form class="signup anim a4" data-signup novalidate>
+      <input type="email" name="email" id="register" placeholder="Your work email" aria-label="Your work email" required>
+      <button class="btn btn-primary" type="submit">Register interest</button>
+    </form>
+    <div class="note anim a4" data-note role="status" aria-live="polite"></div>
+    <div class="trust anim a4"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg> For licensed New Zealand real estate agents only.</div>
+  </div>
+  <div class="tableau" aria-hidden="true">
+    <div class="mcard">
+      <div class="top"><span class="mc-tag"><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span> Buyer brief</span><span class="lock"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg> anonymised</span></div>
+      <div class="mc-price">$1.1m – $1.4m</div>
+      <div class="chips"><span class="chip">4+ bed</span><span class="chip">2+ bath</span><span class="chip">House</span></div>
+      <div class="chips"><span class="chip sub">Fendalton</span><span class="chip sub">Merivale</span></div>
+    </div>
+    <div class="connector"><span class="match-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18"/><path d="m7 8-4 4 4 4"/><path d="m17 8 4 4-4 4"/></svg> Strong match</span></div>
+    <div class="mcard">
+      <div class="top"><span class="mc-tag"><span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-5h6v5"/></svg></span> Listing</span></div>
+      <div class="mc-title">Glandovey Road</div>
+      <div class="mc-sub">Fendalton · House</div>
+      <div class="chips"><span class="chip">$1.25m</span><span class="chip">4 bed</span><span class="chip">3 bath</span></div>
+    </div>
+  </div>
+</div></div></header>
+<section class="section bg-bone s-insight"><div class="wrap reveal">
+  <span class="eyebrow lead-eyebrow">The opportunity</span>
+  <h2 class="display">Half the market is invisible. The buyer sits with one agent; the right property sits with <span class="mut">another</span> — and the deal never happens.</h2>
+  <p>ListEdge connects that demand and supply privately, across offices. No portals, no public listings, no client names — just licensed agents, the buyers they're working, and the properties that fit, found for each other.</p>
+</div></section>
+
+<section class="section bg-bone2 s-steps"><div class="wrap">
+  <div class="head reveal">
+    <span class="eyebrow lead-eyebrow">How it works</span>
+    <h2 class="display">One network, matched both ways.</h2>
+    <p>Whether you're holding the buyer or the listing, ListEdge does the same thing — it finds the other side, across every member office.</p>
+  </div>
+  <div class="steps">
+    <div class="step reveal"><div class="divider"></div><div class="num">01</div><h3>Post the buyer, or the listing</h3><p>Add an anonymised buyer brief — it works like a listing for them — or list a property privately to the network.</p></div>
+    <div class="step reveal" style="transition-delay:.09s"><div class="divider"></div><div class="num">02</div><h3>Get matched, both ways</h3><p>ListEdge matches buyers and listings across the network instantly — strong matches and near-misses, with the reasons why.</p></div>
+    <div class="step reveal" style="transition-delay:.18s"><div class="divider"></div><div class="num">03</div><h3>Make the introduction</h3><p>Whoever holds the match makes the call. Every introduction is logged as a shared, time-stamped conjunctional record.</p></div>
+  </div>
+</div></section>
+<section class="section bg-bone s-why"><div class="wrap">
+  <div class="head reveal">
+    <span class="eyebrow lead-eyebrow">Why ListEdge</span>
+    <h2 class="display">Built for how agents actually work.</h2>
+  </div>
+  <div class="why">
+    <div class="item reveal"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></div><h3>Agents only, verified</h3><p>Every member is a licensed New Zealand agent. Private by default — client names are never shared.</p></div>
+    <div class="item reveal" style="transition-delay:.09s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><rect x="5" y="11" width="3.4" height="7" rx="1"/><rect x="10.5" y="7" width="3.4" height="11" rx="1"/><rect x="16" y="13" width="3.4" height="5" rx="1"/></svg></div><h3>Demand you can act on</h3><p>See real buyer demand by suburb — and price your next appraisal against who's actually looking.</p></div>
+    <div class="item reveal" style="transition-delay:.18s"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="m9.5 13 2 2 3.5-4"/></svg></div><h3>Conjunctionals, handled</h3><p>Introductions and shared commissions, recorded cleanly. ListEdge never takes a cut of your deal.</p></div>
+  </div>
+</div></section>
+
+<section class="section s-founding" id="founding"><div class="wrap">
+  <span class="eyebrow">Founding offices · 2026</span>
+  <h2 class="display">Help shape the network from day one.</h2>
+  <p>We're inviting a small group of founding offices to join before launch — lock in founding pricing, get early access, and help build the network your market actually needs.</p>
+  <form class="signup" data-signup novalidate>
+    <input type="email" name="email" placeholder="Your work email" aria-label="Your work email" required>
+    <button class="btn btn-primary" type="submit">Register interest</button>
+  </form>
+  <div class="note" data-note role="status" aria-live="polite" style="text-align:center"></div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <a class="brand" href="#top" aria-label="ListEdge home">
+        <span class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span>
+        <span class="word">List<span class="e" style="color:var(--citron)">Edge</span></span>
+      </a>
+      <p class="blurb">A private conjunctional network for licensed New Zealand real estate agents.</p>
+    </div>
+    <div class="contact">
+      <div class="lab">Get in touch</div>
+      <a href="mailto:harsh@klyne.nz">harsh@klyne.nz</a>
+      <a href="tel:0273453219">027 345 3219</a>
+      <span>Christchurch, New Zealand</span>
+    </div>
+  </div>
+  <div class="meta"><span>© 2026 ListEdge. For licensed real estate professionals only.</span><span>Launching 2026</span></div>
+</div></footer>
+<script>
+(function(){
+  /* reveal on scroll */
+  if('IntersectionObserver' in window){
+    var R=document.querySelectorAll('.reveal');
+    document.documentElement.classList.add('reveal-ready');
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.1});
+    R.forEach(function(el){io.observe(el);});
+    setTimeout(function(){R.forEach(function(el){el.classList.add('in');});},2200);
+  }
+
+  /* email capture.
+     Works right now: opens the visitor's email pre-filled to you.
+     To capture sign-ups automatically instead, create a free form at formspree.io
+     and paste your form URL between the quotes on the next line. */
+  var FORM_ENDPOINT = "";
+  var CONTACT_EMAIL = "harsh@klyne.nz";
+  function valid(v){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v); }
+  document.querySelectorAll('[data-signup]').forEach(function(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var input=form.querySelector('input[type=email]');
+      var note=form.parentNode.querySelector('[data-note]')||form.nextElementSibling;
+      var email=(input.value||'').trim();
+      if(!valid(email)){ if(note){note.className='note err';note.textContent='Please enter a valid email address.';} input.focus(); return; }
+      var btn=form.querySelector('button'), label=btn.textContent; btn.textContent='Sending…'; btn.disabled=true;
+      function done(){ if(note){note.className='note ok';note.textContent='You\'re on the list. We\'ll be in touch as we approach launch.';} form.reset(); btn.textContent=label; btn.disabled=false; }
+      function fail(){ if(note){note.className='note err';note.textContent='Something went wrong — please email '+CONTACT_EMAIL+'.';} btn.textContent=label; btn.disabled=false; }
+      if(FORM_ENDPOINT){
+        fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({email:email,source:'listedge.co.nz'})})
+          .then(function(r){ r.ok?done():fail(); }).catch(fail);
+      } else {
+        var s=encodeURIComponent('ListEdge — founding office interest');
+        var b=encodeURIComponent('Hi Harsh,\n\nI\'d like to register my interest in ListEdge.\n\nMy email: '+email+'\nMy office: \n\nThanks');
+        window.location.href='mailto:'+CONTACT_EMAIL+'?subject='+s+'&body='+b;
+        done();
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
