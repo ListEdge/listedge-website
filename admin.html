@@ -177,6 +177,121 @@
   }
   @media(prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
 </style>
+<style>
+  /* ===================== Offices module (CRM) ===================== */
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-weight:600;font-size:14px;border:none;border-radius:11px;padding:11px 16px;cursor:pointer;background:var(--citron);color:var(--ink);transition:transform .15s,box-shadow .15s,opacity .15s}
+  .btn-primary svg{width:17px;height:17px}
+  .btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 12px 26px -12px rgba(200,242,74,.7)}
+  .btn-primary:disabled{opacity:.6;cursor:default}
+  .btn-danger{font-family:inherit;font-weight:600;font-size:14px;border:none;border-radius:11px;padding:11px 18px;cursor:pointer;background:#B42318;color:#fff}
+  .btn-danger:hover:not(:disabled){background:#9c1d14}
+  .btn-danger:disabled{opacity:.6}
+
+  .tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .search{position:relative;display:flex;align-items:center}
+  .search svg{position:absolute;left:12px;width:16px;height:16px;color:var(--sub);pointer-events:none}
+  .search input{font-family:inherit;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 14px 10px 34px;outline:none;width:268px;transition:border-color .15s,box-shadow .15s}
+  .search input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(14,90,60,.1)}
+  .search input::placeholder{color:#9aa39d}
+
+  .summary{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+  .st{flex:1;min-width:132px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .st-v{font-family:'Bricolage Grotesque';font-weight:700;font-size:26px;letter-spacing:-.02em;line-height:1}
+  .st-l{font-size:12.5px;color:var(--sub);margin-top:5px}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-family:inherit;font-size:13px;font-weight:600;color:var(--sub);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;cursor:pointer;transition:background .14s,color .14s,border-color .14s}
+  .chip:hover{border-color:#c9d2c8}
+  .chip.active{background:var(--green);color:#fff;border-color:transparent}
+  .chip .ct{font-size:11.5px;font-weight:700;opacity:.75}
+
+  .of-table{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .of-head,.of-row{display:grid;grid-template-columns:2.4fr 2.2fr 1.1fr 1.2fr 1fr auto;align-items:center;gap:14px;padding:13px 18px}
+  .of-head{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--sub);background:#FAFBF8;border-bottom:1px solid var(--line)}
+  .of-row{border-bottom:1px solid var(--line)}
+  .of-row:last-child{border-bottom:none}
+  .of-row:hover{background:#FAFBF8}
+  .c-name{cursor:pointer;min-width:0}
+  .c-name b{font-weight:600;font-size:14px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .c-name .sub{font-size:12px;color:var(--sub);display:block;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .c-contact{font-size:13.5px;min-width:0}
+  .c-contact .dim2{display:block;font-size:12px;color:var(--sub);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .c-suburb,.c-follow{font-size:13.5px}
+  .dim{color:#bcc4bc}
+  .cl{display:none}
+  .spill{font-family:inherit;font-weight:600;font-size:12.5px;border:none;border-radius:999px;padding:5px 27px 5px 12px;cursor:pointer;-webkit-appearance:none;appearance:none;outline:none;
+    background-repeat:no-repeat;background-position:right 9px center;background-size:11px;
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%235C6760'%20stroke-width='2.5'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='m6%209%206%206%206-6'/%3E%3C/svg%3E")}
+  .spill:focus{box-shadow:0 0 0 3px rgba(14,90,60,.12)}
+  .c-act{display:flex;gap:6px;justify-content:flex-end}
+  .ia{width:34px;height:34px;border:1px solid var(--line);background:#fff;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub)}
+  .ia svg{width:16px;height:16px}
+  .ia:hover{background:#F0F3F0;color:var(--ink)}
+  .ia.danger:hover{color:#B42318;border-color:#f0c8c2;background:#fdf3f2}
+
+  .loading{padding:42px;text-align:center;color:var(--sub);font-size:14px}
+  .empty{background:#fff;border:1px dashed var(--line);border-radius:16px;padding:48px 24px;text-align:center;display:flex;flex-direction:column;align-items:center}
+  .empty .ptile{width:60px;height:60px;border-radius:16px;background:#E7F0EA;color:var(--green);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .empty .ptile svg{width:28px;height:28px}
+  .empty h2{font-family:'Bricolage Grotesque';font-weight:700;font-size:23px;letter-spacing:-.02em;margin-bottom:9px}
+  .empty p{color:var(--sub);font-size:14.5px;max-width:44ch;margin-bottom:18px;line-height:1.6}
+  .empty-sm{background:#fff;border:1px solid var(--line);border-radius:14px;padding:32px;text-align:center;color:var(--sub);font-size:14px}
+  .err-box{background:#fff;border:1px solid #f0d8c2;border-radius:16px;padding:26px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px}
+  .err-box .eb-ic{width:46px;height:46px;border-radius:12px;background:#FBF1D8;color:#9A6A00;display:flex;align-items:center;justify-content:center}
+  .err-box .eb-ic svg{width:24px;height:24px}
+  .err-box .eb-tx{font-size:14px;color:var(--ink);max-width:54ch;line-height:1.55}
+  .err-box .eb-tx b{font-weight:700}
+
+  .ov-scrim{position:fixed;inset:0;background:rgba(6,30,20,.42);z-index:60;opacity:0;transition:opacity .22s}
+  .ov-scrim.show{opacity:1}
+  .ov{position:fixed;top:0;right:0;bottom:0;width:444px;max-width:92vw;background:var(--bone);z-index:61;display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform .24s ease;box-shadow:-30px 0 80px -30px rgba(0,0,0,.5)}
+  .ov.show{transform:translateX(0)}
+  .ov-head{display:flex;align-items:center;justify-content:space-between;padding:17px 20px;border-bottom:1px solid var(--line);background:#fff}
+  .ov-head h2{font-family:'Bricolage Grotesque';font-weight:700;font-size:19px;letter-spacing:-.01em}
+  .ov-body{flex:1;overflow-y:auto;padding:20px}
+  .ov-foot{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--line);background:#fff}
+  .ov-err{color:#B42318;font-size:13px;font-weight:500;margin-right:auto;max-width:58%;line-height:1.4}
+  .frm{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .fld{display:flex;flex-direction:column;gap:6px}
+  .fld.span2{grid-column:1 / -1}
+  .fld label{font-size:12.5px;font-weight:600;color:#33403a}
+  .fld input,.fld select,.fld textarea{font-family:inherit;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+  .fld textarea{resize:vertical;min-height:86px}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(14,90,60,.1)}
+  .fe{color:#B42318;font-size:12px;font-weight:500}
+  .divider-lab{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);padding-top:12px;border-top:1px solid var(--line);margin-top:2px}
+
+  .cf-scrim{position:fixed;inset:0;background:rgba(6,30,20,.5);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .18s}
+  .cf-scrim.show{opacity:1}
+  .cf{background:#fff;border-radius:18px;padding:26px;max-width:380px;width:100%;box-shadow:0 40px 90px -30px rgba(0,0,0,.5);transform:scale(.96);transition:transform .18s}
+  .cf-scrim.show .cf{transform:scale(1)}
+  .cf h3{font-family:'Bricolage Grotesque';font-weight:700;font-size:19px;margin-bottom:8px}
+  .cf p{color:var(--sub);font-size:14px;line-height:1.55;margin-bottom:20px}
+  .cf p b{color:var(--ink)}
+  .cf-act{display:flex;justify-content:flex-end;gap:10px}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);background:var(--green-deep);color:#fff;font-size:13.5px;font-weight:500;padding:12px 18px;border-radius:12px;box-shadow:0 18px 40px -16px rgba(0,0,0,.5);z-index:90;opacity:0;visibility:hidden;transition:opacity .2s,transform .2s;max-width:90vw}
+  .toast.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+  .toast.err{background:#B42318}
+
+  @media(max-width:820px){
+    .of-head{display:none}
+    .of-row{grid-template-columns:1fr;gap:9px;padding:15px 16px;position:relative}
+    .of-row .cl{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:#9aa39d;margin-right:8px;min-width:62px}
+    .c-act{position:absolute;top:13px;right:14px}
+    .c-name{padding-right:84px}
+    .c-contact .dim2{display:inline}
+  }
+  @media(max-width:560px){
+    .tools{width:100%}
+    .search{flex:1}
+    .search input{width:100%}
+    .ov{width:100%;max-width:100%}
+    .frm{grid-template-columns:1fr}
+    .fld.span2{grid-column:auto}
+  }
+</style>
 </head>
 <body>
   <!-- shown until we confirm the user is signed in -->
@@ -254,7 +369,7 @@
        ========================================================= */
     var MODULES = [
       { id:'dashboard', label:'Dashboard',        icon:'grid',     title:'Dashboard',        render: renderDashboard },
-      { id:'offices',   label:'Offices',          icon:'building', title:'Offices',          render: ph('Offices','building','Manage every member and prospect office in one place — pipeline stage, key contacts and full history.') },
+      { id:'offices',   label:'Offices',          icon:'building', title:'Offices',          render: officesView, mount: officesMount },
       { id:'meetings',  label:'Meetings',         icon:'calendar', title:'Meetings',         render: ph('Meetings','calendar','Schedule and track demos, intro calls, follow-ups and check-ins across all your offices.') },
       { id:'eois',      label:'EOIs',             icon:'file',     title:'EOIs',             render: ph('EOIs','file','Capture and manage expressions of interest from offices considering ListEdge.') },
       { id:'followups', label:'Follow Ups',       icon:'bell',     title:'Follow Ups',       render: ph('Follow Ups','bell','Never miss a touchpoint — tasks and reminders tied to each office and conversation.') },
@@ -418,6 +533,7 @@
       var m = MODULES.filter(function(x){ return x.id === id; })[0] || MODULES[0];
       document.getElementById('pageTitle').textContent = m.title;
       document.getElementById('view').innerHTML = m.render();
+      if(typeof m.mount === 'function'){ m.mount(); }
       var items = document.querySelectorAll('.navitem');
       for(var i=0;i<items.length;i++){ items[i].classList.toggle('active', items[i].getAttribute('data-id') === m.id); }
       closeDrawer();
@@ -455,6 +571,323 @@
 
     function openDrawer(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('scrim').classList.add('show'); }
     function closeDrawer(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('scrim').classList.remove('show'); }
+
+    /* =========================================================
+       OFFICES — a fully working CRM module, backed by Supabase.
+       Table: public.offices  (run offices-setup.sql once in Supabase).
+       This is the template every future module follows: a render()
+       that returns the shell, and a mount() that loads data + wires events.
+       ========================================================= */
+    var SVG_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
+    var SVG_X      = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+    var SVG_EDIT   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+    var SVG_TRASH  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+    var SVG_WARN   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
+
+    var STAGES = [
+      { id:'lead',      label:'Lead',      c:'#5C6760', bg:'#ECE8DD' },
+      { id:'contacted', label:'Contacted', c:'#2563EB', bg:'#E7EEFC' },
+      { id:'meeting',   label:'Meeting',   c:'#9A6A00', bg:'#FBF1D8' },
+      { id:'proposal',  label:'Proposal',  c:'#7C3AED', bg:'#F1EBFD' },
+      { id:'signed',    label:'Signed',    c:'#0E5A3C', bg:'#E7F0EA' },
+      { id:'passed',    label:'Passed',    c:'#B42318', bg:'#FBEAE8' }
+    ];
+    function stageMeta(id){ for(var i=0;i<STAGES.length;i++){ if(STAGES[i].id===id) return STAGES[i]; } return STAGES[0]; }
+
+    var OF = { all:[], q:'', stage:'all', loading:true, editing:null, deleting:null };
+
+    function officesView(){
+      var stageOpts = STAGES.map(function(s){ return '<option value="'+s.id+'">'+s.label+'</option>'; }).join('');
+      var form = ''
+        + '<div class="frm">'
+        +   '<div class="fld span2"><label for="ofName">Office name *</label><input id="ofName" placeholder="e.g. Harcourts Grenadier"><small class="fe" id="ofNameErr"></small></div>'
+        +   '<div class="fld"><label for="ofBrand">Brand</label><input id="ofBrand" placeholder="e.g. Harcourts"></div>'
+        +   '<div class="fld"><label for="ofStage">Stage</label><select id="ofStage">'+stageOpts+'</select></div>'
+        +   '<div class="fld"><label for="ofSuburb">Suburb</label><input id="ofSuburb" placeholder="e.g. Fendalton"></div>'
+        +   '<div class="fld"><label for="ofAgents">No. of agents</label><input id="ofAgents" type="number" min="0" placeholder="e.g. 18"></div>'
+        +   '<div class="fld span2"><div class="divider-lab">Primary contact</div></div>'
+        +   '<div class="fld"><label for="ofContactName">Contact name</label><input id="ofContactName" placeholder="e.g. Sarah Thompson"></div>'
+        +   '<div class="fld"><label for="ofContactPhone">Phone</label><input id="ofContactPhone" type="tel" placeholder="027 123 4567"></div>'
+        +   '<div class="fld span2"><label for="ofContactEmail">Email</label><input id="ofContactEmail" type="email" placeholder="name@agency.co.nz"></div>'
+        +   '<div class="fld"><label for="ofWebsite">Website</label><input id="ofWebsite" placeholder="agency.co.nz"></div>'
+        +   '<div class="fld"><label for="ofFollow">Next follow-up</label><input id="ofFollow" type="date"></div>'
+        +   '<div class="fld span2"><label for="ofNotes">Notes</label><textarea id="ofNotes" rows="4" placeholder="Anything useful about this office\u2026"></textarea></div>'
+        + '</div>';
+
+      return ''
+        + '<div class="view-head">'
+        +   '<div class="vh-sub">Your pipeline of agencies \u2014 everything here saves to your database.</div>'
+        +   '<div class="tools">'
+        +     '<div class="search">'+SVG_SEARCH+'<input id="ofSearch" type="search" placeholder="Search name, contact, suburb\u2026" autocomplete="off"></div>'
+        +     '<button class="btn-primary" id="ofAdd">'+ic('plus')+'<span>Add office</span></button>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="summary" id="ofSummary"></div>'
+        + '<div class="chips" id="ofChips"></div>'
+        + '<div id="ofBody"><div class="loading">Loading offices\u2026</div></div>'
+
+        + '<div class="ov-scrim" id="ovScrim" hidden></div>'
+        + '<aside class="ov" id="ov" hidden aria-hidden="true" aria-label="Office details">'
+        +   '<div class="ov-head"><h2 id="ovTitle" class="display">Add office</h2><button class="icon-btn" id="ovClose" aria-label="Close">'+SVG_X+'</button></div>'
+        +   '<div class="ov-body">'+form+'</div>'
+        +   '<div class="ov-foot"><div class="ov-err" id="ovErr"></div><button class="btn-out" id="ovCancel">Cancel</button><button class="btn-primary" id="ovSave"><span>Save office</span></button></div>'
+        + '</aside>'
+
+        + '<div class="cf-scrim" id="cfScrim" hidden>'
+        +   '<div class="cf"><h3>Delete office?</h3><p id="cfText"></p>'
+        +     '<div class="cf-act"><button class="btn-out" id="cfCancel">Cancel</button><button class="btn-danger" id="cfDelete">Delete</button></div>'
+        +   '</div>'
+        + '</div>';
+    }
+
+    function officesMount(){
+      var body = document.getElementById('ofBody');
+      if(!sb){ if(body) body.innerHTML = errBox('Not connected to the database yet.'); return; }
+
+      var search = document.getElementById('ofSearch');
+      search.addEventListener('input', function(){ OF.q = search.value.trim().toLowerCase(); renderList(); });
+
+      document.getElementById('ofAdd').addEventListener('click', function(){ openForm(null); });
+      document.getElementById('ovClose').addEventListener('click', closeForm);
+      document.getElementById('ovCancel').addEventListener('click', closeForm);
+      document.getElementById('ovScrim').addEventListener('click', closeForm);
+      document.getElementById('ovSave').addEventListener('click', saveForm);
+      document.getElementById('cfCancel').addEventListener('click', closeConfirm);
+      document.getElementById('cfScrim').addEventListener('click', function(e){ if(e.target.id === 'cfScrim') closeConfirm(); });
+      document.addEventListener('keydown', escClose);
+
+      loadOffices();
+    }
+    function escClose(e){ if(e.key === 'Escape'){ closeForm(); closeConfirm(); } }
+
+    async function loadOffices(){
+      OF.loading = true;
+      var body = document.getElementById('ofBody');
+      if(body) body.innerHTML = '<div class="loading">Loading offices\u2026</div>';
+      try{
+        var res = await sb.from('offices').select('*').order('updated_at', { ascending:false });
+        if(res.error) throw res.error;
+        OF.all = res.data || [];
+        OF.loading = false;
+        renderSummary(); renderChips(); renderList();
+      }catch(e){
+        OF.loading = false;
+        if(body){
+          body.innerHTML = errBox(friendlyDbError(e));
+          var r = document.getElementById('ofRetry'); if(r) r.addEventListener('click', loadOffices);
+        }
+        renderSummary(); renderChips();
+      }
+    }
+
+    function renderSummary(){
+      var el = document.getElementById('ofSummary'); if(!el) return;
+      var total = OF.all.length;
+      var signed = OF.all.filter(function(o){ return o.stage === 'signed'; }).length;
+      var active = OF.all.filter(function(o){ return o.stage !== 'signed' && o.stage !== 'passed'; }).length;
+      el.innerHTML = stat('Total offices', total) + stat('Active pipeline', active) + stat('Signed', signed);
+    }
+    function stat(label, val){ return '<div class="st"><div class="st-v">'+val+'</div><div class="st-l">'+label+'</div></div>'; }
+
+    function renderChips(){
+      var el = document.getElementById('ofChips'); if(!el) return;
+      function count(id){ return id === 'all' ? OF.all.length : OF.all.filter(function(o){ return o.stage === id; }).length; }
+      var items = [{ id:'all', label:'All' }].concat(STAGES);
+      el.innerHTML = items.map(function(s){
+        var active = OF.stage === s.id;
+        var style = (active && s.id !== 'all') ? (' style="background-color:'+s.bg+';color:'+s.c+';border-color:transparent"') : '';
+        return '<button class="chip'+(active?' active':'')+'" data-stage="'+s.id+'"'+style+'>'+s.label+' <span class="ct">'+count(s.id)+'</span></button>';
+      }).join('');
+      Array.prototype.forEach.call(el.querySelectorAll('.chip'), function(b){
+        b.addEventListener('click', function(){ OF.stage = b.getAttribute('data-stage'); renderChips(); renderList(); });
+      });
+    }
+
+    function renderList(){
+      var body = document.getElementById('ofBody'); if(!body || OF.loading) return;
+      if(OF.all.length === 0){ body.innerHTML = emptyBox(); var b = document.getElementById('ofAddEmpty'); if(b) b.addEventListener('click', function(){ openForm(null); }); return; }
+      var rows = OF.all.filter(function(o){
+        if(OF.stage !== 'all' && o.stage !== OF.stage) return false;
+        if(OF.q){
+          var hay = ((o.name||'')+' '+(o.brand||'')+' '+(o.contact_name||'')+' '+(o.suburb||'')+' '+(o.contact_email||'')).toLowerCase();
+          if(hay.indexOf(OF.q) < 0) return false;
+        }
+        return true;
+      });
+      if(rows.length === 0){ body.innerHTML = '<div class="empty-sm">No offices match your search or filter.</div>'; return; }
+      var head = '<div class="of-head"><div>Office</div><div>Contact</div><div>Suburb</div><div>Stage</div><div>Follow-up</div><div></div></div>';
+      body.innerHTML = '<div class="of-table">' + head + rows.map(rowHTML).join('') + '</div>';
+      wireRows();
+    }
+
+    function rowHTML(o){
+      var sm = stageMeta(o.stage);
+      var sub = [o.brand, (o.agents ? o.agents + ' agents' : '')].filter(Boolean).map(esc).join(' \u00b7 ');
+      var contact = o.contact_name ? esc(o.contact_name) : '<span class="dim">\u2014</span>';
+      var cd = []; if(o.contact_email) cd.push(esc(o.contact_email)); if(o.contact_phone) cd.push(esc(o.contact_phone));
+      var follow = o.next_follow_up ? fmtDate(o.next_follow_up) : '<span class="dim">\u2014</span>';
+      var opts = STAGES.map(function(s){ return '<option value="'+s.id+'"'+(s.id===o.stage?' selected':'')+'>'+s.label+'</option>'; }).join('');
+      return ''
+        + '<div class="of-row" data-id="'+esc(o.id)+'">'
+        +   '<div class="c-name" data-edit><b>'+esc(o.name)+'</b>'+(sub ? '<span class="sub">'+sub+'</span>' : '')+'</div>'
+        +   '<div class="c-contact"><span class="cl">Contact</span>'+contact+(cd.length ? '<span class="dim2">'+cd.join(' \u00b7 ')+'</span>' : '')+'</div>'
+        +   '<div class="c-suburb"><span class="cl">Suburb</span>'+(o.suburb ? esc(o.suburb) : '<span class="dim">\u2014</span>')+'</div>'
+        +   '<div class="c-stage"><span class="cl">Stage</span><select class="spill" data-stage-for="'+esc(o.id)+'" style="color:'+sm.c+';background-color:'+sm.bg+'">'+opts+'</select></div>'
+        +   '<div class="c-follow"><span class="cl">Follow-up</span>'+follow+'</div>'
+        +   '<div class="c-act"><button class="ia" data-edit-id="'+esc(o.id)+'" title="Edit" aria-label="Edit">'+SVG_EDIT+'</button><button class="ia danger" data-del-id="'+esc(o.id)+'" title="Delete" aria-label="Delete">'+SVG_TRASH+'</button></div>'
+        + '</div>';
+    }
+
+    function wireRows(){
+      var body = document.getElementById('ofBody');
+      Array.prototype.forEach.call(body.querySelectorAll('select[data-stage-for]'), function(sel){
+        sel.addEventListener('change', function(){ changeStage(sel.getAttribute('data-stage-for'), sel.value, sel); });
+        sel.addEventListener('click', function(e){ e.stopPropagation(); });
+      });
+      Array.prototype.forEach.call(body.querySelectorAll('[data-edit-id]'), function(b){
+        b.addEventListener('click', function(e){ e.stopPropagation(); openForm(findOffice(b.getAttribute('data-edit-id'))); });
+      });
+      Array.prototype.forEach.call(body.querySelectorAll('[data-del-id]'), function(b){
+        b.addEventListener('click', function(e){ e.stopPropagation(); openConfirm(findOffice(b.getAttribute('data-del-id'))); });
+      });
+      Array.prototype.forEach.call(body.querySelectorAll('.c-name[data-edit]'), function(c){
+        c.addEventListener('click', function(){ var row = c.closest('.of-row'); openForm(findOffice(row.getAttribute('data-id'))); });
+      });
+    }
+    function findOffice(id){ return OF.all.filter(function(o){ return String(o.id) === String(id); })[0]; }
+
+    async function changeStage(id, stage, sel){
+      var sm = stageMeta(stage);
+      if(sel){ sel.style.color = sm.c; sel.style.backgroundColor = sm.bg; }
+      try{
+        var res = await sb.from('offices').update({ stage: stage }).eq('id', id).select().single();
+        if(res.error) throw res.error;
+        var o = findOffice(id); if(o){ o.stage = stage; if(res.data && res.data.updated_at) o.updated_at = res.data.updated_at; }
+        renderSummary(); renderChips();
+        toast('Stage updated');
+      }catch(e){ toast(friendlyShort(e), 'err'); loadOffices(); }
+    }
+
+    function openForm(o){
+      OF.editing = o || null;
+      document.getElementById('ovTitle').textContent = o ? 'Edit office' : 'Add office';
+      setVal('ofName', o && o.name); setVal('ofBrand', o && o.brand); setVal('ofSuburb', o && o.suburb);
+      setVal('ofAgents', o && o.agents); setVal('ofContactName', o && o.contact_name);
+      setVal('ofContactEmail', o && o.contact_email); setVal('ofContactPhone', o && o.contact_phone);
+      setVal('ofWebsite', o && o.website); setVal('ofFollow', o && (o.next_follow_up ? String(o.next_follow_up).slice(0,10) : '')); setVal('ofNotes', o && o.notes);
+      document.getElementById('ofStage').value = (o && o.stage) || 'lead';
+      document.getElementById('ofNameErr').textContent = '';
+      document.getElementById('ovErr').textContent = '';
+      showOverlay(true);
+      setTimeout(function(){ var n = document.getElementById('ofName'); if(n) n.focus(); }, 80);
+    }
+    function setVal(id, v){ var el = document.getElementById(id); if(el) el.value = (v === 0 ? '0' : (v || '')); }
+    function val(id){ var el = document.getElementById(id); return el ? el.value : ''; }
+
+    function showOverlay(on){
+      var ov = document.getElementById('ov'), sc = document.getElementById('ovScrim');
+      if(!ov || !sc) return;
+      if(on){ sc.hidden = false; ov.hidden = false; ov.setAttribute('aria-hidden','false'); requestAnimationFrame(function(){ sc.classList.add('show'); ov.classList.add('show'); }); }
+      else { sc.classList.remove('show'); ov.classList.remove('show'); ov.setAttribute('aria-hidden','true'); setTimeout(function(){ sc.hidden = true; ov.hidden = true; }, 230); }
+    }
+    function closeForm(){ showOverlay(false); }
+
+    async function saveForm(){
+      var name = (val('ofName') || '').trim();
+      document.getElementById('ofNameErr').textContent = '';
+      document.getElementById('ovErr').textContent = '';
+      if(!name){ document.getElementById('ofNameErr').textContent = 'Please enter the office name.'; var nm = document.getElementById('ofName'); if(nm) nm.focus(); return; }
+
+      var payload = {
+        name: name,
+        brand: nn(val('ofBrand')),
+        stage: val('ofStage') || 'lead',
+        suburb: nn(val('ofSuburb')),
+        agents: intOrNull(val('ofAgents')),
+        contact_name: nn(val('ofContactName')),
+        contact_email: nn(val('ofContactEmail')),
+        contact_phone: nn(val('ofContactPhone')),
+        website: nn(val('ofWebsite')),
+        next_follow_up: nn(val('ofFollow')),
+        notes: nn(val('ofNotes'))
+      };
+
+      var btn = document.getElementById('ovSave'), span = btn.querySelector('span');
+      var label = span ? span.textContent : '';
+      btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
+      try{
+        var res = OF.editing
+          ? await sb.from('offices').update(payload).eq('id', OF.editing.id).select().single()
+          : await sb.from('offices').insert(payload).select().single();
+        if(res.error) throw res.error;
+        var wasEdit = !!OF.editing;
+        closeForm();
+        toast(wasEdit ? 'Office updated' : 'Office added');
+        await loadOffices();
+      }catch(e){
+        document.getElementById('ovErr').textContent = friendlyShort(e);
+      }finally{
+        btn.disabled = false; if(span) span.textContent = label || 'Save office';
+      }
+    }
+
+    function openConfirm(o){
+      if(!o) return;
+      OF.deleting = o;
+      document.getElementById('cfText').innerHTML = 'Delete <b>'+esc(o.name)+'</b>? This can\u2019t be undone.';
+      var sc = document.getElementById('cfScrim');
+      sc.hidden = false; requestAnimationFrame(function(){ sc.classList.add('show'); });
+      document.getElementById('cfDelete').onclick = function(){ doDelete(o); };
+    }
+    function closeConfirm(){ var sc = document.getElementById('cfScrim'); if(!sc) return; sc.classList.remove('show'); setTimeout(function(){ sc.hidden = true; }, 200); OF.deleting = null; }
+
+    async function doDelete(o){
+      var del = document.getElementById('cfDelete'); var t = del.textContent;
+      del.disabled = true; del.textContent = 'Deleting\u2026';
+      try{
+        var res = await sb.from('offices').delete().eq('id', o.id);
+        if(res.error) throw res.error;
+        closeConfirm(); toast('Office deleted'); await loadOffices();
+      }catch(e){ toast(friendlyShort(e), 'err'); }
+      finally{ del.disabled = false; del.textContent = t || 'Delete'; }
+    }
+
+    function emptyBox(){
+      return '<div class="empty"><span class="ptile">'+ic('building')+'</span>'
+        + '<h2 class="display">No offices yet</h2>'
+        + '<p>Add your first agency to start building your pipeline. Everything you add is saved straight to your database.</p>'
+        + '<button class="btn-primary" id="ofAddEmpty">'+ic('plus')+'<span>Add your first office</span></button></div>';
+    }
+    function errBox(msg){
+      return '<div class="err-box"><div class="eb-ic">'+SVG_WARN+'</div><div class="eb-tx">'+msg+'</div><button class="btn-out" id="ofRetry">Try again</button></div>';
+    }
+
+    /* small helpers */
+    function nn(s){ s = (s == null ? '' : String(s)).trim(); return s === '' ? null : s; }
+    function intOrNull(s){ s = (s == null ? '' : String(s)).trim(); if(s === '') return null; var n = parseInt(s, 10); return isNaN(n) ? null : n; }
+    function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); }
+    function fmtDate(d){ try{ var p = String(d).slice(0,10).split('-'); var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return (+p[2]) + ' ' + mo[(+p[1]) - 1] + ' ' + p[0]; }catch(e){ return esc(d); } }
+    function toast(msg, kind){
+      var t = document.getElementById('le-toast');
+      if(!t){ t = document.createElement('div'); t.id = 'le-toast'; document.body.appendChild(t); }
+      t.textContent = msg;
+      t.className = 'toast show' + (kind === 'err' ? ' err' : '');
+      clearTimeout(toast._t); toast._t = setTimeout(function(){ t.className = 'toast' + (kind === 'err' ? ' err' : ''); }, 2600);
+    }
+    function friendlyDbError(e){
+      var m = ((e && (e.message || e.hint || e.details)) || '').toLowerCase(); var code = e && e.code;
+      if(code === '42P01' || code === 'PGRST205' || m.indexOf('does not exist') >= 0 || m.indexOf('could not find the table') >= 0 || m.indexOf('schema cache') >= 0)
+        return 'The <b>offices</b> table isn\u2019t set up yet. Run the one-time setup SQL (offices-setup.sql) in your Supabase SQL editor, then press Try again.';
+      if(code === '42501' || m.indexOf('row-level security') >= 0 || m.indexOf('permission') >= 0)
+        return 'Your database blocked that request. Make sure you ran the full setup SQL (it adds the access rule) and that you\u2019re signed in.';
+      return 'Couldn\u2019t reach the database. Please check your connection and press Try again.';
+    }
+    function friendlyShort(e){
+      var m = ((e && e.message) || '').toLowerCase();
+      if(m.indexOf('does not exist') >= 0 || m.indexOf('could not find the table') >= 0 || m.indexOf('schema cache') >= 0) return 'Database table isn\u2019t set up yet \u2014 run the setup SQL.';
+      if(m.indexOf('row-level security') >= 0 || m.indexOf('permission') >= 0) return 'The database blocked that request.';
+      return 'Something went wrong \u2014 please try again.';
+    }
 
     boot();
   })();
