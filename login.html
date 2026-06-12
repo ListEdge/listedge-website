@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ListEdge Admin — Sign in</title>
+<meta name="theme-color" content="#0A4630">
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --green:#0E5A3C; --green-dk:#0A4630; --green-deep:#063225; --citron:#C8F24A;
+    --bone:#F2EFE7; --ink:#16191A; --sub:#5C6760; --line:#E2DCCE; --card:#fff;
+  }
+  body{font-family:'Instrument Sans',system-ui,sans-serif;color:var(--ink);min-height:100vh;min-height:100dvh;
+    display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(620px 360px at 84% -8%,rgba(200,242,74,.16),transparent 60%),
+               linear-gradient(168deg,#0E5A3C 0%,#0A3F2B 58%,#06301F 100%);}
+  .display{font-family:'Bricolage Grotesque','Instrument Sans',sans-serif;letter-spacing:-.02em}
+  .card{width:100%;max-width:412px;background:var(--card);border-radius:22px;padding:38px 36px 28px;
+    box-shadow:0 44px 90px -30px rgba(0,0,0,.55);animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+  .brand .tile{width:38px;height:38px;border-radius:11px;background:var(--citron);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .brand .word{font-family:'Bricolage Grotesque';font-weight:800;font-size:22px;letter-spacing:-.02em}
+  .brand .word .e{color:var(--green)}
+  .eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+  h1{font-size:25px;font-weight:700;margin-bottom:7px}
+  .sub{color:var(--sub);font-size:14.5px;margin-bottom:24px;line-height:1.5}
+  label{display:block;font-size:13px;font-weight:600;margin:0 0 7px 2px;color:#33403a}
+  .field{margin-bottom:15px;position:relative}
+  input{width:100%;font-family:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--line);
+    border-radius:12px;padding:13px 15px;outline:none;transition:border-color .15s,box-shadow .15s}
+  input::placeholder{color:#9aa39d}
+  input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(14,90,60,.12)}
+  .pw-toggle{position:absolute;right:7px;top:32px;background:none;border:none;color:var(--sub);font-size:12.5px;
+    font-weight:600;cursor:pointer;padding:7px 9px;border-radius:8px}
+  .pw-toggle:hover{color:var(--green);background:#F0F3F0}
+  .btn{width:100%;font-family:inherit;font-weight:600;font-size:15.5px;border:none;border-radius:12px;padding:14px;
+    cursor:pointer;background:var(--citron);color:var(--ink);transition:transform .15s,box-shadow .15s,opacity .15s;margin-top:6px}
+  .btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 12px 28px -10px rgba(200,242,74,.6)}
+  .btn:disabled{opacity:.6;cursor:default}
+  .msg{min-height:20px;margin-top:14px;font-size:13.5px;font-weight:500;line-height:1.45}
+  .msg.err{color:#B42318}
+  .msg.ok{color:var(--green)}
+  .foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;color:#8a948d;font-size:12.5px}
+  .foot svg{color:var(--green);flex-shrink:0}
+  :focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  @media(prefers-reduced-motion:reduce){.card{animation:none}.btn{transition:none}}
+</style>
+</head>
+<body>
+  <main class="card" role="main">
+    <div class="brand">
+      <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span>
+      <span class="word">List<span class="e">Edge</span></span>
+    </div>
+    <div class="eyebrow">Admin</div>
+    <h1 class="display">Sign in to continue.</h1>
+    <p class="sub">The internal operating system for ListEdge. Authorised access only.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" inputmode="email" placeholder="you@listedge.co.nz" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">Show</button>
+      </div>
+      <button class="btn" type="submit" id="submitBtn">Sign in</button>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    </form>
+
+    <div class="foot">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+      Secure admin access · ListEdge
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/admin/supabase-config.js"></script>
+  <script>
+  (function(){
+    var cfg   = window.LISTEDGE_SUPABASE || {};
+    var msg   = document.getElementById('msg');
+    var form  = document.getElementById('loginForm');
+    var btn   = document.getElementById('submitBtn');
+    var email = document.getElementById('email');
+    var pass  = document.getElementById('password');
+
+    // show / hide password
+    var tog = document.getElementById('pwToggle');
+    tog.addEventListener('click', function(){
+      var show = pass.type === 'password';
+      pass.type = show ? 'text' : 'password';
+      tog.textContent = show ? 'Hide' : 'Show';
+      tog.setAttribute('aria-label', (show ? 'Hide' : 'Show') + ' password');
+      pass.focus();
+    });
+
+    function configured(){
+      return cfg.url && cfg.anonKey &&
+             cfg.url.indexOf('YOUR-PROJECT') === -1 &&
+             cfg.anonKey.indexOf('YOUR-') === -1;
+    }
+
+    // Not connected to Supabase yet — guide instead of failing silently.
+    if(!window.supabase || !configured()){
+      msg.className = 'msg err';
+      msg.textContent = 'Not connected yet — add your Supabase Project URL and key in assets/admin/supabase-config.js.';
+      btn.disabled = true;
+      return;
+    }
+
+    var sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+
+    // Already signed in? Skip straight to the dashboard.
+    sb.auth.getSession().then(function(r){
+      if(r && r.data && r.data.session){ location.replace('admin.html'); }
+    }).catch(function(){});
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      var em = (email.value || '').trim();
+      var pw = pass.value || '';
+      if(!em || !pw){ msg.className = 'msg err'; msg.textContent = 'Please enter your email and password.'; return; }
+
+      var label = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      msg.className = 'msg'; msg.textContent = '';
+
+      try{
+        var res = await sb.auth.signInWithPassword({ email: em, password: pw });
+        if(res.error){
+          msg.className = 'msg err';
+          msg.textContent = friendly(res.error.message);
+          btn.disabled = false; btn.textContent = label; pass.focus();
+          return;
+        }
+        msg.className = 'msg ok';
+        msg.textContent = 'Welcome back — taking you in…';
+        location.replace('admin.html');
+      }catch(err){
+        msg.className = 'msg err';
+        msg.textContent = 'Could not connect. Please check your internet and try again.';
+        btn.disabled = false; btn.textContent = label;
+      }
+    });
+
+    function friendly(m){
+      m = (m || '').toLowerCase();
+      if(m.indexOf('invalid login') >= 0 || m.indexOf('credentials') >= 0) return 'Incorrect email or password.';
+      if(m.indexOf('email not confirmed') >= 0) return 'This account isn’t confirmed yet — confirm it in Supabase, then try again.';
+      if(m.indexOf('email logins are disabled') >= 0) return 'Email sign-in is turned off in Supabase. Enable the Email provider and try again.';
+      return 'Sign in failed. Please try again.';
+    }
+  })();
+  </script>
+</body>
+</html>

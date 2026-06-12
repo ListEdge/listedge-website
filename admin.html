@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ListEdge Admin</title>
+<meta name="theme-color" content="#0A4630">
+<link rel="icon" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --green:#0E5A3C; --green-dk:#0A4630; --green-deep:#063225; --citron:#C8F24A;
+    --bone:#F2EFE7; --bone-2:#ECE8DD; --ink:#16191A; --sub:#5C6760; --sage:#A6C0B1;
+    --line:#E2DCCE; --card:#FFFFFF; --muted:#9aa39d;
+  }
+  body{font-family:'Instrument Sans',system-ui,sans-serif;color:var(--ink);background:var(--bone);-webkit-font-smoothing:antialiased}
+  .display{font-family:'Bricolage Grotesque','Instrument Sans',sans-serif;letter-spacing:-.02em}
+  a{text-decoration:none;color:inherit}
+  [hidden]{display:none!important}
+  :focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:8px}
+
+  /* ---- loading splash ---- */
+  .splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    background:linear-gradient(180deg,#0A4630,#063225);color:#fff}
+  .splash .lk{display:flex;align-items:center;gap:11px}
+  .splash .tile{width:34px;height:34px;border-radius:10px;background:var(--citron);display:flex;align-items:center;justify-content:center}
+  .splash .word{font-family:'Bricolage Grotesque';font-weight:800;font-size:20px}
+  .splash .word .e{color:var(--citron)}
+  .splash .ld{font-size:12.5px;color:#A9C3B5;letter-spacing:.04em}
+
+  /* ---- app shell ---- */
+  .app{min-height:100vh;min-height:100dvh}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:248px;z-index:50;display:flex;flex-direction:column;padding:18px 14px;
+    background:linear-gradient(185deg,#0A4630 0%,#073525 100%);color:#fff}
+  .side-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 2px;margin-bottom:20px}
+  .side-brand .tile{width:32px;height:32px;border-radius:9px;background:var(--citron);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .side-brand .word{font-family:'Bricolage Grotesque';font-weight:800;font-size:19px;color:#fff;letter-spacing:-.02em}
+  .side-brand .word .e{color:var(--citron)}
+  .side-lab{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#6f897b;padding:0 10px 8px}
+  .nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto}
+  .navitem{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:#A9C3B5;font-size:14px;font-weight:500;
+    transition:background .14s ease,color .14s ease;cursor:pointer}
+  .navitem svg{width:18px;height:18px;flex-shrink:0;opacity:.85}
+  .navitem:hover{background:rgba(255,255,255,.07);color:#fff}
+  .navitem.active{background:rgba(200,242,74,.15);color:var(--citron);font-weight:600}
+  .navitem.active svg{opacity:1}
+  .side-foot{margin-top:8px;padding:13px 12px 4px;border-top:1px solid rgba(255,255,255,.08);
+    color:#6f897b;font-size:11.5px;font-weight:600;letter-spacing:.04em;display:flex;align-items:center;gap:7px}
+  .side-foot .dot{width:6px;height:6px;border-radius:50%;background:var(--citron)}
+
+  /* ---- main column ---- */
+  .main{margin-left:248px;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:0 24px;height:64px;
+    background:rgba(242,239,231,.86);backdrop-filter:saturate(140%) blur(10px);-webkit-backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid var(--line)}
+  .icon-btn{background:#fff;border:1px solid var(--line);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+  .icon-btn:hover{box-shadow:0 4px 12px -8px rgba(0,0,0,.4)}
+  .menu{display:none}
+  .page-title{font-size:21px;font-weight:700;letter-spacing:-.02em}
+  .spacer{flex:1}
+
+  .profile{position:relative}
+  .profile-btn{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px 5px 6px;cursor:pointer;color:var(--ink)}
+  .profile-btn:hover{box-shadow:0 4px 14px -8px rgba(0,0,0,.35)}
+  .profile-btn .chev{color:var(--sub)}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--green);color:var(--citron);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+  .pinfo{line-height:1.15;text-align:left}
+  .pinfo b{display:block;font-size:13px;font-weight:600}
+  .pinfo span{display:block;font-size:11.5px;color:var(--sub);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pop{position:absolute;right:0;top:52px;background:#fff;border:1px solid var(--line);border-radius:14px;min-width:236px;padding:8px;
+    box-shadow:0 22px 48px -16px rgba(0,0,0,.34);z-index:40;animation:rise .14s both}
+  @keyframes rise{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .pop[hidden]{display:none}
+  .pop-head{padding:9px 11px 11px;font-size:12px;color:var(--sub);border-bottom:1px solid var(--line);margin-bottom:6px;line-height:1.5}
+  .pop-head b{color:var(--ink);font-size:13px;word-break:break-all}
+  .pop-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;font-family:inherit;font-size:13.5px;color:var(--ink);padding:10px 11px;border-radius:9px;cursor:pointer}
+  .pop-item:hover{background:#F0F3F0}
+  .pop-item svg{width:16px;height:16px;color:var(--sub)}
+  .pop-item.danger{color:#B42318}
+  .pop-item.danger svg{color:#B42318}
+
+  /* ---- content ---- */
+  .content{padding:26px 24px 44px;max-width:1320px;width:100%}
+  .view-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+  .vh-sub{color:var(--sub);font-size:14.5px}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--green);background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--citron)}
+
+  /* metric cards */
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:16px;margin-bottom:22px}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;transition:transform .18s ease,box-shadow .18s ease}
+  .metric:hover{transform:translateY(-2px);box-shadow:0 16px 34px -20px rgba(20,30,24,.3)}
+  .metric .mtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+  .metric .mlabel{font-size:12.5px;font-weight:600;color:var(--sub)}
+  .metric .mtile{width:34px;height:34px;border-radius:10px;background:#E7F0EA;color:var(--green);display:flex;align-items:center;justify-content:center}
+  .metric .mtile svg{width:18px;height:18px}
+  .metric .mval{font-family:'Bricolage Grotesque';font-weight:700;font-size:34px;letter-spacing:-.02em;line-height:1}
+  .metric .mdelta{margin-top:9px;font-size:12.5px;font-weight:500;color:var(--sub);display:flex;align-items:center;gap:5px}
+  .metric .mdelta.up{color:var(--green)}
+  .metric .mdelta.warn{color:#9A6A00}
+  .metric .mdelta svg{width:13px;height:13px}
+
+  /* panels */
+  .panels{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:18px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .panel-head h2{font-family:'Bricolage Grotesque';font-weight:700;font-size:16px;letter-spacing:-.01em}
+  .panel-head .link{font-size:12.5px;font-weight:600;color:var(--green);cursor:pointer;opacity:.85}
+  .panel-head .link:hover{opacity:1}
+  .panel-body{padding:8px}
+
+  .row{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px}
+  .row:hover{background:#FAFBF8}
+  .row .ricon{width:34px;height:34px;border-radius:9px;background:#E7F0EA;color:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .row .ricon svg{width:17px;height:17px}
+  .row .rtext{flex:1;font-size:13.5px;color:var(--ink);line-height:1.4}
+  .row .rtext b{font-weight:600}
+  .row .rwhen{font-size:12px;color:var(--muted);white-space:nowrap}
+
+  .mrow{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px}
+  .mrow:hover{background:#FAFBF8}
+  .datebox{width:46px;text-align:center;background:#0A4630;color:#fff;border-radius:10px;padding:6px 0;flex-shrink:0}
+  .datebox .d{font-family:'Bricolage Grotesque';font-weight:700;font-size:17px;line-height:1}
+  .datebox .mo{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--citron);margin-top:2px}
+  .minfo{flex:1}
+  .minfo .nm{font-size:13.5px;font-weight:600}
+  .minfo .tm{font-size:12.5px;color:var(--sub);margin-top:1px}
+  .tag{font-size:11px;font-weight:600;color:var(--green);background:#E7F0EA;border-radius:999px;padding:4px 9px;white-space:nowrap}
+
+  .task{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;cursor:pointer}
+  .task:hover{background:#FAFBF8}
+  .box{width:20px;height:20px;border:2px solid #c9d2c8;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;transition:background .12s,border-color .12s}
+  .box svg{width:12px;height:12px;opacity:0}
+  .task.done .box{background:var(--green);border-color:var(--green)}
+  .task.done .box svg{opacity:1}
+  .task .tlabel{flex:1;font-size:13.5px;line-height:1.4}
+  .task.done .tlabel{color:var(--muted);text-decoration:line-through}
+  .due{font-size:11px;font-weight:600;color:var(--sub);background:var(--bone-2);border-radius:999px;padding:4px 9px;white-space:nowrap}
+  .due.today{color:#9A6A00;background:#FBF1D8}
+
+  .btn-out{font-family:inherit;font-weight:600;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:11px;padding:11px 18px;cursor:pointer}
+  .btn-out:hover{background:#FAFBF8}
+  .btn-out.danger{color:#B42318;border-color:#f0c8c2}
+  .btn-out.danger:hover{background:#fdf3f2}
+
+  /* placeholder module view */
+  .placeholder{min-height:58vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px}
+  .placeholder .ptile{width:64px;height:64px;border-radius:18px;background:#E7F0EA;color:var(--green);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+  .placeholder .ptile svg{width:30px;height:30px}
+  .placeholder h2{font-family:'Bricolage Grotesque';font-weight:700;font-size:26px;letter-spacing:-.02em;margin-bottom:10px}
+  .placeholder p{color:var(--sub);font-size:15px;max-width:44ch;margin-bottom:18px;line-height:1.6}
+  .pnote{font-size:12.5px;color:var(--muted)}
+
+  /* scrim (mobile drawer) */
+  .scrim{position:fixed;inset:0;background:rgba(6,30,20,.45);z-index:45;opacity:0;visibility:hidden;transition:opacity .2s}
+  .scrim.show{opacity:1;visibility:visible}
+
+  /* ---- responsive ---- */
+  @media(min-width:961px){ .scrim{display:none} }
+  @media(max-width:960px){
+    .sidebar{transform:translateX(-100%);transition:transform .25s ease;box-shadow:0 0 70px rgba(0,0,0,.45)}
+    .sidebar.open{transform:translateX(0)}
+    .main{margin-left:0}
+    .menu{display:flex}
+    .panels{grid-template-columns:1fr}
+  }
+  @media(max-width:560px){
+    .content{padding:18px 16px 36px}
+    .topbar{padding:0 14px;gap:10px}
+    .pinfo{display:none}
+    .metric .mval{font-size:30px}
+    .page-title{font-size:19px}
+  }
+  @media(prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+  <!-- shown until we confirm the user is signed in -->
+  <div class="splash" id="splash">
+    <div class="lk"><span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span><span class="word">List<span class="e">Edge</span></span></div>
+    <div class="ld">Loading your dashboard…</div>
+  </div>
+
+  <div class="app" id="app" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <span class="tile"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#16191A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span>
+        <span class="word">List<span class="e">Edge</span></span>
+      </div>
+      <div class="side-lab">Admin</div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-foot"><span class="dot"></span> Phase 1 · v0.1</div>
+    </aside>
+
+    <div class="scrim" id="scrim"></div>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn menu" id="menuBtn" aria-label="Open menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="page-title display" id="pageTitle">Dashboard</div>
+        <div class="spacer"></div>
+        <div class="profile" id="profile">
+          <button class="profile-btn" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+            <span class="avatar" id="avatar">A</span>
+            <span class="pinfo"><b>Admin</b><span id="pemail">—</span></span>
+            <span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+          </button>
+          <div class="pop" id="pop" hidden role="menu">
+            <div class="pop-head">Signed in as<br><b id="pemail2">—</b></div>
+            <a class="pop-item" href="#/settings" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</a>
+            <button class="pop-item danger" id="logoutBtn" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg> Log out</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="content" id="view"></main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/admin/supabase-config.js"></script>
+  <script>
+  (function(){
+    "use strict";
+
+    /* =========================================================
+       ICONS — small inline SVGs used across the dashboard.
+       ========================================================= */
+    var P = {
+      grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+      building:'<path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M19 21v-9a1 1 0 0 0-1-1h-3"/><path d="M9 7h2M9 11h2M9 15h2"/>',
+      calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+      file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="m9.5 14.5 2 2 3.5-4"/>',
+      bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+      note:'<path d="M15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9z"/><path d="M15 3v6h6"/><path d="M8 13h6M8 17h4"/>',
+      star:'<path d="M12 2.5l2.9 6.1 6.6.6-5 4.4 1.5 6.4L12 17.1 6 20.5l1.5-6.4-5-4.4 6.6-.6z"/>',
+      gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+      check:'<path d="M20 6 9 17l-5-5"/>',
+      plus:'<path d="M12 5v14M5 12h14"/>',
+      up:'<path d="M7 17 17 7M9 7h8v8"/>'
+    };
+    function ic(name){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(P[name]||'')+'</svg>'; }
+
+    /* =========================================================
+       MODULES — the heart of the framework.
+       Each entry becomes a sidebar item + a route (#/<id>) + a view.
+       TO ADD A FUTURE MODULE: add an icon to P above (if needed),
+       then add one line here with a render() function. The sidebar,
+       routing, active states and page title all update automatically.
+       ========================================================= */
+    var MODULES = [
+      { id:'dashboard', label:'Dashboard',        icon:'grid',     title:'Dashboard',        render: renderDashboard },
+      { id:'offices',   label:'Offices',          icon:'building', title:'Offices',          render: ph('Offices','building','Manage every member and prospect office in one place — pipeline stage, key contacts and full history.') },
+      { id:'meetings',  label:'Meetings',         icon:'calendar', title:'Meetings',         render: ph('Meetings','calendar','Schedule and track demos, intro calls, follow-ups and check-ins across all your offices.') },
+      { id:'eois',      label:'EOIs',             icon:'file',     title:'EOIs',             render: ph('EOIs','file','Capture and manage expressions of interest from offices considering ListEdge.') },
+      { id:'followups', label:'Follow Ups',       icon:'bell',     title:'Follow Ups',       render: ph('Follow Ups','bell','Never miss a touchpoint — tasks and reminders tied to each office and conversation.') },
+      { id:'notes',     label:'Notes',            icon:'note',     title:'Notes',            render: ph('Notes','note','Shared notes and context on every office, contact and conversation.') },
+      { id:'founding',  label:'Founding Offices', icon:'star',     title:'Founding Offices', render: ph('Founding Offices','star','Track your founding cohort from first contact through to signed and onboarded.') },
+      { id:'settings',  label:'Settings',         icon:'gear',     title:'Settings',         render: renderSettings }
+    ];
+
+    /* =========================================================
+       PLACEHOLDER DATA (sample only — nothing is saved yet)
+       ========================================================= */
+    var METRICS = [
+      { label:'Offices',     value:'14', delta:'+3 this month',           cls:'up',   icon:'building' },
+      { label:'Meetings',    value:'27', delta:'6 scheduled this week',   cls:'',     icon:'calendar' },
+      { label:'EOIs',        value:'9',  delta:'Expressions of interest', cls:'',     icon:'file' },
+      { label:'Follow-ups',  value:'12', delta:'4 due today',             cls:'warn', icon:'bell' }
+    ];
+    var ACTIVITY = [
+      { icon:'building', t:'Harcourts Grenadier moved to <b>Meeting booked</b>',  when:'2h ago' },
+      { icon:'file',     t:'EOI received from <b>Ray White Papanui</b>',          when:'5h ago' },
+      { icon:'check',    t:'Follow-up completed — <b>Bayleys Christchurch</b>',   when:'Yesterday' },
+      { icon:'note',     t:'Note added to <b>Tall Poppy Christchurch</b>',        when:'Yesterday' },
+      { icon:'plus',     t:'New office added — <b>Harcourts Gold</b>',            when:'2 days ago' }
+    ];
+    var MEETINGS = [
+      { d:'17', mo:'Jun', nm:'Harcourts Gold · Riccarton', tm:'2:00 PM', tag:'Demo' },
+      { d:'18', mo:'Jun', nm:'Ray White Ferrymead',        tm:'10:30 AM', tag:'Follow-up' },
+      { d:'19', mo:'Jun', nm:'Mike Pero · Christchurch',    tm:'1:00 PM',  tag:'Intro call' },
+      { d:'20', mo:'Jun', nm:'Bayleys Christchurch',        tm:'9:30 AM',  tag:'Pricing' }
+    ];
+    var TASKS = [
+      { t:'Send founding-office pack to Mike Pero Christchurch', due:'Today',     today:true,  done:false },
+      { t:'Follow up with Tall Poppy after demo',               due:'Today',     today:true,  done:false },
+      { t:'Prepare pricing summary — Harcourts Grenadier',      due:'Tomorrow',  today:false, done:false },
+      { t:'Confirm meeting time with Ray White Ferrymead',      due:'This week', today:false, done:true }
+    ];
+
+    /* =========================================================
+       VIEWS
+       ========================================================= */
+    function renderDashboard(){
+      var metrics = METRICS.map(function(m){
+        return '<div class="metric"><div class="mtop"><span class="mlabel">'+m.label+'</span>'
+          +'<span class="mtile">'+ic(m.icon)+'</span></div>'
+          +'<div class="mval">'+m.value+'</div>'
+          +'<div class="mdelta '+m.cls+'">'+(m.cls==='up'?ic('up'):'')+m.delta+'</div></div>';
+      }).join('');
+
+      var activity = ACTIVITY.map(function(a){
+        return '<div class="row"><span class="ricon">'+ic(a.icon)+'</span>'
+          +'<span class="rtext">'+a.t+'</span><span class="rwhen">'+a.when+'</span></div>';
+      }).join('');
+
+      var meetings = MEETINGS.map(function(m){
+        return '<div class="mrow"><span class="datebox"><span class="d">'+m.d+'</span><span class="mo">'+m.mo+'</span></span>'
+          +'<span class="minfo"><span class="nm">'+m.nm+'</span><span class="tm">'+m.tm+'</span></span>'
+          +'<span class="tag">'+m.tag+'</span></div>';
+      }).join('');
+
+      var tasks = TASKS.map(function(t,i){
+        return '<div class="task'+(t.done?' done':'')+'" data-task="'+i+'"><span class="box">'+ic('check')+'</span>'
+          +'<span class="tlabel">'+t.t+'</span><span class="due'+(t.today?' today':'')+'">'+t.due+'</span></div>';
+      }).join('');
+
+      return ''
+        + '<div class="view-head"><div class="vh-sub">Here\u2019s what\u2019s happening across ListEdge today.</div>'
+        + '<span class="pill"><span class="dot"></span> Sample data · Phase 1</span></div>'
+        + '<div class="metrics">'+metrics+'</div>'
+        + '<div class="panels">'
+        +   '<div class="panel"><div class="panel-head"><h2>Recent Activity</h2><span class="link">View all</span></div><div class="panel-body">'+activity+'</div></div>'
+        +   '<div class="col">'
+        +     '<div class="panel"><div class="panel-head"><h2>Upcoming Meetings</h2><span class="link">Calendar</span></div><div class="panel-body">'+meetings+'</div></div>'
+        +     '<div class="panel"><div class="panel-head"><h2>Tasks</h2><span class="link">All tasks</span></div><div class="panel-body">'+tasks+'</div></div>'
+        +   '</div>'
+        + '</div>';
+    }
+
+    function ph(name, icon, desc){
+      return function(){
+        return '<div class="placeholder"><span class="ptile">'+ic(icon)+'</span>'
+          +'<h2 class="display">'+name+'</h2><p>'+desc+'</p>'
+          +'<span class="pill"><span class="dot"></span> Module coming soon</span>'
+          +'<div class="pnote" style="margin-top:16px">This connects to live data in the next phase.</div></div>';
+      };
+    }
+
+    function renderSettings(){
+      return ''
+        + '<div class="view-head"><div class="vh-sub">Manage your admin account.</div></div>'
+        + '<div class="panel" style="max-width:560px"><div class="panel-head"><h2>Account</h2></div>'
+        +   '<div style="padding:18px">'
+        +     '<div style="display:flex;align-items:center;gap:13px;margin-bottom:18px">'
+        +       '<span class="avatar" style="width:46px;height:46px;font-size:18px">'+(STATE.initial)+'</span>'
+        +       '<div><div style="font-weight:600;font-size:15px">ListEdge Admin</div>'
+        +       '<div style="color:var(--sub);font-size:13.5px;word-break:break-all">'+(STATE.email||'\u2014')+'</div></div>'
+        +     '</div>'
+        +     '<button class="btn-out danger" id="setLogout">Log out</button>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="pnote" style="margin-top:18px">Team access, billing and platform configuration will appear here in a future phase.</div>';
+    }
+
+    /* =========================================================
+       AUTH + APP WIRING
+       ========================================================= */
+    var cfg    = window.LISTEDGE_SUPABASE || {};
+    var splash = document.getElementById('splash');
+    var app    = document.getElementById('app');
+    var sb, STATE = { email:'', initial:'A' };
+
+    function configured(){
+      return cfg.url && cfg.anonKey &&
+             cfg.url.indexOf('YOUR-PROJECT') === -1 &&
+             cfg.anonKey.indexOf('YOUR-') === -1;
+    }
+    function gotoLogin(){ location.replace('login.html'); }
+
+    async function boot(){
+      if(!window.supabase || !configured()){ gotoLogin(); return; }
+      try{ sb = window.supabase.createClient(cfg.url, cfg.anonKey); }
+      catch(e){ gotoLogin(); return; }
+
+      var session = null;
+      try{ var r = await sb.auth.getSession(); session = (r && r.data) ? r.data.session : null; }
+      catch(e){ session = null; }
+
+      if(!session){ gotoLogin(); return; }   // protected: no session -> login
+
+      setProfile(session.user);
+      buildNav();
+      wire();
+      splash.hidden = true;
+      app.hidden = false;
+      route();
+
+      // if the session ends anywhere, return to login
+      sb.auth.onAuthStateChange(function(evt, sess){
+        if(evt === 'SIGNED_OUT' || !sess){ gotoLogin(); }
+      });
+    }
+
+    function setProfile(user){
+      var email = (user && user.email) ? user.email : 'admin';
+      STATE.email = email;
+      STATE.initial = (email.charAt(0) || 'A').toUpperCase();
+      document.getElementById('pemail').textContent = email;
+      document.getElementById('pemail2').textContent = email;
+      document.getElementById('avatar').textContent = STATE.initial;
+    }
+
+    function buildNav(){
+      document.getElementById('nav').innerHTML = MODULES.map(function(m){
+        return '<a class="navitem" href="#/'+m.id+'" data-id="'+m.id+'">'+ic(m.icon)+'<span>'+m.label+'</span></a>';
+      }).join('');
+    }
+
+    /* ---- routing ---- */
+    function currentId(){ var h = (location.hash || '').replace(/^#\/?/, ''); return h || 'dashboard'; }
+    function route(){
+      var id = currentId();
+      var m = MODULES.filter(function(x){ return x.id === id; })[0] || MODULES[0];
+      document.getElementById('pageTitle').textContent = m.title;
+      document.getElementById('view').innerHTML = m.render();
+      var items = document.querySelectorAll('.navitem');
+      for(var i=0;i<items.length;i++){ items[i].classList.toggle('active', items[i].getAttribute('data-id') === m.id); }
+      closeDrawer();
+      window.scrollTo(0,0);
+    }
+    window.addEventListener('hashchange', route);
+
+    /* ---- interactions ---- */
+    function wire(){
+      var pop = document.getElementById('pop');
+      var pbtn = document.getElementById('profileBtn');
+      function setPop(open){ pop.hidden = !open; pbtn.setAttribute('aria-expanded', open ? 'true':'false'); }
+      pbtn.addEventListener('click', function(e){ e.stopPropagation(); setPop(pop.hidden); });
+      document.addEventListener('click', function(e){ if(!pop.hidden && !pop.contains(e.target) && !pbtn.contains(e.target)) setPop(false); });
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ setPop(false); closeDrawer(); } });
+
+      document.getElementById('logoutBtn').addEventListener('click', logout);
+
+      // mobile drawer
+      document.getElementById('menuBtn').addEventListener('click', function(){ openDrawer(); });
+      document.getElementById('scrim').addEventListener('click', closeDrawer);
+
+      // delegated clicks inside the view (tasks toggle, settings logout)
+      document.getElementById('view').addEventListener('click', function(e){
+        var task = e.target.closest('.task');
+        if(task){ task.classList.toggle('done'); return; }
+        if(e.target.closest('#setLogout')){ logout(); }
+      });
+    }
+
+    async function logout(){
+      try{ if(sb) await sb.auth.signOut(); }catch(e){}
+      gotoLogin();
+    }
+
+    function openDrawer(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('scrim').classList.add('show'); }
+    function closeDrawer(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('scrim').classList.remove('show'); }
+
+    boot();
+  })();
+  </script>
+</body>
+</html>
