@@ -14,11 +14,11 @@ window.LISTEDGE_SUPABASE = {
 
   // 1) Supabase dashboard  →  Settings  →  API  →  "Project URL"
   //    Looks like:  https://abcdefghijklmnop.supabase.co
-  url: "https://YOUR-PROJECT-REF.supabase.co",
+  url: "https://szqtmvvxyoypbralobmk.supabase.co",
 
   // 2) Supabase dashboard  →  Settings  →  API Keys  →  "Publishable key"
   //    Looks like:  sb_publishable_xxxxxxxxxxxxxxxxxxxxx
   //    (Older projects show an "anon public" key starting with eyJ... — that works too.)
-  anonKey: "YOUR-PUBLISHABLE-OR-ANON-KEY"
+  anonKey: "sb_publishable_g0Az9muzYSzthynORNkRgQ_JXWyqZKP"
 
 };
