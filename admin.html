@@ -142,7 +142,8 @@
   .due{font-size:11px;font-weight:600;color:var(--sub);background:var(--bone-2);border-radius:999px;padding:4px 9px;white-space:nowrap}
   .due.today{color:#9A6A00;background:#FBF1D8}
 
-  .btn-out{font-family:inherit;font-weight:600;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:11px;padding:11px 18px;cursor:pointer}
+  .btn-out{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;font-weight:600;font-size:14px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:11px;padding:11px 18px;cursor:pointer}
+  .btn-out svg{width:17px;height:17px;flex-shrink:0}
   .btn-out:hover{background:#FAFBF8}
   .btn-out.danger{color:#B42318;border-color:#f0c8c2}
   .btn-out.danger:hover{background:#fdf3f2}
@@ -438,6 +439,30 @@
   .fld label.chkline input{width:17px;height:17px;accent-color:var(--green);cursor:pointer}
   .opt{font-weight:500;color:var(--muted);font-size:12px}
 </style>
+<style>
+  /* ===================== Settings ===================== */
+  .set-wrap{display:flex;flex-direction:column;gap:18px;max-width:620px}
+  .set-body{padding:18px}
+  .set-lead{font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 14px}
+  .set-acct{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+  .set-av{width:46px;height:46px;font-size:18px}
+  .set-acct-info{flex:1;min-width:120px}
+  .set-acct-name{font-weight:600;font-size:15px}
+  .set-acct-mail{color:var(--sub);font-size:13.5px;word-break:break-all}
+  .set-form{display:flex;flex-direction:column;gap:14px;max-width:380px}
+  .set-actions{display:flex;gap:10px;margin-top:2px}
+  .set-msg{font-size:13px;line-height:1.45;display:none;margin:2px 0 0}
+  .set-msg.ok{display:block;color:var(--green)}
+  .set-msg.err{display:block;color:#B42318}
+  .set-status{display:flex;flex-direction:column;gap:8px}
+  .set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#fff}
+  .set-row-main{min-width:0}
+  .set-row-name{font-size:13.5px;font-weight:600}
+  .set-row-sub{font-size:12px;color:var(--sub);margin-top:1px}
+  .set-about{display:flex;align-items:center;gap:13px}
+  .set-brand{width:42px;height:42px;border-radius:11px;background:var(--citron);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .set-brand svg{width:22px;height:22px;color:var(--green-deep)}
+</style>
 </head>
 <body>
   <!-- shown until we confirm the user is signed in -->
@@ -525,7 +550,7 @@
       { id:'followups', label:'Follow Ups',       icon:'bell',     title:'Follow Ups',       render: followupsView, mount: followupsMount },
       { id:'notes',     label:'Notes',            icon:'note',     title:'Notes',            render: notesView, mount: notesMount },
       { id:'founding',  label:'Founding Offices', icon:'star',     title:'Founding Offices', render: ph('Founding Offices','star','Track your founding cohort from first contact through to signed and onboarded.') },
-      { id:'settings',  label:'Settings',         icon:'gear',     title:'Settings',         render: renderSettings }
+      { id:'settings',  label:'Settings',         icon:'gear',     title:'Settings',         render: settingsView, mount: settingsMount }
     ];
 
     /* =========================================================
@@ -674,20 +699,166 @@
       };
     }
 
-    function renderSettings(){
+    function settingsView(){
       return ''
-        + '<div class="view-head"><div class="vh-sub">Manage your admin account.</div></div>'
-        + '<div class="panel" style="max-width:560px"><div class="panel-head"><h2>Account</h2></div>'
-        +   '<div style="padding:18px">'
-        +     '<div style="display:flex;align-items:center;gap:13px;margin-bottom:18px">'
-        +       '<span class="avatar" style="width:46px;height:46px;font-size:18px">'+(STATE.initial)+'</span>'
-        +       '<div><div style="font-weight:600;font-size:15px">ListEdge Admin</div>'
-        +       '<div style="color:var(--sub);font-size:13.5px;word-break:break-all">'+(STATE.email||'\u2014')+'</div></div>'
+        + '<div class="view-head"><div class="vh-sub">Your account, your data, and the health of your ListEdge workspace.</div></div>'
+        + '<div class="set-wrap">'
+
+        + '<div class="panel"><div class="panel-head"><h2>Account</h2></div>'
+        +   '<div class="set-body">'
+        +     '<div class="set-acct">'
+        +       '<span class="avatar set-av">'+esc(STATE.initial)+'</span>'
+        +       '<div class="set-acct-info"><div class="set-acct-name">ListEdge Admin</div><div class="set-acct-mail">'+esc(STATE.email||'\u2014')+'</div></div>'
+        +       '<button class="btn-out danger set-acct-out" id="setLogout">Log out</button>'
         +     '</div>'
-        +     '<button class="btn-out danger" id="setLogout">Log out</button>'
         +   '</div>'
         + '</div>'
-        + '<div class="pnote" style="margin-top:18px">Team access, billing and platform configuration will appear here in a future phase.</div>';
+
+        + '<div class="panel"><div class="panel-head"><h2>Change password</h2></div>'
+        +   '<div class="set-body">'
+        +     '<div class="set-form">'
+        +       '<div class="fld"><label for="setCur">Current password</label><input id="setCur" type="password" autocomplete="current-password" placeholder="Enter current password"></div>'
+        +       '<div class="fld"><label for="setNew">New password</label><input id="setNew" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>'
+        +       '<div class="fld"><label for="setNew2">Confirm new password</label><input id="setNew2" type="password" autocomplete="new-password" placeholder="Re-enter new password"></div>'
+        +       '<div class="set-msg" id="setPwMsg"></div>'
+        +       '<div class="set-actions"><button class="btn-primary" id="setPwSave"><span>Update password</span></button></div>'
+        +     '</div>'
+        +   '</div>'
+        + '</div>'
+
+        + '<div class="panel"><div class="panel-head"><h2>Setup status</h2><button class="link" id="setStatusRefresh" type="button">Refresh</button></div>'
+        +   '<div class="set-body">'
+        +     '<p class="set-lead">A quick check of which parts of your database are ready. If anything says \u201cNeeds setup\u201d, run that section\u2019s SQL file in your Supabase SQL editor.</p>'
+        +     '<div class="set-status" id="setStatus"><div class="hist-loading">Checking\u2026</div></div>'
+        +   '</div>'
+        + '</div>'
+
+        + '<div class="panel"><div class="panel-head"><h2>Data &amp; backup</h2></div>'
+        +   '<div class="set-body">'
+        +     '<p class="set-lead">Download a complete copy of your records \u2014 offices, meetings, EOIs, follow-ups and notes \u2014 as a single file you can keep somewhere safe.</p>'
+        +     '<div class="set-msg" id="setExpMsg"></div>'
+        +     '<div class="set-actions"><button class="btn-out" id="setExport">'+ic('download')+'<span>Download backup (JSON)</span></button></div>'
+        +     '<p class="fld-hint" style="margin-top:12px">Uploaded document files live separately in Supabase Storage; this backup lists them but doesn\u2019t include the PDFs themselves.</p>'
+        +   '</div>'
+        + '</div>'
+
+        + '<div class="panel"><div class="panel-head"><h2>About</h2></div>'
+        +   '<div class="set-body">'
+        +     '<div class="set-about">'
+        +       '<span class="set-brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/></svg></span>'
+        +       '<div><div class="set-acct-name">ListEdge Admin</div><div class="set-acct-mail">Phase 1 \u00b7 v0.1</div></div>'
+        +     '</div>'
+        +     '<p class="set-lead" style="margin-top:13px;margin-bottom:0">Your private control room for ListEdge \u2014 the offices in your pipeline, the meetings and EOIs that move them toward signing, and the documents and notes that keep everything in one place.</p>'
+        +   '</div>'
+        + '</div>'
+
+        + '</div>';
+    }
+
+    function settingsMount(){
+      var lo = document.getElementById('setLogout'); if(lo) lo.addEventListener('click', logout);
+      var pwBtn = document.getElementById('setPwSave'); if(pwBtn) pwBtn.addEventListener('click', changePassword);
+      var rf = document.getElementById('setStatusRefresh'); if(rf) rf.addEventListener('click', loadSetupStatus);
+      var ex = document.getElementById('setExport'); if(ex) ex.addEventListener('click', exportBackup);
+      loadSetupStatus();
+    }
+
+    async function changePassword(){
+      var cur = document.getElementById('setCur'), nw = document.getElementById('setNew'), nw2 = document.getElementById('setNew2');
+      var msg = document.getElementById('setPwMsg');
+      function fail(t){ msg.className = 'set-msg err'; msg.textContent = t; }
+      function good(t){ msg.className = 'set-msg ok'; msg.textContent = t; }
+      msg.className = 'set-msg'; msg.textContent = '';
+      var c = cur.value, n = nw.value, n2 = nw2.value;
+      if(!c || !n || !n2){ fail('Please fill in all three fields.'); return; }
+      if(n.length < 8){ fail('Your new password needs to be at least 8 characters.'); return; }
+      if(n !== n2){ fail('The new passwords don\u2019t match.'); return; }
+      if(n === c){ fail('Your new password is the same as your current one.'); return; }
+      if(!sb){ fail('Not connected to the database.'); return; }
+      var btn = document.getElementById('setPwSave'), span = btn.querySelector('span'); var lbl = span ? span.textContent : '';
+      btn.disabled = true; if(span) span.textContent = 'Updating\u2026';
+      try{
+        var reauth = await sb.auth.signInWithPassword({ email: STATE.email, password: c });
+        if(reauth.error){ fail('Your current password is incorrect.'); return; }
+        var up = await sb.auth.updateUser({ password: n });
+        if(up.error) throw up.error;
+        cur.value = ''; nw.value = ''; nw2.value = '';
+        good('Password updated. Use it next time you sign in.');
+        toast('Password updated');
+      }catch(e){
+        var m = ((e && e.message) || '').toLowerCase();
+        if(m.indexOf('at least') >= 0 || m.indexOf('weak') >= 0 || m.indexOf('characters') >= 0 || m.indexOf('should be') >= 0) fail('That password is too weak \u2014 try a longer one.');
+        else fail('Couldn\u2019t update your password. Please try again.');
+      }finally{ btn.disabled = false; if(span) span.textContent = lbl || 'Update password'; }
+    }
+
+    async function loadSetupStatus(){
+      var box = document.getElementById('setStatus'); if(!box) return;
+      box.innerHTML = '<div class="hist-loading">Checking\u2026</div>';
+      if(!sb){ box.innerHTML = '<p class="set-lead" style="margin:0">Not connected to the database.</p>'; return; }
+      var checks = [
+        { key:'offices',    label:'Offices',    file:'offices-setup.sql' },
+        { key:'meetings',   label:'Meetings',   file:'meetings-setup.sql' },
+        { key:'eois',       label:'EOIs',       file:'eois-setup.sql' },
+        { key:'follow_ups', label:'Follow-ups', file:'follow-ups-setup.sql' },
+        { key:'notes',      label:'Notes',      file:'notes-setup.sql' },
+        { key:'documents',  label:'Documents',  file:'documents-setup.sql' }
+      ];
+      var results = [];
+      for(var i = 0; i < checks.length; i++){
+        var c = checks[i];
+        try{
+          var res = await sb.from(c.key).select('id');
+          if(res.error) throw res.error;
+          results.push({ label:c.label, ok:true, count:(res.data || []).length, file:c.file });
+        }catch(e){
+          var m = ((e && (e.message || e.hint)) || '').toLowerCase(); var code = e && e.code;
+          var missing = (code === '42P01' || code === 'PGRST205' || m.indexOf('does not exist') >= 0 || m.indexOf('could not find the table') >= 0 || m.indexOf('schema cache') >= 0);
+          results.push({ label:c.label, ok:false, missing:missing, file:c.file });
+        }
+      }
+      try{
+        var st = await sb.storage.from('office-documents').list('', { limit:1 });
+        if(st.error) throw st.error;
+        results.push({ label:'Document storage', ok:true, storage:true, file:'documents-setup.sql' });
+      }catch(e){
+        results.push({ label:'Document storage', ok:false, storage:true, file:'documents-setup.sql' });
+      }
+      box.innerHTML = results.map(setupRow).join('');
+    }
+    function setupRow(r){
+      var pill = r.ok
+        ? '<span class="spill-static" style="color:#0E5A3C;background-color:#E7F0EA">Ready</span>'
+        : '<span class="spill-static" style="color:#9A6A00;background-color:#FBF1D8">Needs setup</span>';
+      var sub = r.ok
+        ? (r.storage ? 'Storage bucket connected' : ((r.count || 0) + ' record' + (r.count === 1 ? '' : 's')))
+        : ('Run ' + esc(r.file));
+      return '<div class="set-row"><div class="set-row-main"><div class="set-row-name">'+esc(r.label)+'</div><div class="set-row-sub">'+sub+'</div></div>'+pill+'</div>';
+    }
+
+    async function exportBackup(){
+      var msg = document.getElementById('setExpMsg'); var btn = document.getElementById('setExport'); var span = btn.querySelector('span'); var lbl = span ? span.textContent : '';
+      function good(t){ msg.className = 'set-msg ok'; msg.textContent = t; }
+      function fail(t){ msg.className = 'set-msg err'; msg.textContent = t; }
+      msg.className = 'set-msg'; msg.textContent = '';
+      if(!sb){ fail('Not connected to the database.'); return; }
+      btn.disabled = true; if(span) span.textContent = 'Preparing\u2026';
+      var tables = ['offices','meetings','eois','follow_ups','notes','documents']; var out = {};
+      try{
+        for(var i = 0; i < tables.length; i++){
+          try{ var res = await sb.from(tables[i]).select('*'); out[tables[i]] = (res.error ? [] : (res.data || [])); }
+          catch(e){ out[tables[i]] = []; }
+        }
+        var bundle = { app:'ListEdge Admin', version:'0.1', exported_at:new Date().toISOString(), account:(STATE.email || null), data:out };
+        var total = tables.reduce(function(n, t){ return n + (out[t] ? out[t].length : 0); }, 0);
+        var blob = new Blob([JSON.stringify(bundle, null, 2)], { type:'application/json' });
+        var url = URL.createObjectURL(blob); var a = document.createElement('a');
+        a.href = url; a.download = 'listedge-backup-' + todayStr() + '.json'; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+        good('Backup downloaded \u2014 ' + total + ' record' + (total === 1 ? '' : 's') + ' across ' + tables.length + ' tables.');
+        toast('Backup downloaded');
+      }catch(e){ fail('Couldn\u2019t prepare the backup. Please try again.'); }
+      finally{ btn.disabled = false; if(span) span.textContent = lbl || 'Download backup (JSON)'; }
     }
 
     /* =========================================================
@@ -773,11 +944,6 @@
       // mobile drawer
       document.getElementById('menuBtn').addEventListener('click', function(){ openDrawer(); });
       document.getElementById('scrim').addEventListener('click', closeDrawer);
-
-      // delegated clicks inside the view (settings logout)
-      document.getElementById('view').addEventListener('click', function(e){
-        if(e.target.closest('#setLogout')){ logout(); }
-      });
     }
 
     async function logout(){
