@@ -369,6 +369,16 @@
     .fu-row .c-act{position:absolute;top:13px;right:14px}
   }
 </style>
+<style>
+  /* ===================== Dashboard (live data) ===================== */
+  .skel{display:inline-block;height:30px;width:46px;border-radius:7px;background:linear-gradient(90deg,#ECE8DD 25%,#F5F2EA 50%,#ECE8DD 75%);background-size:200% 100%;animation:shimmer 1.2s infinite}
+  @keyframes shimmer{to{background-position:-200% 0}}
+  .panel-loading,.panel-empty{padding:20px 14px;color:var(--muted);font-size:13.5px;text-align:center}
+  .tmut{color:var(--muted);font-weight:400}
+  .due.over{color:#B42318;background:#FBEAE8}
+  .metric[data-goto]{transition:transform .18s ease,box-shadow .18s ease}
+  .panel-head a.link{text-decoration:none}
+</style>
 </head>
 <body>
   <!-- shown until we confirm the user is signed in -->
@@ -445,7 +455,7 @@
        routing, active states and page title all update automatically.
        ========================================================= */
     var MODULES = [
-      { id:'dashboard', label:'Dashboard',        icon:'grid',     title:'Dashboard',        render: renderDashboard },
+      { id:'dashboard', label:'Dashboard',        icon:'grid',     title:'Dashboard',        render: renderDashboard, mount: dashboardMount },
       { id:'offices',   label:'Offices',          icon:'building', title:'Offices',          render: officesView, mount: officesMount },
       { id:'meetings',  label:'Meetings',         icon:'calendar', title:'Meetings',         render: meetingsView, mount: meetingsMount },
       { id:'eois',      label:'EOIs',             icon:'file',     title:'EOIs',             render: ph('EOIs','file','Capture and manage expressions of interest from offices considering ListEdge.') },
@@ -456,72 +466,131 @@
     ];
 
     /* =========================================================
-       PLACEHOLDER DATA (sample only — nothing is saved yet)
-       ========================================================= */
-    var METRICS = [
-      { label:'Offices',     value:'14', delta:'+3 this month',           cls:'up',   icon:'building' },
-      { label:'Meetings',    value:'27', delta:'6 scheduled this week',   cls:'',     icon:'calendar' },
-      { label:'EOIs',        value:'9',  delta:'Expressions of interest', cls:'',     icon:'file' },
-      { label:'Follow-ups',  value:'12', delta:'4 due today',             cls:'warn', icon:'bell' }
-    ];
-    var ACTIVITY = [
-      { icon:'building', t:'Harcourts Grenadier moved to <b>Meeting booked</b>',  when:'2h ago' },
-      { icon:'file',     t:'EOI received from <b>Ray White Papanui</b>',          when:'5h ago' },
-      { icon:'check',    t:'Follow-up completed — <b>Bayleys Christchurch</b>',   when:'Yesterday' },
-      { icon:'note',     t:'Note added to <b>Tall Poppy Christchurch</b>',        when:'Yesterday' },
-      { icon:'plus',     t:'New office added — <b>Harcourts Gold</b>',            when:'2 days ago' }
-    ];
-    var MEETINGS = [
-      { d:'17', mo:'Jun', nm:'Harcourts Gold · Riccarton', tm:'2:00 PM', tag:'Demo' },
-      { d:'18', mo:'Jun', nm:'Ray White Ferrymead',        tm:'10:30 AM', tag:'Follow-up' },
-      { d:'19', mo:'Jun', nm:'Mike Pero · Christchurch',    tm:'1:00 PM',  tag:'Intro call' },
-      { d:'20', mo:'Jun', nm:'Bayleys Christchurch',        tm:'9:30 AM',  tag:'Pricing' }
-    ];
-    var TASKS = [
-      { t:'Send founding-office pack to Mike Pero Christchurch', due:'Today',     today:true,  done:false },
-      { t:'Follow up with Tall Poppy after demo',               due:'Today',     today:true,  done:false },
-      { t:'Prepare pricing summary — Harcourts Grenadier',      due:'Tomorrow',  today:false, done:false },
-      { t:'Confirm meeting time with Ray White Ferrymead',      due:'This week', today:false, done:true }
-    ];
-
-    /* =========================================================
        VIEWS
        ========================================================= */
+
+    /* ---- DASHBOARD — live data pulled from your modules ---- */
+    var DASH = {};
+
     function renderDashboard(){
-      var metrics = METRICS.map(function(m){
-        return '<div class="metric"><div class="mtop"><span class="mlabel">'+m.label+'</span>'
-          +'<span class="mtile">'+ic(m.icon)+'</span></div>'
-          +'<div class="mval">'+m.value+'</div>'
-          +'<div class="mdelta '+m.cls+'">'+(m.cls==='up'?ic('up'):'')+m.delta+'</div></div>';
-      }).join('');
-
-      var activity = ACTIVITY.map(function(a){
-        return '<div class="row"><span class="ricon">'+ic(a.icon)+'</span>'
-          +'<span class="rtext">'+a.t+'</span><span class="rwhen">'+a.when+'</span></div>';
-      }).join('');
-
-      var meetings = MEETINGS.map(function(m){
-        return '<div class="mrow"><span class="datebox"><span class="d">'+m.d+'</span><span class="mo">'+m.mo+'</span></span>'
-          +'<span class="minfo"><span class="nm">'+m.nm+'</span><span class="tm">'+m.tm+'</span></span>'
-          +'<span class="tag">'+m.tag+'</span></div>';
-      }).join('');
-
-      var tasks = TASKS.map(function(t,i){
-        return '<div class="task'+(t.done?' done':'')+'" data-task="'+i+'"><span class="box">'+ic('check')+'</span>'
-          +'<span class="tlabel">'+t.t+'</span><span class="due'+(t.today?' today':'')+'">'+t.due+'</span></div>';
-      }).join('');
-
       return ''
-        + '<div class="view-head"><div class="vh-sub">Here\u2019s what\u2019s happening across ListEdge today.</div>'
-        + '<span class="pill"><span class="dot"></span> Sample data · Phase 1</span></div>'
-        + '<div class="metrics">'+metrics+'</div>'
+        + '<div class="view-head"><div class="vh-sub">Here\u2019s what\u2019s happening across ListEdge.</div>'
+        +   '<span class="pill"><span class="dot"></span> Live data</span></div>'
+        + '<div class="metrics" id="dashMetrics">'+dashMetricSkeletons()+'</div>'
         + '<div class="panels">'
-        +   '<div class="panel"><div class="panel-head"><h2>Recent Activity</h2><span class="link">View all</span></div><div class="panel-body">'+activity+'</div></div>'
+        +   '<div class="panel"><div class="panel-head"><h2>Recent Activity</h2></div><div class="panel-body" id="dashActivity"><div class="panel-loading">Loading\u2026</div></div></div>'
         +   '<div class="col">'
-        +     '<div class="panel"><div class="panel-head"><h2>Upcoming Meetings</h2><span class="link">Calendar</span></div><div class="panel-body">'+meetings+'</div></div>'
-        +     '<div class="panel"><div class="panel-head"><h2>Tasks</h2><span class="link">All tasks</span></div><div class="panel-body">'+tasks+'</div></div>'
+        +     '<div class="panel"><div class="panel-head"><h2>Upcoming Meetings</h2><a class="link" href="#/meetings">View all</a></div><div class="panel-body" id="dashUpcoming"><div class="panel-loading">Loading\u2026</div></div></div>'
+        +     '<div class="panel"><div class="panel-head"><h2>Follow-ups due</h2><a class="link" href="#/followups">View all</a></div><div class="panel-body" id="dashFollows"><div class="panel-loading">Loading\u2026</div></div></div>'
         +   '</div>'
         + '</div>';
+    }
+    function dashMetricSkeletons(){
+      var L=[['Offices','building'],['Meetings','calendar'],['EOIs','file'],['Follow-ups','bell']];
+      return L.map(function(l){ return '<div class="metric"><div class="mtop"><span class="mlabel">'+l[0]+'</span><span class="mtile">'+ic(l[1])+'</span></div><div class="mval"><span class="skel"></span></div><div class="mdelta">&nbsp;</div></div>'; }).join('');
+    }
+
+    function dashboardMount(){ loadDashboard(false); }
+
+    async function safeRows(t){
+      try{ var r = await sb.from(t).select('*'); if(r.error) return null; return r.data || []; }
+      catch(e){ return null; }
+    }
+
+    async function loadDashboard(silent){
+      if(!sb){ var v=document.getElementById('dashMetrics'); if(v) v.innerHTML=''; return; }
+      var O = await safeRows('offices');
+      var M = await safeRows('meetings');
+      var F = await safeRows('follow_ups');
+      DASH = { offices:O, meetings:M, follows:F, byId: buildOfficeMap(O) };
+      renderDashMetrics(); renderDashActivity(); renderDashUpcoming(); renderDashFollows();
+    }
+    function buildOfficeMap(O){ var m={}; (O||[]).forEach(function(o){ m[o.id]=o; }); return m; }
+
+    function renderDashMetrics(){
+      var el=document.getElementById('dashMetrics'); if(!el) return;
+      var O=DASH.offices, M=DASH.meetings, F=DASH.follows;
+      var oVal = O ? O.length : '\u2014';
+      var oDelta = O ? (O.filter(function(o){ return o.stage!=='signed' && o.stage!=='passed'; }).length+' in pipeline') : 'Run setup SQL';
+      var mVal = M ? M.length : '\u2014';
+      var mDelta = M ? (M.filter(isUpcomingMeeting).length+' upcoming') : 'Run setup SQL';
+      var fVal = F ? F.length : '\u2014';
+      var overdue = F ? F.filter(function(f){ return fuEff(f)==='overdue'; }).length : 0;
+      var open = F ? F.filter(function(f){ return f.status!=='completed'; }).length : 0;
+      var fDelta = F ? (overdue>0 ? overdue+' overdue' : open+' open') : 'Run setup SQL';
+      el.innerHTML =
+          dashCard('Offices','building', oVal, oDelta, '', 'offices')
+        + dashCard('Meetings','calendar', mVal, mDelta, '', 'meetings')
+        + dashCard('EOIs','file', '\u2014', 'Module coming soon', '', null)
+        + dashCard('Follow-ups','bell', fVal, fDelta, (overdue>0?'warn':''), 'followups');
+      Array.prototype.forEach.call(el.querySelectorAll('[data-goto]'), function(c){ c.addEventListener('click', function(){ location.hash='#/'+c.getAttribute('data-goto'); }); });
+    }
+    function dashCard(label,icon,val,delta,cls,goto){
+      var go = goto ? ' data-goto="'+goto+'" style="cursor:pointer"' : '';
+      return '<div class="metric"'+go+'><div class="mtop"><span class="mlabel">'+label+'</span><span class="mtile">'+ic(icon)+'</span></div>'
+        + '<div class="mval">'+val+'</div><div class="mdelta '+(cls||'')+'">'+esc(delta)+'</div></div>';
+    }
+
+    function isUpcomingMeeting(m){
+      if(!m.meeting_date) return false;
+      if(String(m.meeting_date).slice(0,10) < todayStr()) return false;
+      return m.status!=='completed' && m.status!=='cancelled';
+    }
+
+    function renderDashActivity(){
+      var el=document.getElementById('dashActivity'); if(!el) return;
+      var O=DASH.offices||[], M=DASH.meetings||[], F=DASH.follows||[], map=DASH.byId||{};
+      var items=[];
+      O.forEach(function(o){ items.push({ t:tstamp(o), icon:'building', html:'New office \u2014 <b>'+esc(o.name)+'</b>' }); });
+      M.forEach(function(m){ var o=map[m.office_id]; items.push({ t:tstamp(m), icon:'calendar', html:'Meeting logged \u2014 <b>'+esc(o?o.name:'office')+'</b>'+(m.meeting_date?' ('+esc(fmtDate(m.meeting_date))+')':'') }); });
+      F.forEach(function(f){ var o=map[f.office_id]; items.push({ t:tstamp(f), icon:'bell', html:'Follow-up added \u2014 <b>'+esc(f.type||(o?o.name:'office'))+'</b>' }); });
+      items.sort(function(a,b){ return a.t<b.t?1:a.t>b.t?-1:0; });
+      items=items.slice(0,6);
+      if(items.length===0){ el.innerHTML='<div class="panel-empty">No activity yet \u2014 add an office to get started.</div>'; return; }
+      el.innerHTML=items.map(function(a){ return '<div class="row"><span class="ricon">'+ic(a.icon)+'</span><span class="rtext">'+a.html+'</span><span class="rwhen">'+timeAgo(a.t)+'</span></div>'; }).join('');
+    }
+    function tstamp(r){ return r.created_at || r.updated_at || ''; }
+    function timeAgo(iso){
+      if(!iso) return ''; var then=new Date(iso).getTime(); if(isNaN(then)) return '';
+      var mins=Math.floor((Date.now()-then)/60000);
+      if(mins<1) return 'Just now'; if(mins<60) return mins+'m ago';
+      var hrs=Math.floor(mins/60); if(hrs<24) return hrs+'h ago';
+      var days=Math.floor(hrs/24); if(days===1) return 'Yesterday'; if(days<7) return days+' days ago';
+      return fmtDate(iso);
+    }
+
+    function renderDashUpcoming(){
+      var el=document.getElementById('dashUpcoming'); if(!el) return;
+      var M=DASH.meetings, map=DASH.byId||{};
+      if(M===null){ el.innerHTML='<div class="panel-empty">Run the meetings setup to see this.</div>'; return; }
+      var ups=M.filter(isUpcomingMeeting).sort(function(a,b){ var ad=String(a.meeting_date).slice(0,10)+(a.meeting_time||''), bd=String(b.meeting_date).slice(0,10)+(b.meeting_time||''); return ad<bd?-1:ad>bd?1:0; }).slice(0,5);
+      if(ups.length===0){ el.innerHTML='<div class="panel-empty">No upcoming meetings.</div>'; return; }
+      el.innerHTML=ups.map(function(m){ var o=map[m.office_id]; var d=dateParts(m.meeting_date); var sm=mtgStatusMeta(m.status);
+        var sub=[(m.meeting_time?fmtTime(m.meeting_time):''),(o&&o.suburb?o.suburb:'')].filter(Boolean).map(esc).join(' \u00b7 ');
+        return '<div class="mrow"><span class="datebox"><span class="d">'+d.day+'</span><span class="mo">'+d.mon+'</span></span>'
+          +'<span class="minfo"><span class="nm">'+esc(o?o.name:'Office')+'</span><span class="tm">'+sub+'</span></span>'
+          +'<span class="tag">'+sm.label+'</span></div>'; }).join('');
+    }
+    function dateParts(d){ try{ var p=String(d).slice(0,10).split('-'); var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return { day:(+p[2]), mon:mo[(+p[1])-1] }; }catch(e){ return { day:'', mon:'' }; } }
+
+    function renderDashFollows(){
+      var el=document.getElementById('dashFollows'); if(!el) return;
+      var F=DASH.follows, map=DASH.byId||{};
+      if(F===null){ el.innerHTML='<div class="panel-empty">Run the follow-ups setup to see this.</div>'; return; }
+      var open=F.filter(function(f){ return f.status!=='completed'; }).sort(function(a,b){ var ad=a.due_date?String(a.due_date).slice(0,10):'9999-12-31', bd=b.due_date?String(b.due_date).slice(0,10):'9999-12-31'; return ad<bd?-1:ad>bd?1:0; }).slice(0,5);
+      if(open.length===0){ el.innerHTML='<div class="panel-empty">Nothing due \u2014 you\u2019re all caught up.</div>'; return; }
+      el.innerHTML=open.map(function(f){ var o=map[f.office_id]; var over=fuEff(f)==='overdue';
+        var title=f.type?esc(f.type):(o?esc(o.name):'Follow-up');
+        var dueTxt=f.due_date?esc(fmtDate(f.due_date)):'No date';
+        return '<div class="task" data-dashfu="'+esc(f.id)+'"><button class="chk" data-dashcheck="'+esc(f.id)+'" title="Mark done" aria-label="Mark done">'+ic('check')+'</button>'
+          +'<span class="tlabel" data-dashopen="'+esc(f.id)+'">'+title+'<span class="tmut"> \u00b7 '+esc(o?o.name:'')+'</span></span>'
+          +'<span class="due'+(over?' over':'')+'">'+dueTxt+'</span></div>'; }).join('');
+      Array.prototype.forEach.call(el.querySelectorAll('[data-dashcheck]'), function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); dashCompleteFollow(b.getAttribute('data-dashcheck')); }); });
+      Array.prototype.forEach.call(el.querySelectorAll('[data-dashopen]'), function(b){ b.addEventListener('click', function(){ var f=(DASH.follows||[]).filter(function(x){ return String(x.id)===String(b.getAttribute('data-dashopen')); })[0]; if(f) FollowUpEditor.open(f, null, function(){ loadDashboard(true); }); }); });
+    }
+    async function dashCompleteFollow(id){
+      try{ var res=await sb.from('follow_ups').update({ status:'completed' }).eq('id', id); if(res.error) throw res.error; toast('Marked done'); loadDashboard(true); }
+      catch(e){ toast(friendlyShort(e), 'err'); }
     }
 
     function ph(name, icon, desc){
@@ -633,10 +702,8 @@
       document.getElementById('menuBtn').addEventListener('click', function(){ openDrawer(); });
       document.getElementById('scrim').addEventListener('click', closeDrawer);
 
-      // delegated clicks inside the view (tasks toggle, settings logout)
+      // delegated clicks inside the view (settings logout)
       document.getElementById('view').addEventListener('click', function(e){
-        var task = e.target.closest('.task');
-        if(task){ task.classList.toggle('done'); return; }
         if(e.target.closest('#setLogout')){ logout(); }
       });
     }
