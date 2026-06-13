@@ -412,6 +412,32 @@
   .doc-act{display:flex;gap:3px;flex-shrink:0}
   .doc-empty{font-size:13px;color:var(--muted);padding:8px 2px}
 </style>
+<style>
+  /* ===================== Notes module ===================== */
+  .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:14px;margin-top:4px;align-items:start}
+  .note-card{position:relative;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px 12px;min-height:120px;transition:box-shadow .15s ease,border-color .15s ease}
+  .note-card:hover{box-shadow:0 8px 24px rgba(16,25,20,.08);border-color:#d6cfbe}
+  .note-card.pinned{border-color:#cfe0b4;background:#FCFEF6}
+  .note-pin{position:absolute;top:9px;right:9px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:8px;color:#b7bdb6;cursor:pointer;transition:background .12s ease,color .12s ease}
+  .note-pin svg{width:16px;height:16px}
+  .note-pin:hover{background:#F1EFE7;color:var(--green)}
+  .note-pin.on{color:var(--green)}
+  .note-pin.on svg{fill:var(--green)}
+  .note-main{cursor:pointer;flex:1;padding-right:26px}
+  .note-title{font-weight:700;font-size:14.5px;line-height:1.3;margin-bottom:5px;word-break:break-word;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .note-body{font-size:13px;color:#444c46;line-height:1.5;white-space:pre-wrap;word-break:break-word;overflow:hidden;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical}
+  .note-body.notitle{-webkit-line-clamp:7}
+  .note-body.dim{color:var(--muted);font-style:italic}
+  .note-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+  .note-meta{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+  .note-office{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--green);background:#E7F0EA;padding:3px 8px 3px 6px;border-radius:999px;max-width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .note-office svg{width:12px;height:12px;flex-shrink:0;stroke-width:2.2}
+  .note-when{font-size:11.5px;color:var(--muted);white-space:nowrap}
+  .note-act{display:flex;gap:2px;flex-shrink:0}
+  .fld label.chkline{display:flex;align-items:center;gap:9px;cursor:pointer;font-weight:500;color:var(--ink);margin-bottom:0}
+  .fld label.chkline input{width:17px;height:17px;accent-color:var(--green);cursor:pointer}
+  .opt{font-weight:500;color:var(--muted);font-size:12px}
+</style>
 </head>
 <body>
   <!-- shown until we confirm the user is signed in -->
@@ -479,7 +505,8 @@
       up:'<path d="M7 17 17 7M9 7h8v8"/>',
       eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
       download:'<path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/>',
-      upload:'<path d="M12 21V9"/><path d="m7 13 5-5 5 5"/><path d="M5 5h14"/>'
+      upload:'<path d="M12 21V9"/><path d="m7 13 5-5 5 5"/><path d="M5 5h14"/>',
+      pin:'<path d="M12 17v5"/><path d="M9 10.8V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6.8a2 2 0 0 0 .55 1.38l1.6 1.66a1 1 0 0 1-.72 1.7H7.57a1 1 0 0 1-.72-1.7l1.6-1.66A2 2 0 0 0 9 10.8Z"/>'
     };
     function ic(name){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(P[name]||'')+'</svg>'; }
 
@@ -496,7 +523,7 @@
       { id:'meetings',  label:'Meetings',         icon:'calendar', title:'Meetings',         render: meetingsView, mount: meetingsMount },
       { id:'eois',      label:'EOIs',             icon:'file',     title:'EOIs',             render: eoisView, mount: eoisMount },
       { id:'followups', label:'Follow Ups',       icon:'bell',     title:'Follow Ups',       render: followupsView, mount: followupsMount },
-      { id:'notes',     label:'Notes',            icon:'note',     title:'Notes',            render: ph('Notes','note','Shared notes and context on every office, contact and conversation.') },
+      { id:'notes',     label:'Notes',            icon:'note',     title:'Notes',            render: notesView, mount: notesMount },
       { id:'founding',  label:'Founding Offices', icon:'star',     title:'Founding Offices', render: ph('Founding Offices','star','Track your founding cohort from first contact through to signed and onboarded.') },
       { id:'settings',  label:'Settings',         icon:'gear',     title:'Settings',         render: renderSettings }
     ];
@@ -539,7 +566,8 @@
       var M = await safeRows('meetings');
       var F = await safeRows('follow_ups');
       var E = await safeRows('eois');
-      DASH = { offices:O, meetings:M, follows:F, eois:E, byId: buildOfficeMap(O) };
+      var N = await safeRows('notes');
+      DASH = { offices:O, meetings:M, follows:F, eois:E, notes:N, byId: buildOfficeMap(O) };
       renderDashMetrics(); renderDashActivity(); renderDashUpcoming(); renderDashFollows();
     }
     function buildOfficeMap(O){ var m={}; (O||[]).forEach(function(o){ m[o.id]=o; }); return m; }
@@ -581,12 +609,13 @@
 
     function renderDashActivity(){
       var el=document.getElementById('dashActivity'); if(!el) return;
-      var O=DASH.offices||[], M=DASH.meetings||[], F=DASH.follows||[], E=DASH.eois||[], map=DASH.byId||{};
+      var O=DASH.offices||[], M=DASH.meetings||[], F=DASH.follows||[], E=DASH.eois||[], N=DASH.notes||[], map=DASH.byId||{};
       var items=[];
       O.forEach(function(o){ items.push({ t:tstamp(o), icon:'building', html:'New office \u2014 <b>'+esc(o.name)+'</b>' }); });
       M.forEach(function(m){ var o=map[m.office_id]; items.push({ t:tstamp(m), icon:'calendar', html:'Meeting logged \u2014 <b>'+esc(o?o.name:'office')+'</b>'+(m.meeting_date?' ('+esc(fmtDate(m.meeting_date))+')':'') }); });
       F.forEach(function(f){ var o=map[f.office_id]; items.push({ t:tstamp(f), icon:'bell', html:'Follow-up added \u2014 <b>'+esc(f.type||(o?o.name:'office'))+'</b>' }); });
       E.forEach(function(x){ var o=map[x.office_id]; items.push({ t:tstamp(x), icon:'file', html:(x.status==='signed'?'EOI signed \u2014 ':'EOI added \u2014 ')+'<b>'+esc(o?o.name:'office')+'</b>' }); });
+      N.forEach(function(n){ var lab=(n.title||'').trim()||(n.body||'').trim().slice(0,40)||'Note'; items.push({ t:tstamp(n), icon:'note', html:'Note added \u2014 <b>'+esc(lab)+'</b>' }); });
       items.sort(function(a,b){ return a.t<b.t?1:a.t>b.t?-1:0; });
       items=items.slice(0,6);
       if(items.length===0){ el.innerHTML='<div class="panel-empty">No activity yet \u2014 add an office to get started.</div>'; return; }
@@ -2109,6 +2138,238 @@
       if(m.indexOf('exceeded') >= 0 || m.indexOf('too large') >= 0 || m.indexOf('maximum allowed size') >= 0) return 'That file is too large to upload.';
       return 'Couldn\u2019t complete that document action. Please try again.';
     }
+
+    /* =========================================================
+       NOTES — free-form notes, optionally linked to an office.
+       Pinned notes float to the top. Table: public.notes
+       (run notes-setup.sql once). Shown as a card grid.
+       ========================================================= */
+    var NT = { all:[], offices:{}, officeList:null, q:'', filter:'all', loading:true };
+
+    function sortNotes(arr){
+      return arr.slice().sort(function(a,b){
+        if(!!b.pinned !== !!a.pinned) return (b.pinned?1:0) - (a.pinned?1:0);
+        var at = a.updated_at || a.created_at || '', bt = b.updated_at || b.created_at || '';
+        return at < bt ? 1 : at > bt ? -1 : 0;
+      });
+    }
+
+    function notesView(){
+      return ''
+        + '<div class="view-head">'
+        +   '<div class="vh-sub">Free-form notes \u2014 reminders, call summaries, anything worth keeping. Pin the important ones to the top.</div>'
+        +   '<div class="tools">'
+        +     '<div class="search">'+SVG_SEARCH+'<input id="ntSearch" type="search" placeholder="Search notes\u2026" autocomplete="off"></div>'
+        +     '<button class="btn-primary" id="ntAdd">'+ic('plus')+'<span>Add note</span></button>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="summary" id="ntSummary"></div>'
+        + '<div class="chips" id="ntChips"></div>'
+        + '<div id="ntBody"><div class="loading">Loading notes\u2026</div></div>';
+    }
+
+    function notesMount(){
+      var body = document.getElementById('ntBody');
+      if(!sb){ if(body) body.innerHTML = errBox('Not connected to the database yet.'); return; }
+      var s = document.getElementById('ntSearch'); s.addEventListener('input', function(){ NT.q = s.value.trim().toLowerCase(); renderNtList(); });
+      document.getElementById('ntAdd').addEventListener('click', function(){ NoteEditor.open(null, loadNotes); });
+      loadNotes();
+    }
+
+    async function loadNotes(){
+      NT.loading = true;
+      var body = document.getElementById('ntBody'); if(body) body.innerHTML = '<div class="loading">Loading notes\u2026</div>';
+      try{
+        var offRes = await sb.from('offices').select('id,name').order('name', { ascending:true });
+        if(offRes.error) throw offRes.error;
+        NT.officeList = offRes.data || []; NT.offices = {}; NT.officeList.forEach(function(o){ NT.offices[o.id] = o; });
+        var res = await sb.from('notes').select('*').order('updated_at', { ascending:false });
+        if(res.error) throw res.error;
+        NT.all = sortNotes(res.data || []); NT.loading = false;
+        renderNtSummary(); renderNtChips(); renderNtList();
+      }catch(e){
+        NT.loading = false;
+        if(body){ body.innerHTML = errBox(friendlyNtError(e)); var r = document.getElementById('ofRetry'); if(r) r.addEventListener('click', loadNotes); }
+        renderNtSummary(); renderNtChips();
+      }
+    }
+
+    function renderNtSummary(){
+      var el = document.getElementById('ntSummary'); if(!el) return;
+      var pinned = NT.all.filter(function(n){ return n.pinned; }).length;
+      var linked = NT.all.filter(function(n){ return !!n.office_id; }).length;
+      el.innerHTML = stat('Total notes', NT.all.length) + stat('Pinned', pinned) + stat('Linked to offices', linked);
+    }
+
+    function renderNtChips(){
+      var el = document.getElementById('ntChips'); if(!el) return;
+      var pinned = NT.all.filter(function(n){ return n.pinned; }).length;
+      var defs = [{ id:'all', label:'All', ct:NT.all.length },{ id:'pinned', label:'Pinned', ct:pinned }];
+      el.innerHTML = defs.map(function(d){ var active = NT.filter === d.id; return '<button class="chip'+(active?' active':'')+'" data-nf="'+d.id+'">'+d.label+' <span class="ct">'+d.ct+'</span></button>'; }).join('');
+      Array.prototype.forEach.call(el.querySelectorAll('.chip'), function(b){ b.addEventListener('click', function(){ NT.filter = b.getAttribute('data-nf'); renderNtChips(); renderNtList(); }); });
+    }
+
+    function renderNtList(){
+      var body = document.getElementById('ntBody'); if(!body || NT.loading) return;
+      if(NT.all.length === 0){
+        body.innerHTML = ntEmpty();
+        var b = document.getElementById('ntAddEmpty'); if(b) b.addEventListener('click', function(){ NoteEditor.open(null, loadNotes); });
+        return;
+      }
+      var rows = NT.all.filter(function(n){
+        if(NT.filter === 'pinned' && !n.pinned) return false;
+        if(NT.q){ var off = n.office_id ? NT.offices[n.office_id] : null; var hay = ((n.title||'')+' '+(n.body||'')+' '+((off&&off.name)||'')).toLowerCase(); if(hay.indexOf(NT.q) < 0) return false; }
+        return true;
+      });
+      if(rows.length === 0){ body.innerHTML = '<div class="empty-sm">No notes match your search or filter.</div>'; return; }
+      body.innerHTML = '<div class="notes-grid">' + rows.map(noteCard).join('') + '</div>';
+      wireNtCards();
+    }
+
+    function noteCard(n){
+      var off = n.office_id ? NT.offices[n.office_id] : null;
+      var title = (n.title || '').trim();
+      var body = (n.body || '').trim();
+      var when = timeAgo(n.updated_at || n.created_at);
+      return ''
+        + '<div class="note-card'+(n.pinned?' pinned':'')+'" data-id="'+esc(n.id)+'">'
+        +   '<button class="note-pin'+(n.pinned?' on':'')+'" data-pin="'+esc(n.id)+'" title="'+(n.pinned?'Unpin':'Pin to top')+'" aria-label="'+(n.pinned?'Unpin':'Pin to top')+'">'+ic('pin')+'</button>'
+        +   '<div class="note-main" data-edit>'
+        +     (title ? '<div class="note-title">'+esc(title)+'</div>' : '')
+        +     (body ? '<div class="note-body'+(title?'':' notitle')+'">'+esc(body)+'</div>' : (title ? '' : '<div class="note-body dim">Empty note</div>'))
+        +   '</div>'
+        +   '<div class="note-foot">'
+        +     '<div class="note-meta">'+(off?'<span class="note-office">'+ic('building')+esc(off.name)+'</span>':'')+(when?'<span class="note-when">Edited '+esc(when)+'</span>':'')+'</div>'
+        +     '<div class="note-act"><button class="ia" data-nedit="'+esc(n.id)+'" title="Edit" aria-label="Edit">'+SVG_EDIT+'</button><button class="ia danger" data-ndel="'+esc(n.id)+'" title="Delete" aria-label="Delete">'+SVG_TRASH+'</button></div>'
+        +   '</div>'
+        + '</div>';
+    }
+
+    function wireNtCards(){
+      var body = document.getElementById('ntBody');
+      Array.prototype.forEach.call(body.querySelectorAll('[data-pin]'), function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); togglePin(b.getAttribute('data-pin')); }); });
+      Array.prototype.forEach.call(body.querySelectorAll('.note-main[data-edit]'), function(c){ c.addEventListener('click', function(){ var n = findNote(c.closest('.note-card').getAttribute('data-id')); if(n) NoteEditor.open(n, loadNotes); }); });
+      Array.prototype.forEach.call(body.querySelectorAll('[data-nedit]'), function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var n = findNote(b.getAttribute('data-nedit')); if(n) NoteEditor.open(n, loadNotes); }); });
+      Array.prototype.forEach.call(body.querySelectorAll('[data-ndel]'), function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); confirmNoteDelete(findNote(b.getAttribute('data-ndel'))); }); });
+    }
+    function findNote(id){ return NT.all.filter(function(n){ return String(n.id) === String(id); })[0]; }
+
+    async function togglePin(id){
+      var n = findNote(id); if(!n) return;
+      var newval = !n.pinned;
+      try{
+        var res = await sb.from('notes').update({ pinned: newval }).eq('id', id).select().single();
+        if(res.error) throw res.error;
+        n.pinned = newval; NT.all = sortNotes(NT.all);
+        renderNtSummary(); renderNtChips(); renderNtList();
+        toast(newval ? 'Pinned to top' : 'Unpinned');
+      }catch(err){ toast(friendlyShort(err), 'err'); loadNotes(); }
+    }
+
+    function confirmNoteDelete(n){
+      if(!n) return;
+      var has = (n.title || n.body || '').trim();
+      var label = (n.title || '').trim() || (n.body || '').trim();
+      if(label.length > 44) label = label.slice(0, 44) + '\u2026';
+      var msg = has ? ('Delete \u201c<b>'+esc(label)+'</b>\u201d? This can\u2019t be undone.') : 'Delete this note? This can\u2019t be undone.';
+      confirmDialog('Delete note?', msg, async function(){
+        var res = await sb.from('notes').delete().eq('id', n.id);
+        if(res.error){ toast(friendlyShort(res.error), 'err'); throw res.error; }
+        toast('Note deleted'); loadNotes();
+      });
+    }
+
+    function ntEmpty(){
+      return '<div class="empty"><span class="ptile">'+ic('note')+'</span><h2 class="display">No notes yet</h2>'
+        + '<p>Jot down anything \u2014 a reminder, a call summary, a thought about an office. Pin the important ones to keep them up top.</p>'
+        + '<button class="btn-primary" id="ntAddEmpty">'+ic('plus')+'<span>Write your first note</span></button></div>';
+    }
+
+    function friendlyNtError(e){
+      var m = ((e && (e.message || e.hint || e.details)) || '').toLowerCase(); var code = e && e.code;
+      if(code === '42P01' || code === 'PGRST205' || m.indexOf('does not exist') >= 0 || m.indexOf('could not find the table') >= 0 || m.indexOf('schema cache') >= 0)
+        return 'The <b>notes</b> table isn\u2019t set up yet. Run the one-time setup SQL (notes-setup.sql) in your Supabase SQL editor, then press Try again.';
+      if(code === '42501' || m.indexOf('row-level security') >= 0 || m.indexOf('permission') >= 0)
+        return 'Your database blocked that request. Make sure you ran the full setup SQL and that you\u2019re signed in.';
+      return 'Couldn\u2019t reach the database. Please check your connection and press Try again.';
+    }
+
+    /* ---- shared note editor (slide-over appended to <body>) ---- */
+    var NoteEditor = (function(){
+      var built = false, editing = null, onSaved = null, els = {};
+      function build(){
+        if(built) return;
+        var form = ''
+          + '<div class="frm">'
+          +   '<div class="fld span2"><label for="ntTitle">Title <span class="opt">(optional)</span></label><input id="ntTitle" type="text" placeholder="Give it a short title\u2026" maxlength="160"></div>'
+          +   '<div class="fld span2"><label for="ntBodyF">Note</label><textarea id="ntBodyF" rows="8" placeholder="Write your note\u2026"></textarea><small class="fe" id="ntErrF"></small></div>'
+          +   '<div class="fld span2"><label for="ntOffice">Link to an office <span class="opt">(optional)</span></label><select id="ntOffice"></select></div>'
+          +   '<div class="fld span2"><label class="chkline"><input type="checkbox" id="ntPin"> <span>Pin this note to the top</span></label></div>'
+          + '</div>';
+        var html = ''
+          + '<div class="ov-scrim l2" id="ntScrim"></div>'
+          + '<aside class="ov l2" id="ntOv" aria-hidden="true" aria-label="Note">'
+          +   '<div class="ov-head"><h2 id="ntTitleH" class="display">New note</h2><button class="icon-btn" id="ntClose" aria-label="Close">'+SVG_X+'</button></div>'
+          +   '<div class="ov-body">'+form+'</div>'
+          +   '<div class="ov-foot"><div class="ov-err" id="ntErr"></div><button class="btn-out" id="ntCancel">Cancel</button><button class="btn-primary" id="ntSave"><span>Save note</span></button></div>'
+          + '</aside>';
+        var wrap = document.createElement('div'); wrap.innerHTML = html; while(wrap.firstChild) document.body.appendChild(wrap.firstChild);
+        els.scrim = document.getElementById('ntScrim'); els.ov = document.getElementById('ntOv');
+        document.getElementById('ntClose').addEventListener('click', close);
+        document.getElementById('ntCancel').addEventListener('click', close);
+        els.scrim.addEventListener('click', close);
+        document.getElementById('ntSave').addEventListener('click', save);
+        document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && els.ov.classList.contains('show')) close(); });
+        built = true;
+      }
+      async function fillOffices(selId){
+        var sel = document.getElementById('ntOffice'); sel.innerHTML = '<option value="">Loading\u2026</option>';
+        try{
+          var res = await sb.from('offices').select('id,name').order('name', { ascending:true });
+          if(res.error) throw res.error;
+          var list = res.data || [];
+          sel.innerHTML = '<option value="">\u2014 No office \u2014</option>' + list.map(function(o){ return '<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>'; }).join('');
+          if(selId) sel.value = selId;
+        }catch(e){ sel.innerHTML = '<option value="">\u2014 No office \u2014</option>'; }
+      }
+      function show(on){
+        if(on){ els.scrim.classList.add('show'); els.ov.classList.add('show'); els.ov.setAttribute('aria-hidden','false'); }
+        else { els.scrim.classList.remove('show'); els.ov.classList.remove('show'); els.ov.setAttribute('aria-hidden','true'); }
+      }
+      function open(note, savedCb){
+        build();
+        editing = note || null; onSaved = savedCb || null;
+        document.getElementById('ntTitleH').textContent = note ? 'Edit note' : 'New note';
+        document.getElementById('ntTitle').value = (note && note.title) || '';
+        document.getElementById('ntBodyF').value = (note && note.body) || '';
+        document.getElementById('ntPin').checked = !!(note && note.pinned);
+        document.getElementById('ntErrF').textContent = ''; document.getElementById('ntErr').textContent = '';
+        show(true);
+        setTimeout(function(){ var t = document.getElementById('ntTitle'); if(t) t.focus(); }, 80);
+        fillOffices(note ? note.office_id : '');
+      }
+      function close(){ show(false); }
+      async function save(){
+        var title = nn(document.getElementById('ntTitle').value);
+        var bodyv = nn(document.getElementById('ntBodyF').value);
+        document.getElementById('ntErrF').textContent = ''; document.getElementById('ntErr').textContent = '';
+        if(!title && !bodyv){ document.getElementById('ntErrF').textContent = 'Add a title or some text first.'; var b = document.getElementById('ntBodyF'); if(b) b.focus(); return; }
+        var payload = { title: title, body: bodyv, office_id: (document.getElementById('ntOffice').value || null), pinned: document.getElementById('ntPin').checked };
+        var btn = document.getElementById('ntSave'), span = btn.querySelector('span'); var label = span ? span.textContent : '';
+        btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
+        try{
+          var res = editing
+            ? await sb.from('notes').update(payload).eq('id', editing.id).select().single()
+            : await sb.from('notes').insert(payload).select().single();
+          if(res.error) throw res.error;
+          var wasEdit = !!editing; close();
+          toast(wasEdit ? 'Note updated' : 'Note added');
+          if(onSaved) onSaved();
+        }catch(e){ document.getElementById('ntErr').textContent = friendlyShort(e); }
+        finally{ btn.disabled = false; if(span) span.textContent = label || 'Save note'; }
+      }
+      return { open: open };
+    })();
 
     boot();
   })();
