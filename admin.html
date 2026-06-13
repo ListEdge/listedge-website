@@ -90,7 +90,7 @@
   .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--citron)}
 
   /* metric cards */
-  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:16px;margin-bottom:22px}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(184px,1fr));gap:16px;margin-bottom:22px}
   .metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;transition:transform .18s ease,box-shadow .18s ease}
   .metric:hover{transform:translateY(-2px);box-shadow:0 16px 34px -20px rgba(20,30,24,.3)}
   .metric .mtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
@@ -463,6 +463,31 @@
   .set-brand{width:42px;height:42px;border-radius:11px;background:var(--citron);display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .set-brand svg{width:22px;height:22px;color:var(--green-deep)}
 </style>
+<style>
+  /* ===================== Founding Offices ===================== */
+  .fo-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+  .fo-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line)}
+  .fo-row:last-child{border-bottom:none}
+  .fo-row:hover{background:#FAFBF8}
+  .fo-badge{font-family:'Bricolage Grotesque';font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--green);background:#E7F0EA;border:1px solid #cfe3d7;border-radius:10px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+  .fo-main{min-width:0;cursor:pointer}
+  .fo-name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fo-sub{font-size:12.5px;color:var(--sub);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  @media(max-width:640px){ .fo-row{grid-template-columns:auto 1fr;gap:9px 12px} .fo-row .c-act{grid-column:2;justify-self:end} }
+  /* editor: number preview + fixed office */
+  .fo-num-preview{font-family:'Bricolage Grotesque';font-weight:700;font-size:18px;color:var(--green);background:#E7F0EA;border-radius:10px;padding:9px 12px;display:inline-block;align-self:flex-start}
+  .fo-office-fixed{font-size:14px;font-weight:600;color:var(--ink);background:#F2EFE7;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  /* office drawer founding section */
+  .fo-inner{display:flex;align-items:center;gap:12px;margin-top:20px;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:#FAFBF8}
+  .fo-inner.is-founding{border-color:#cfe3d7;background:#F1F8F3}
+  .fo-inner-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Bricolage Grotesque';font-weight:700;font-size:15px;color:var(--green);background:#E7F0EA;border-radius:10px;padding:8px 11px;white-space:nowrap}
+  .fo-inner-badge svg{width:15px;height:15px;fill:var(--green)}
+  .fo-inner-text{flex:1;min-width:0}
+  .fo-inner-title{font-weight:600;font-size:13.5px}
+  .fo-inner-sub{font-size:12px;color:var(--sub);margin-top:1px}
+  .fo-inner .btn-soft{flex-shrink:0;text-decoration:none}
+  .fo-inner .btn-soft svg{fill:var(--green)}
+</style>
 </head>
 <body>
   <!-- shown until we confirm the user is signed in -->
@@ -549,7 +574,7 @@
       { id:'eois',      label:'EOIs',             icon:'file',     title:'EOIs',             render: eoisView, mount: eoisMount },
       { id:'followups', label:'Follow Ups',       icon:'bell',     title:'Follow Ups',       render: followupsView, mount: followupsMount },
       { id:'notes',     label:'Notes',            icon:'note',     title:'Notes',            render: notesView, mount: notesMount },
-      { id:'founding',  label:'Founding Offices', icon:'star',     title:'Founding Offices', render: ph('Founding Offices','star','Track your founding cohort from first contact through to signed and onboarded.') },
+      { id:'founding',  label:'Founding Offices', icon:'star',     title:'Founding Offices', render: foundingView, mount: foundingMount },
       { id:'settings',  label:'Settings',         icon:'gear',     title:'Settings',         render: settingsView, mount: settingsMount }
     ];
 
@@ -574,7 +599,7 @@
         + '</div>';
     }
     function dashMetricSkeletons(){
-      var L=[['Offices','building'],['Meetings','calendar'],['EOIs','file'],['Follow-ups','bell']];
+      var L=[['Offices','building'],['Meetings','calendar'],['EOIs','file'],['Follow-ups','bell'],['Founding','star']];
       return L.map(function(l){ return '<div class="metric"><div class="mtop"><span class="mlabel">'+l[0]+'</span><span class="mtile">'+ic(l[1])+'</span></div><div class="mval"><span class="skel"></span></div><div class="mdelta">&nbsp;</div></div>'; }).join('');
     }
 
@@ -592,7 +617,8 @@
       var F = await safeRows('follow_ups');
       var E = await safeRows('eois');
       var N = await safeRows('notes');
-      DASH = { offices:O, meetings:M, follows:F, eois:E, notes:N, byId: buildOfficeMap(O) };
+      var FO = await safeRows('founding_offices');
+      DASH = { offices:O, meetings:M, follows:F, eois:E, notes:N, founding:FO, byId: buildOfficeMap(O) };
       renderDashMetrics(); renderDashActivity(); renderDashUpcoming(); renderDashFollows();
     }
     function buildOfficeMap(O){ var m={}; (O||[]).forEach(function(o){ m[o.id]=o; }); return m; }
@@ -613,11 +639,17 @@
       var eUnder = E ? E.filter(function(x){ return x.status==='under_review'; }).length : 0;
       var eSigned = E ? E.filter(function(x){ return x.status==='signed'; }).length : 0;
       var eDelta = E ? (eUnder>0 ? eUnder+' under review' : (eSigned>0 ? eSigned+' signed' : E.length+' total')) : 'Run setup SQL';
+      var FO=DASH.founding;
+      var foVal = FO ? FO.length : '\u2014';
+      var foMonth = FO ? FO.filter(function(x){ return inThisMonth(x.date_signed); }).length : 0;
+      var foMax = FO ? FO.reduce(function(m,x){ return Math.max(m, x.number||0); }, 0) : 0;
+      var foDelta = FO ? (foMonth>0 ? foMonth+' this month' : (FO.length>0 ? 'Latest '+foNumLabel(foMax) : 'None yet')) : 'Run setup SQL';
       el.innerHTML =
           dashCard('Offices','building', oVal, oDelta, '', 'offices')
         + dashCard('Meetings','calendar', mVal, mDelta, '', 'meetings')
         + dashCard('EOIs','file', eVal, eDelta, '', 'eois')
-        + dashCard('Follow-ups','bell', fVal, fDelta, (overdue>0?'warn':''), 'followups');
+        + dashCard('Follow-ups','bell', fVal, fDelta, (overdue>0?'warn':''), 'followups')
+        + dashCard('Founding','star', foVal, foDelta, '', 'founding');
       Array.prototype.forEach.call(el.querySelectorAll('[data-goto]'), function(c){ c.addEventListener('click', function(){ location.hash='#/'+c.getAttribute('data-goto'); }); });
     }
     function dashCard(label,icon,val,delta,cls,goto){
@@ -634,13 +666,14 @@
 
     function renderDashActivity(){
       var el=document.getElementById('dashActivity'); if(!el) return;
-      var O=DASH.offices||[], M=DASH.meetings||[], F=DASH.follows||[], E=DASH.eois||[], N=DASH.notes||[], map=DASH.byId||{};
+      var O=DASH.offices||[], M=DASH.meetings||[], F=DASH.follows||[], E=DASH.eois||[], N=DASH.notes||[], FO=DASH.founding||[], map=DASH.byId||{};
       var items=[];
       O.forEach(function(o){ items.push({ t:tstamp(o), icon:'building', html:'New office \u2014 <b>'+esc(o.name)+'</b>' }); });
       M.forEach(function(m){ var o=map[m.office_id]; items.push({ t:tstamp(m), icon:'calendar', html:'Meeting logged \u2014 <b>'+esc(o?o.name:'office')+'</b>'+(m.meeting_date?' ('+esc(fmtDate(m.meeting_date))+')':'') }); });
       F.forEach(function(f){ var o=map[f.office_id]; items.push({ t:tstamp(f), icon:'bell', html:'Follow-up added \u2014 <b>'+esc(f.type||(o?o.name:'office'))+'</b>' }); });
       E.forEach(function(x){ var o=map[x.office_id]; items.push({ t:tstamp(x), icon:'file', html:(x.status==='signed'?'EOI signed \u2014 ':'EOI added \u2014 ')+'<b>'+esc(o?o.name:'office')+'</b>' }); });
       N.forEach(function(n){ var lab=(n.title||'').trim()||(n.body||'').trim().slice(0,40)||'Note'; items.push({ t:tstamp(n), icon:'note', html:'Note added \u2014 <b>'+esc(lab)+'</b>' }); });
+      FO.forEach(function(x){ items.push({ t:tstamp(x), icon:'star', html:'Founding office '+foNumLabel(x.number)+' \u2014 <b>'+esc(x.office_name||(map[x.office_id]?map[x.office_id].name:'office'))+'</b>' }); });
       items.sort(function(a,b){ return a.t<b.t?1:a.t>b.t?-1:0; });
       items=items.slice(0,6);
       if(items.length===0){ el.innerHTML='<div class="panel-empty">No activity yet \u2014 add an office to get started.</div>'; return; }
@@ -1011,7 +1044,7 @@
         + '<div class="ov-scrim" id="ovScrim" hidden></div>'
         + '<aside class="ov" id="ov" hidden aria-hidden="true" aria-label="Office details">'
         +   '<div class="ov-head"><h2 id="ovTitle" class="display">Add office</h2><button class="icon-btn" id="ovClose" aria-label="Close">'+SVG_X+'</button></div>'
-        +   '<div class="ov-body">'+form+'<div id="ofEoiHistory"></div><div id="ofHistory"></div><div id="ofDocs"></div></div>'
+        +   '<div class="ov-body">'+form+'<div id="ofFounding"></div><div id="ofEoiHistory"></div><div id="ofHistory"></div><div id="ofDocs"></div></div>'
         +   '<div class="ov-foot"><div class="ov-err" id="ovErr"></div><button class="btn-out" id="ovCancel">Cancel</button><button class="btn-primary" id="ovSave"><span>Save office</span></button></div>'
         + '</aside>'
         + '<input type="file" id="ofDocInput" accept="application/pdf" style="display:none">'
@@ -1167,6 +1200,7 @@
       document.getElementById('ovErr').textContent = '';
       showOverlay(true);
       setTimeout(function(){ var n = document.getElementById('ofName'); if(n) n.focus(); }, 80);
+      renderOfficeFounding(o);
       renderOfficeEoiHistory(o);
       renderOfficeHistory(o);
       renderOfficeDocs(o);
@@ -2536,6 +2570,311 @@
       }
       return { open: open };
     })();
+
+    /* =========================================================
+       FOUNDING OFFICES — a stable, numbered registry of signed
+       founding partners. Linked to offices; numbers are assigned
+       sequentially (#001, #002, ...) and never change.
+       Table: public.founding_offices (run founding-offices-setup.sql).
+       ========================================================= */
+    function foNumLabel(n){ n = parseInt(n, 10); if(isNaN(n) || n < 1) return '#\u2014'; return '#' + String(n).padStart(3, '0'); }
+    function inThisMonth(d){ if(!d) return false; var s = String(d).slice(0,7); var now = new Date(); return s === (now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')); }
+
+    var FO = { all:[], offices:{}, officeList:null, foundingIds:{}, q:'', loading:true };
+
+    function foundingView(){
+      return ''
+        + '<div class="view-head">'
+        +   '<div class="vh-sub">Your signed founding partners \u2014 each with a permanent founding number.</div>'
+        +   '<div class="tools">'
+        +     '<div class="search">'+SVG_SEARCH+'<input id="foSearch" type="search" placeholder="Search office, notes\u2026" autocomplete="off"></div>'
+        +     '<button class="btn-primary" id="foAdd">'+ic('plus')+'<span>Add founding office</span></button>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="summary" id="foSummary"></div>'
+        + '<div id="foBody"><div class="loading">Loading founding offices\u2026</div></div>';
+    }
+
+    function foundingMount(){
+      var body = document.getElementById('foBody');
+      if(!sb){ if(body) body.innerHTML = errBox('Not connected to the database yet.'); return; }
+      var s = document.getElementById('foSearch'); s.addEventListener('input', function(){ FO.q = s.value.trim().toLowerCase(); renderFoList(); });
+      document.getElementById('foAdd').addEventListener('click', function(){
+        if(FO.officeList && FO.officeList.length === 0){ toast('Add an office first', 'err'); return; }
+        var available = availableFoundingOffices();
+        if(available.length === 0){ toast('All your offices are already founding offices', 'err'); return; }
+        FoundingEditor.open({ available: available });
+      });
+      loadFounding();
+    }
+
+    function availableFoundingOffices(){ return (FO.officeList || []).filter(function(o){ return !FO.foundingIds[o.id]; }); }
+    function foOfficeName(f){ var o = f.office_id ? FO.offices[f.office_id] : null; return (o && o.name) || f.office_name || 'Unknown office'; }
+
+    async function loadFounding(){
+      FO.loading = true;
+      var body = document.getElementById('foBody'); if(body) body.innerHTML = '<div class="loading">Loading founding offices\u2026</div>';
+      try{
+        var offRes = await sb.from('offices').select('id,name,suburb').order('name', { ascending:true });
+        if(offRes.error) throw offRes.error;
+        FO.officeList = offRes.data || []; FO.offices = {}; FO.officeList.forEach(function(o){ FO.offices[o.id] = o; });
+        var res = await sb.from('founding_offices').select('*').order('number', { ascending:true });
+        if(res.error) throw res.error;
+        FO.all = res.data || []; FO.foundingIds = {}; FO.all.forEach(function(f){ if(f.office_id) FO.foundingIds[f.office_id] = true; });
+        FO.loading = false;
+        renderFoSummary(); renderFoList();
+      }catch(e){
+        FO.loading = false;
+        if(body){ body.innerHTML = errBox(friendlyFoError(e)); var r = document.getElementById('ofRetry'); if(r) r.addEventListener('click', loadFounding); }
+        renderFoSummary();
+      }
+    }
+
+    function renderFoSummary(){
+      var el = document.getElementById('foSummary'); if(!el) return;
+      var month = FO.all.filter(function(f){ return inThisMonth(f.date_signed); }).length;
+      var max = FO.all.reduce(function(m, f){ return Math.max(m, f.number || 0); }, 0);
+      el.innerHTML = stat('Founding offices', FO.all.length) + stat('Signed this month', month) + stat('Most recent', FO.all.length ? foNumLabel(max) : '\u2014');
+    }
+
+    function renderFoList(){
+      var body = document.getElementById('foBody'); if(!body || FO.loading) return;
+      if(FO.all.length === 0){
+        body.innerHTML = foEmpty();
+        var b = document.getElementById('foAddEmpty'); if(b) b.addEventListener('click', function(){ var a = availableFoundingOffices(); if(a.length === 0){ toast('Add an office first', 'err'); return; } FoundingEditor.open({ available:a }); });
+        return;
+      }
+      var rows = FO.all.filter(function(f){
+        if(FO.q){ var hay = ((foOfficeName(f) || '') + ' ' + (f.notes || '')).toLowerCase(); if(hay.indexOf(FO.q) < 0) return false; }
+        return true;
+      });
+      if(rows.length === 0){ body.innerHTML = '<div class="empty-sm">No founding offices match your search.</div>'; return; }
+      body.innerHTML = '<div class="fo-list">' + rows.map(foRow).join('') + '</div>';
+      wireFoRows();
+    }
+
+    function foRow(f){
+      var name = foOfficeName(f);
+      var signed = f.date_signed ? ('Signed ' + fmtDate(f.date_signed)) : 'Date not set';
+      return ''
+        + '<div class="fo-row" data-id="'+esc(f.id)+'">'
+        +   '<div class="fo-badge" data-edit>'+foNumLabel(f.number)+'</div>'
+        +   '<div class="fo-main" data-edit><div class="fo-name">'+esc(name)+'</div><div class="fo-sub">'+esc(signed)+(f.notes ? ' \u00b7 ' + esc(f.notes) : '')+'</div></div>'
+        +   '<div class="c-act"><button class="ia" data-foedit="'+esc(f.id)+'" title="Edit" aria-label="Edit">'+SVG_EDIT+'</button><button class="ia danger" data-fodel="'+esc(f.id)+'" title="Remove" aria-label="Remove">'+SVG_TRASH+'</button></div>'
+        + '</div>';
+    }
+
+    function wireFoRows(){
+      var body = document.getElementById('foBody');
+      Array.prototype.forEach.call(body.querySelectorAll('[data-foedit]'), function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var f = findFo(b.getAttribute('data-foedit')); if(f) FoundingEditor.open({ editing:f }); }); });
+      Array.prototype.forEach.call(body.querySelectorAll('[data-fodel]'), function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); confirmFoDelete(findFo(b.getAttribute('data-fodel'))); }); });
+      Array.prototype.forEach.call(body.querySelectorAll('.fo-row [data-edit]'), function(c){ c.addEventListener('click', function(){ var f = findFo(c.closest('.fo-row').getAttribute('data-id')); if(f) FoundingEditor.open({ editing:f }); }); });
+    }
+    function findFo(id){ return FO.all.filter(function(f){ return String(f.id) === String(id); })[0]; }
+
+    function confirmFoDelete(f){
+      if(!f) return; var name = foOfficeName(f);
+      confirmDialog('Remove founding office?', 'Remove <b>'+esc(name)+'</b> ('+foNumLabel(f.number)+') from your founding registry? The office itself stays \u2014 only its founding status is removed.', async function(){
+        var res = await sb.from('founding_offices').delete().eq('id', f.id);
+        if(res.error){ toast(friendlyShort(res.error), 'err'); throw res.error; }
+        toast('Founding office removed'); loadFounding();
+      });
+    }
+
+    function foEmpty(){
+      if(FO.officeList && FO.officeList.length === 0){
+        return '<div class="empty"><span class="ptile">'+ic('star')+'</span><h2 class="display">No founding offices yet</h2>'
+          + '<p>Founding offices are your signed launch partners. Add an office first, then convert it from its own record \u2014 or with the button above.</p>'
+          + '<a class="btn-primary" href="#/offices">'+ic('building')+'<span>Go to Offices</span></a></div>';
+      }
+      return '<div class="empty"><span class="ptile">'+ic('star')+'</span><h2 class="display">No founding offices yet</h2>'
+        + '<p>When an office signs on as a founding partner, convert it here or from the office\u2019s own record. Each one gets a permanent founding number, starting at '+foNumLabel(1)+'.</p>'
+        + '<button class="btn-primary" id="foAddEmpty">'+ic('plus')+'<span>Add your first founding office</span></button></div>';
+    }
+
+    function friendlyFoError(e){
+      var m = ((e && (e.message || e.hint || e.details)) || '').toLowerCase(); var code = e && e.code;
+      if(code === '42P01' || code === 'PGRST205' || m.indexOf('does not exist') >= 0 || m.indexOf('could not find the table') >= 0 || m.indexOf('schema cache') >= 0)
+        return 'The <b>founding_offices</b> table isn\u2019t set up yet. Run the one-time setup SQL (founding-offices-setup.sql) in your Supabase SQL editor, then press Try again.';
+      if(code === '42501' || m.indexOf('row-level security') >= 0 || m.indexOf('permission') >= 0)
+        return 'Your database blocked that request. Make sure you ran the full setup SQL and that you\u2019re signed in.';
+      return 'Couldn\u2019t reach the database. Please check your connection and press Try again.';
+    }
+
+    /* ---- shared numbering + creation (used by editor and convert) ---- */
+    async function nextFoundingNumber(){
+      var res = await sb.from('founding_offices').select('number');
+      if(res.error) throw res.error;
+      var max = (res.data || []).reduce(function(m, r){ return Math.max(m, r.number || 0); }, 0);
+      return max + 1;
+    }
+    async function createFoundingOffice(officeId, officeName, dateSigned, notes){
+      var lastErr = null;
+      for(var attempt = 0; attempt < 2; attempt++){
+        var number = await nextFoundingNumber();
+        var ins = await sb.from('founding_offices').insert({ office_id:officeId, office_name:officeName, number:number, date_signed:dateSigned, notes:notes }).select().single();
+        if(!ins.error) return ins;
+        lastErr = ins.error; var code = ins.error.code || ''; var msg = (ins.error.message || '').toLowerCase();
+        if(code === '23505' && msg.indexOf('number') >= 0){ continue; }   // number race — retry with fresh number
+        return ins;                                                       // office already founding, or other error
+      }
+      return { error: lastErr || { message:'Could not assign a founding number.' } };
+    }
+    async function markOfficeSigned(officeId){ try{ await sb.from('offices').update({ stage:'signed' }).eq('id', officeId); }catch(e){} }
+
+    /* ---- shared founding editor (slide-over appended to <body>) ---- */
+    var FoundingEditor = (function(){
+      var built = false, mode = 'add', editing = null, presetOffice = null, available = null, onSaved = null, els = {};
+      function build(){
+        if(built) return;
+        var form = ''
+          + '<div class="frm">'
+          +   '<div class="fld span2"><label for="foOffice">Office *</label><select id="foOffice"></select><div class="fo-office-fixed" id="foOfficeFixed" style="display:none"></div><small class="fe" id="foOfficeErr"></small></div>'
+          +   '<div class="fld"><label>Founding number</label><div class="fo-num-preview" id="foNumPreview">#\u2014</div></div>'
+          +   '<div class="fld"><label for="foSigned">Date signed</label><input id="foSigned" type="date"></div>'
+          +   '<div class="fld span2"><label for="foNotes">Notes</label><textarea id="foNotes" rows="3" placeholder="Anything to remember about this founding office\u2026"></textarea></div>'
+          + '</div>';
+        var html = ''
+          + '<div class="ov-scrim l2" id="foScrim"></div>'
+          + '<aside class="ov l2" id="foOv" aria-hidden="true" aria-label="Founding office">'
+          +   '<div class="ov-head"><h2 id="foTitle" class="display">Add founding office</h2><button class="icon-btn" id="foClose" aria-label="Close">'+SVG_X+'</button></div>'
+          +   '<div class="ov-body">'+form+'</div>'
+          +   '<div class="ov-foot"><div class="ov-err" id="foErr"></div><button class="btn-out" id="foCancel">Cancel</button><button class="btn-primary" id="foSave"><span>Save</span></button></div>'
+          + '</aside>';
+        var wrap = document.createElement('div'); wrap.innerHTML = html; while(wrap.firstChild) document.body.appendChild(wrap.firstChild);
+        els.scrim = document.getElementById('foScrim'); els.ov = document.getElementById('foOv');
+        document.getElementById('foClose').addEventListener('click', close);
+        document.getElementById('foCancel').addEventListener('click', close);
+        els.scrim.addEventListener('click', close);
+        document.getElementById('foSave').addEventListener('click', save);
+        document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && els.ov.classList.contains('show')) close(); });
+        built = true;
+      }
+      function show(on){
+        if(on){ els.scrim.classList.add('show'); els.ov.classList.add('show'); els.ov.setAttribute('aria-hidden','false'); }
+        else { els.scrim.classList.remove('show'); els.ov.classList.remove('show'); els.ov.setAttribute('aria-hidden','true'); }
+      }
+      function setFixedOffice(name){
+        var sel = document.getElementById('foOffice'), fixed = document.getElementById('foOfficeFixed');
+        sel.style.display = 'none'; fixed.style.display = 'block'; fixed.textContent = name;
+      }
+      function setDropdown(list, selId){
+        var sel = document.getElementById('foOffice'), fixed = document.getElementById('foOfficeFixed');
+        fixed.style.display = 'none'; sel.style.display = 'block';
+        sel.innerHTML = '<option value="">Select an office\u2026</option>' + list.map(function(o){ return '<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>'; }).join('');
+        if(selId) sel.value = selId;
+      }
+      function editName(f){ var o = f.office_id ? FO.offices[f.office_id] : null; return (o && o.name) || f.office_name || 'Office'; }
+      async function previewNumber(){
+        var el = document.getElementById('foNumPreview'); el.textContent = '#\u2026';
+        try{ var n = await nextFoundingNumber(); el.textContent = foNumLabel(n); }catch(e){ el.textContent = '#\u2014'; }
+      }
+      function open(opts){
+        build(); opts = opts || {};
+        editing = opts.editing || null; presetOffice = opts.presetOffice || null; available = opts.available || null; onSaved = opts.savedCb || null;
+        var title = document.getElementById('foTitle');
+        document.getElementById('foSigned').value = editing ? (editing.date_signed ? String(editing.date_signed).slice(0,10) : '') : todayStr();
+        document.getElementById('foNotes').value = editing ? (editing.notes || '') : '';
+        document.getElementById('foOfficeErr').textContent = ''; document.getElementById('foErr').textContent = '';
+        var saveSpan = document.getElementById('foSave').querySelector('span');
+        if(editing){
+          mode = 'edit'; title.textContent = 'Edit founding office';
+          setFixedOffice(editName(editing));
+          document.getElementById('foNumPreview').textContent = foNumLabel(editing.number);
+          if(saveSpan) saveSpan.textContent = 'Save changes';
+        } else if(presetOffice){
+          mode = 'convert'; title.textContent = 'Convert to founding office';
+          setFixedOffice(presetOffice.name);
+          if(saveSpan) saveSpan.textContent = 'Convert';
+          previewNumber();
+        } else {
+          mode = 'add'; title.textContent = 'Add founding office';
+          setDropdown(available || [], '');
+          if(saveSpan) saveSpan.textContent = 'Add founding office';
+          previewNumber();
+        }
+        show(true);
+      }
+      function close(){ show(false); }
+      async function save(){
+        document.getElementById('foOfficeErr').textContent = ''; document.getElementById('foErr').textContent = '';
+        var dateSigned = nn(document.getElementById('foSigned').value);
+        var notes = nn(document.getElementById('foNotes').value);
+        var btn = document.getElementById('foSave'), span = btn.querySelector('span'); var lbl = span ? span.textContent : '';
+        if(mode === 'edit'){
+          btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
+          try{
+            var upd = await sb.from('founding_offices').update({ date_signed:dateSigned, notes:notes }).eq('id', editing.id).select().single();
+            if(upd.error) throw upd.error;
+            close(); toast('Founding office updated'); if(onSaved) onSaved(); else loadFounding();
+          }catch(e){ document.getElementById('foErr').textContent = friendlyShort(e); }
+          finally{ btn.disabled = false; if(span) span.textContent = lbl || 'Save changes'; }
+          return;
+        }
+        var officeId, officeName;
+        if(mode === 'convert'){ officeId = presetOffice.id; officeName = presetOffice.name; }
+        else {
+          var sel = document.getElementById('foOffice'); officeId = sel.value;
+          officeName = (sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '');
+          if(!officeId){ document.getElementById('foOfficeErr').textContent = 'Please choose an office.'; return; }
+        }
+        btn.disabled = true; if(span) span.textContent = (mode === 'convert' ? 'Converting\u2026' : 'Adding\u2026');
+        try{
+          var ins = await createFoundingOffice(officeId, officeName, dateSigned, notes);
+          if(ins.error){
+            var msg = (ins.error.message || '').toLowerCase();
+            if(ins.error.code === '23505' && msg.indexOf('number') < 0){ document.getElementById('foErr').textContent = 'That office is already a founding office.'; }
+            else { document.getElementById('foErr').textContent = friendlyShort(ins.error); }
+            return;
+          }
+          await markOfficeSigned(officeId);
+          var num = ins.data ? ins.data.number : null;
+          close(); toast('Founding office ' + foNumLabel(num) + ' created');
+          if(onSaved) onSaved(ins.data); else loadFounding();
+        }catch(e){ document.getElementById('foErr').textContent = friendlyShort(e); }
+        finally{ btn.disabled = false; if(span) span.textContent = lbl; }
+      }
+      return { open: open };
+    })();
+
+    /* ---- office drawer: Founding status / convert action ---- */
+    function renderOfficeFounding(o){
+      var box = document.getElementById('ofFounding'); if(!box) return;
+      if(!o){ box.innerHTML = ''; return; }
+      box.innerHTML = '<div id="ofFoundingInner" class="fo-inner"><div class="hist-loading">Loading\u2026</div></div>';
+      loadOfficeFounding(o);
+    }
+    async function loadOfficeFounding(o){
+      var box = document.getElementById('ofFoundingInner'); if(!box) return;
+      try{
+        var res = await sb.from('founding_offices').select('*').eq('office_id', o.id).order('number', { ascending:true });
+        if(res.error) throw res.error;
+        var f = (res.data || [])[0];
+        if(f){
+          box.className = 'fo-inner is-founding';
+          box.innerHTML = '<span class="fo-inner-badge">'+ic('star')+foNumLabel(f.number)+'</span>'
+            + '<div class="fo-inner-text"><div class="fo-inner-title">Founding office</div><div class="fo-inner-sub">'+(f.date_signed ? ('Signed ' + esc(fmtDate(f.date_signed))) : 'Date not set')+'</div></div>'
+            + '<a class="btn-soft" href="#/founding">View</a>';
+        } else {
+          box.className = 'fo-inner';
+          box.innerHTML = '<div class="fo-inner-text"><div class="fo-inner-title">Founding office</div><div class="fo-inner-sub">Mark this office as a signed founding partner.</div></div>'
+            + '<button class="btn-soft" id="ofConvertFounding">'+ic('star')+' Convert to Founding Office</button>';
+          var btn = document.getElementById('ofConvertFounding');
+          if(btn) btn.addEventListener('click', function(){
+            FoundingEditor.open({ presetOffice:o, savedCb:function(){
+              var st = document.getElementById('ofStage'); if(st) st.value = 'signed';
+              if(o) o.stage = 'signed';
+              loadOfficeFounding(o);
+              if(typeof loadOffices === 'function') loadOffices();
+            }});
+          });
+        }
+      }catch(e){
+        var mm = ((e && e.message) || '').toLowerCase(); var setup = (mm.indexOf('schema cache') >= 0 || mm.indexOf('does not exist') >= 0 || mm.indexOf('could not find the table') >= 0 || (e && e.code) === 'PGRST205');
+        box.className = 'fo-inner';
+        box.innerHTML = '<div class="fo-inner-text"><div class="fo-inner-sub">'+(setup ? 'Run the founding-offices setup SQL to enable this.' : 'Couldn\u2019t check founding status.')+'</div></div>';
+      }
+    }
 
     boot();
   })();
