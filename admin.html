@@ -379,6 +379,39 @@
   .metric[data-goto]{transition:transform .18s ease,box-shadow .18s ease}
   .panel-head a.link{text-decoration:none}
 </style>
+<style>
+  /* ===================== EOIs module ===================== */
+  .eo-head,.eo-row{display:grid;grid-template-columns:2fr 1.1fr 1.2fr 1.1fr auto;align-items:center;gap:14px;padding:12px 18px}
+  .eo-head{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--sub);background:#FAFBF8;border-bottom:1px solid var(--line)}
+  .eo-row{border-bottom:1px solid var(--line)}
+  .eo-row:last-child{border-bottom:none}
+  .eo-row:hover{background:#FAFBF8}
+  .eo-office{min-width:0;cursor:pointer}
+  .eo-office b{font-weight:600;font-size:14px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .eo-office .sub{font-size:12.5px;color:var(--sub);display:block;margin-top:1px}
+  .eo-sent,.eo-signed{font-size:13.5px}
+
+  @media(max-width:820px){
+    .eo-head{display:none}
+    .eo-row{grid-template-columns:1fr;gap:7px;padding:14px 16px;position:relative}
+    .eo-row .cl{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:#9aa39d;margin-right:8px;min-width:64px}
+    .eo-office{padding-right:80px}
+    .eo-status .spill{max-width:200px}
+    .eo-row .c-act{position:absolute;top:13px;right:14px}
+  }
+
+  /* ===================== Documents (Supabase Storage) ===================== */
+  #ofDocs{margin-top:20px}
+  .docs{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .doc-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#fff}
+  .doc-ic{width:34px;height:34px;border-radius:9px;background:#FBEDEA;color:#C23B22;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .doc-ic svg{width:17px;height:17px}
+  .doc-meta{flex:1;min-width:0}
+  .doc-name{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .doc-sub{font-size:12px;color:var(--sub);margin-top:1px}
+  .doc-act{display:flex;gap:3px;flex-shrink:0}
+  .doc-empty{font-size:13px;color:var(--muted);padding:8px 2px}
+</style>
 </head>
 <body>
   <!-- shown until we confirm the user is signed in -->
@@ -443,7 +476,10 @@
       gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
       check:'<path d="M20 6 9 17l-5-5"/>',
       plus:'<path d="M12 5v14M5 12h14"/>',
-      up:'<path d="M7 17 17 7M9 7h8v8"/>'
+      up:'<path d="M7 17 17 7M9 7h8v8"/>',
+      eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+      download:'<path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/>',
+      upload:'<path d="M12 21V9"/><path d="m7 13 5-5 5 5"/><path d="M5 5h14"/>'
     };
     function ic(name){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(P[name]||'')+'</svg>'; }
 
@@ -458,7 +494,7 @@
       { id:'dashboard', label:'Dashboard',        icon:'grid',     title:'Dashboard',        render: renderDashboard, mount: dashboardMount },
       { id:'offices',   label:'Offices',          icon:'building', title:'Offices',          render: officesView, mount: officesMount },
       { id:'meetings',  label:'Meetings',         icon:'calendar', title:'Meetings',         render: meetingsView, mount: meetingsMount },
-      { id:'eois',      label:'EOIs',             icon:'file',     title:'EOIs',             render: ph('EOIs','file','Capture and manage expressions of interest from offices considering ListEdge.') },
+      { id:'eois',      label:'EOIs',             icon:'file',     title:'EOIs',             render: eoisView, mount: eoisMount },
       { id:'followups', label:'Follow Ups',       icon:'bell',     title:'Follow Ups',       render: followupsView, mount: followupsMount },
       { id:'notes',     label:'Notes',            icon:'note',     title:'Notes',            render: ph('Notes','note','Shared notes and context on every office, contact and conversation.') },
       { id:'founding',  label:'Founding Offices', icon:'star',     title:'Founding Offices', render: ph('Founding Offices','star','Track your founding cohort from first contact through to signed and onboarded.') },
@@ -502,7 +538,8 @@
       var O = await safeRows('offices');
       var M = await safeRows('meetings');
       var F = await safeRows('follow_ups');
-      DASH = { offices:O, meetings:M, follows:F, byId: buildOfficeMap(O) };
+      var E = await safeRows('eois');
+      DASH = { offices:O, meetings:M, follows:F, eois:E, byId: buildOfficeMap(O) };
       renderDashMetrics(); renderDashActivity(); renderDashUpcoming(); renderDashFollows();
     }
     function buildOfficeMap(O){ var m={}; (O||[]).forEach(function(o){ m[o.id]=o; }); return m; }
@@ -518,10 +555,15 @@
       var overdue = F ? F.filter(function(f){ return fuEff(f)==='overdue'; }).length : 0;
       var open = F ? F.filter(function(f){ return f.status!=='completed'; }).length : 0;
       var fDelta = F ? (overdue>0 ? overdue+' overdue' : open+' open') : 'Run setup SQL';
+      var E=DASH.eois;
+      var eVal = E ? E.length : '\u2014';
+      var eUnder = E ? E.filter(function(x){ return x.status==='under_review'; }).length : 0;
+      var eSigned = E ? E.filter(function(x){ return x.status==='signed'; }).length : 0;
+      var eDelta = E ? (eUnder>0 ? eUnder+' under review' : (eSigned>0 ? eSigned+' signed' : E.length+' total')) : 'Run setup SQL';
       el.innerHTML =
           dashCard('Offices','building', oVal, oDelta, '', 'offices')
         + dashCard('Meetings','calendar', mVal, mDelta, '', 'meetings')
-        + dashCard('EOIs','file', '\u2014', 'Module coming soon', '', null)
+        + dashCard('EOIs','file', eVal, eDelta, '', 'eois')
         + dashCard('Follow-ups','bell', fVal, fDelta, (overdue>0?'warn':''), 'followups');
       Array.prototype.forEach.call(el.querySelectorAll('[data-goto]'), function(c){ c.addEventListener('click', function(){ location.hash='#/'+c.getAttribute('data-goto'); }); });
     }
@@ -539,11 +581,12 @@
 
     function renderDashActivity(){
       var el=document.getElementById('dashActivity'); if(!el) return;
-      var O=DASH.offices||[], M=DASH.meetings||[], F=DASH.follows||[], map=DASH.byId||{};
+      var O=DASH.offices||[], M=DASH.meetings||[], F=DASH.follows||[], E=DASH.eois||[], map=DASH.byId||{};
       var items=[];
       O.forEach(function(o){ items.push({ t:tstamp(o), icon:'building', html:'New office \u2014 <b>'+esc(o.name)+'</b>' }); });
       M.forEach(function(m){ var o=map[m.office_id]; items.push({ t:tstamp(m), icon:'calendar', html:'Meeting logged \u2014 <b>'+esc(o?o.name:'office')+'</b>'+(m.meeting_date?' ('+esc(fmtDate(m.meeting_date))+')':'') }); });
       F.forEach(function(f){ var o=map[f.office_id]; items.push({ t:tstamp(f), icon:'bell', html:'Follow-up added \u2014 <b>'+esc(f.type||(o?o.name:'office'))+'</b>' }); });
+      E.forEach(function(x){ var o=map[x.office_id]; items.push({ t:tstamp(x), icon:'file', html:(x.status==='signed'?'EOI signed \u2014 ':'EOI added \u2014 ')+'<b>'+esc(o?o.name:'office')+'</b>' }); });
       items.sort(function(a,b){ return a.t<b.t?1:a.t>b.t?-1:0; });
       items=items.slice(0,6);
       if(items.length===0){ el.innerHTML='<div class="panel-empty">No activity yet \u2014 add an office to get started.</div>'; return; }
@@ -773,9 +816,10 @@
         + '<div class="ov-scrim" id="ovScrim" hidden></div>'
         + '<aside class="ov" id="ov" hidden aria-hidden="true" aria-label="Office details">'
         +   '<div class="ov-head"><h2 id="ovTitle" class="display">Add office</h2><button class="icon-btn" id="ovClose" aria-label="Close">'+SVG_X+'</button></div>'
-        +   '<div class="ov-body">'+form+'<div id="ofHistory"></div></div>'
+        +   '<div class="ov-body">'+form+'<div id="ofEoiHistory"></div><div id="ofHistory"></div><div id="ofDocs"></div></div>'
         +   '<div class="ov-foot"><div class="ov-err" id="ovErr"></div><button class="btn-out" id="ovCancel">Cancel</button><button class="btn-primary" id="ovSave"><span>Save office</span></button></div>'
         + '</aside>'
+        + '<input type="file" id="ofDocInput" accept="application/pdf" style="display:none">'
 
         + '<div class="cf-scrim" id="cfScrim" hidden>'
         +   '<div class="cf"><h3>Delete office?</h3><p id="cfText"></p>'
@@ -802,7 +846,11 @@
 
       loadOffices();
     }
-    function escClose(e){ if(e.key !== 'Escape') return; var me = document.getElementById('meOv'); if(me && me.classList.contains('show')) return; closeForm(); closeConfirm(); }
+    function escClose(e){ if(e.key !== 'Escape') return;
+      var me = document.getElementById('meOv'); if(me && me.classList.contains('show')) return;
+      var eo = document.getElementById('eoOv'); if(eo && eo.classList.contains('show')) return;
+      var fu = document.getElementById('fuOv'); if(fu && fu.classList.contains('show')) return;
+      closeForm(); closeConfirm(); }
 
     async function loadOffices(){
       OF.loading = true;
@@ -924,7 +972,9 @@
       document.getElementById('ovErr').textContent = '';
       showOverlay(true);
       setTimeout(function(){ var n = document.getElementById('ofName'); if(n) n.focus(); }, 80);
+      renderOfficeEoiHistory(o);
       renderOfficeHistory(o);
+      renderOfficeDocs(o);
     }
     function setVal(id, v){ var el = document.getElementById(id); if(el) el.value = (v === 0 ? '0' : (v || '')); }
     function val(id){ var el = document.getElementById(id); return el ? el.value : ''; }
@@ -1686,6 +1736,379 @@
       }
       return { open: open };
     })();
+
+    /* =========================================================
+       EOIs — expressions of interest, linked to offices.
+       Table: public.eois (run eois-setup.sql once).
+       ========================================================= */
+    var EOISTAT = {
+      draft:        { label:'Draft',        c:'#5C6760', bg:'#ECE8DD' },
+      sent:         { label:'Sent',         c:'#2563EB', bg:'#E7EEFC' },
+      under_review: { label:'Under review', c:'#9A6A00', bg:'#FBF1D8' },
+      signed:       { label:'Signed',       c:'#0E5A3C', bg:'#E7F0EA' },
+      declined:     { label:'Declined',     c:'#B42318', bg:'#FBEAE8' }
+    };
+    function eoiStatusMeta(s){ return EOISTAT[s] || EOISTAT.draft; }
+
+    var EO = { all:[], offices:{}, officeList:null, q:'', status:'all', loading:true };
+
+    function eoisView(){
+      return ''
+        + '<div class="view-head">'
+        +   '<div class="vh-sub">Expressions of interest sent to offices \u2014 from first draft to signed.</div>'
+        +   '<div class="tools">'
+        +     '<div class="search">'+SVG_SEARCH+'<input id="eoSearch" type="search" placeholder="Search office, notes\u2026" autocomplete="off"></div>'
+        +     '<button class="btn-primary" id="eoAdd">'+ic('plus')+'<span>Add EOI</span></button>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="summary" id="eoSummary"></div>'
+        + '<div class="chips" id="eoChips"></div>'
+        + '<div id="eoBody"><div class="loading">Loading EOIs\u2026</div></div>';
+    }
+
+    function eoisMount(){
+      var body = document.getElementById('eoBody');
+      if(!sb){ if(body) body.innerHTML = errBox('Not connected to the database yet.'); return; }
+      var s = document.getElementById('eoSearch'); s.addEventListener('input', function(){ EO.q = s.value.trim().toLowerCase(); renderEoList(); });
+      document.getElementById('eoAdd').addEventListener('click', function(){
+        if(EO.officeList && EO.officeList.length === 0){ toast('Add an office first', 'err'); return; }
+        EOIEditor.open(null, null, loadEOIs);
+      });
+      loadEOIs();
+    }
+
+    async function loadEOIs(){
+      EO.loading = true;
+      var body = document.getElementById('eoBody'); if(body) body.innerHTML = '<div class="loading">Loading EOIs\u2026</div>';
+      try{
+        var offRes = await sb.from('offices').select('id,name,suburb').order('name', { ascending:true });
+        if(offRes.error) throw offRes.error;
+        EO.officeList = offRes.data || []; EO.offices = {}; EO.officeList.forEach(function(o){ EO.offices[o.id] = o; });
+        var res = await sb.from('eois').select('*').order('date_sent', { ascending:false, nullsFirst:false });
+        if(res.error) throw res.error;
+        EO.all = res.data || []; EO.loading = false;
+        renderEoSummary(); renderEoChips(); renderEoList();
+      }catch(e){
+        EO.loading = false;
+        if(body){ body.innerHTML = errBox(friendlyEoError(e)); var r = document.getElementById('ofRetry'); if(r) r.addEventListener('click', loadEOIs); }
+        renderEoSummary(); renderEoChips();
+      }
+    }
+
+    function renderEoSummary(){
+      var el = document.getElementById('eoSummary'); if(!el) return;
+      var ur = EO.all.filter(function(e){ return e.status === 'under_review'; }).length;
+      var signed = EO.all.filter(function(e){ return e.status === 'signed'; }).length;
+      el.innerHTML = stat('Total EOIs', EO.all.length) + stat('Under review', ur) + stat('Signed', signed);
+    }
+
+    function renderEoChips(){
+      var el = document.getElementById('eoChips'); if(!el) return;
+      var defs = [{ id:'all', label:'All' },{ id:'draft', label:'Draft' },{ id:'sent', label:'Sent' },{ id:'under_review', label:'Under review' },{ id:'signed', label:'Signed' },{ id:'declined', label:'Declined' }];
+      function count(id){ return id === 'all' ? EO.all.length : EO.all.filter(function(e){ return e.status === id; }).length; }
+      el.innerHTML = defs.map(function(s){
+        var active = EO.status === s.id; var meta = EOISTAT[s.id];
+        var style = (active && meta) ? (' style="background-color:'+meta.bg+';color:'+meta.c+';border-color:transparent"') : '';
+        return '<button class="chip'+(active?' active':'')+'" data-est="'+s.id+'"'+style+'>'+s.label+' <span class="ct">'+count(s.id)+'</span></button>';
+      }).join('');
+      Array.prototype.forEach.call(el.querySelectorAll('.chip'), function(b){ b.addEventListener('click', function(){ EO.status = b.getAttribute('data-est'); renderEoChips(); renderEoList(); }); });
+    }
+
+    function renderEoList(){
+      var body = document.getElementById('eoBody'); if(!body || EO.loading) return;
+      if(EO.all.length === 0){
+        body.innerHTML = eoEmpty();
+        var b = document.getElementById('eoAddEmpty'); if(b) b.addEventListener('click', function(){ EOIEditor.open(null, null, loadEOIs); });
+        return;
+      }
+      var rows = EO.all.filter(function(e){
+        if(EO.status !== 'all' && e.status !== EO.status) return false;
+        if(EO.q){ var off = EO.offices[e.office_id]; var hay = (((off && off.name) || '')+' '+(e.notes||'')).toLowerCase(); if(hay.indexOf(EO.q) < 0) return false; }
+        return true;
+      });
+      if(rows.length === 0){ body.innerHTML = '<div class="empty-sm">No EOIs match your search or filter.</div>'; return; }
+      var head = '<div class="eo-head"><div>Office</div><div>Date sent</div><div>Status</div><div>Signed</div><div></div></div>';
+      body.innerHTML = '<div class="of-table">' + head + rows.map(eoRow).join('') + '</div>';
+      wireEoRows();
+    }
+
+    function eoRow(e){
+      var off = EO.offices[e.office_id]; var sm = eoiStatusMeta(e.status);
+      var opts = Object.keys(EOISTAT).map(function(k){ return '<option value="'+k+'"'+(k===e.status?' selected':'')+'>'+EOISTAT[k].label+'</option>'; }).join('');
+      var sent = e.date_sent ? esc(fmtDate(e.date_sent)) : '<span class="dim">\u2014</span>';
+      var signed = e.signed_date ? esc(fmtDate(e.signed_date)) : '<span class="dim">\u2014</span>';
+      return ''
+        + '<div class="eo-row" data-id="'+esc(e.id)+'">'
+        +   '<div class="eo-office" data-edit><b>'+(off?esc(off.name):'<span class="dim">Unknown office</span>')+'</b>'+(off&&off.suburb?'<span class="sub">'+esc(off.suburb)+'</span>':'')+'</div>'
+        +   '<div class="eo-sent"><span class="cl">Date sent</span>'+sent+'</div>'
+        +   '<div class="eo-status"><span class="cl">Status</span><select class="spill" data-estatus="'+esc(e.id)+'" style="color:'+sm.c+';background-color:'+sm.bg+'">'+opts+'</select></div>'
+        +   '<div class="eo-signed"><span class="cl">Signed</span>'+signed+'</div>'
+        +   '<div class="c-act"><button class="ia" data-eedit="'+esc(e.id)+'" title="Edit" aria-label="Edit">'+SVG_EDIT+'</button><button class="ia danger" data-edel="'+esc(e.id)+'" title="Delete" aria-label="Delete">'+SVG_TRASH+'</button></div>'
+        + '</div>';
+    }
+
+    function wireEoRows(){
+      var body = document.getElementById('eoBody');
+      Array.prototype.forEach.call(body.querySelectorAll('[data-estatus]'), function(sel){
+        sel.addEventListener('change', function(){ changeEoStatus(sel.getAttribute('data-estatus'), sel.value); });
+        sel.addEventListener('click', function(ev){ ev.stopPropagation(); });
+      });
+      Array.prototype.forEach.call(body.querySelectorAll('[data-eedit]'), function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); var e = findEo(b.getAttribute('data-eedit')); if(e) EOIEditor.open(e, null, loadEOIs); }); });
+      Array.prototype.forEach.call(body.querySelectorAll('[data-edel]'), function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); confirmEoDelete(findEo(b.getAttribute('data-edel'))); }); });
+      Array.prototype.forEach.call(body.querySelectorAll('.eo-office[data-edit]'), function(c){ c.addEventListener('click', function(){ var e = findEo(c.closest('.eo-row').getAttribute('data-id')); if(e) EOIEditor.open(e, null, loadEOIs); }); });
+    }
+    function findEo(id){ return EO.all.filter(function(e){ return String(e.id) === String(id); })[0]; }
+
+    async function changeEoStatus(id, status){
+      var e = findEo(id); if(!e) return;
+      var patch = { status: status };
+      if(status === 'signed' && !e.signed_date){ patch.signed_date = todayStr(); }
+      try{
+        var res = await sb.from('eois').update(patch).eq('id', id).select().single();
+        if(res.error) throw res.error;
+        e.status = status; if(patch.signed_date) e.signed_date = patch.signed_date;
+        renderEoSummary(); renderEoChips(); renderEoList();
+        toast('Status updated');
+      }catch(err){ toast(friendlyShort(err), 'err'); loadEOIs(); }
+    }
+
+    function confirmEoDelete(e){
+      if(!e) return; var off = EO.offices[e.office_id];
+      confirmDialog('Delete EOI?', 'Delete this EOI'+(off?(' for <b>'+esc(off.name)+'</b>'):'')+'? This can\u2019t be undone.', async function(){
+        var res = await sb.from('eois').delete().eq('id', e.id);
+        if(res.error){ toast(friendlyShort(res.error), 'err'); throw res.error; }
+        toast('EOI deleted'); loadEOIs();
+      });
+    }
+
+    function eoEmpty(){
+      if(EO.officeList && EO.officeList.length === 0){
+        return '<div class="empty"><span class="ptile">'+ic('file')+'</span><h2 class="display">No EOIs yet</h2>'
+          + '<p>EOIs are linked to your offices. Add an office first, then you can record an expression of interest.</p>'
+          + '<a class="btn-primary" href="#/offices">'+ic('building')+'<span>Go to Offices</span></a></div>';
+      }
+      return '<div class="empty"><span class="ptile">'+ic('file')+'</span><h2 class="display">No EOIs yet</h2>'
+        + '<p>Record your first expression of interest. Everything saves to your database.</p>'
+        + '<button class="btn-primary" id="eoAddEmpty">'+ic('plus')+'<span>Add your first EOI</span></button></div>';
+    }
+
+    function friendlyEoError(e){
+      var m = ((e && (e.message || e.hint || e.details)) || '').toLowerCase(); var code = e && e.code;
+      if(code === '42P01' || code === 'PGRST205' || m.indexOf('does not exist') >= 0 || m.indexOf('could not find the table') >= 0 || m.indexOf('schema cache') >= 0)
+        return 'The <b>eois</b> table isn\u2019t set up yet. Run the one-time setup SQL (eois-setup.sql) in your Supabase SQL editor, then press Try again.';
+      if(code === '42501' || m.indexOf('row-level security') >= 0 || m.indexOf('permission') >= 0)
+        return 'Your database blocked that request. Make sure you ran the full setup SQL and that you\u2019re signed in.';
+      return 'Couldn\u2019t reach the database. Please check your connection and press Try again.';
+    }
+
+    /* ---- shared EOI editor (slide-over appended to <body>) ---- */
+    var EOIEditor = (function(){
+      var built = false, editing = null, onSaved = null, els = {};
+      function build(){
+        if(built) return;
+        var form = ''
+          + '<div class="frm">'
+          +   '<div class="fld span2"><label for="eoOffice">Office *</label><select id="eoOffice"></select><small class="fe" id="eoOfficeErr"></small></div>'
+          +   '<div class="fld"><label for="eoSent">Date sent</label><input id="eoSent" type="date"></div>'
+          +   '<div class="fld"><label for="eoStatusF">Status</label><select id="eoStatusF"><option value="draft">Draft</option><option value="sent">Sent</option><option value="under_review">Under review</option><option value="signed">Signed</option><option value="declined">Declined</option></select></div>'
+          +   '<div class="fld span2"><label for="eoSigned">Signed date</label><input id="eoSigned" type="date"><small class="fld-hint">Filled in automatically when you set the status to Signed \u2014 you can change it.</small></div>'
+          +   '<div class="fld span2"><label for="eoNotes">Notes</label><textarea id="eoNotes" rows="3" placeholder="Anything to remember about this EOI\u2026"></textarea></div>'
+          + '</div>';
+        var html = ''
+          + '<div class="ov-scrim l2" id="eoScrim"></div>'
+          + '<aside class="ov l2" id="eoOv" aria-hidden="true" aria-label="EOI details">'
+          +   '<div class="ov-head"><h2 id="eoTitle" class="display">Add EOI</h2><button class="icon-btn" id="eoClose" aria-label="Close">'+SVG_X+'</button></div>'
+          +   '<div class="ov-body">'+form+'</div>'
+          +   '<div class="ov-foot"><div class="ov-err" id="eoErr"></div><button class="btn-out" id="eoCancel">Cancel</button><button class="btn-primary" id="eoSave"><span>Save EOI</span></button></div>'
+          + '</aside>';
+        var wrap = document.createElement('div'); wrap.innerHTML = html; while(wrap.firstChild) document.body.appendChild(wrap.firstChild);
+        els.scrim = document.getElementById('eoScrim'); els.ov = document.getElementById('eoOv');
+        document.getElementById('eoClose').addEventListener('click', close);
+        document.getElementById('eoCancel').addEventListener('click', close);
+        els.scrim.addEventListener('click', close);
+        document.getElementById('eoSave').addEventListener('click', save);
+        document.getElementById('eoStatusF').addEventListener('change', function(){ var st = document.getElementById('eoStatusF').value; var sd = document.getElementById('eoSigned'); if(st === 'signed' && !sd.value) sd.value = todayStr(); });
+        document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && els.ov.classList.contains('show')) close(); });
+        built = true;
+      }
+      async function fillOffices(selId){
+        var sel = document.getElementById('eoOffice'); sel.innerHTML = '<option value="">Loading\u2026</option>';
+        try{
+          var res = await sb.from('offices').select('id,name').order('name', { ascending:true });
+          if(res.error) throw res.error;
+          var list = res.data || [];
+          if(list.length === 0){ sel.innerHTML = '<option value="">No offices yet</option>'; }
+          else { sel.innerHTML = '<option value="">Select an office\u2026</option>' + list.map(function(o){ return '<option value="'+esc(o.id)+'">'+esc(o.name)+'</option>'; }).join(''); }
+          if(selId) sel.value = selId;
+        }catch(e){ sel.innerHTML = '<option value="">Could not load offices</option>'; }
+      }
+      function show(on){
+        if(on){ els.scrim.classList.add('show'); els.ov.classList.add('show'); els.ov.setAttribute('aria-hidden','false'); }
+        else { els.scrim.classList.remove('show'); els.ov.classList.remove('show'); els.ov.setAttribute('aria-hidden','true'); }
+      }
+      function open(eo, presetOfficeId, savedCb){
+        build();
+        editing = eo || null; onSaved = savedCb || null;
+        document.getElementById('eoTitle').textContent = eo ? 'Edit EOI' : 'Add EOI';
+        document.getElementById('eoSent').value = (eo && eo.date_sent) ? String(eo.date_sent).slice(0,10) : '';
+        document.getElementById('eoStatusF').value = (eo && eo.status) || 'draft';
+        document.getElementById('eoSigned').value = (eo && eo.signed_date) ? String(eo.signed_date).slice(0,10) : '';
+        document.getElementById('eoNotes').value = (eo && eo.notes) || '';
+        document.getElementById('eoOfficeErr').textContent = ''; document.getElementById('eoErr').textContent = '';
+        show(true);
+        fillOffices(eo ? eo.office_id : (presetOfficeId || ''));
+      }
+      function close(){ show(false); }
+      async function save(){
+        var officeId = document.getElementById('eoOffice').value;
+        document.getElementById('eoOfficeErr').textContent = ''; document.getElementById('eoErr').textContent = '';
+        if(!officeId){ document.getElementById('eoOfficeErr').textContent = 'Please choose an office.'; return; }
+        var status = document.getElementById('eoStatusF').value || 'draft';
+        var signed = nn(document.getElementById('eoSigned').value);
+        if(status === 'signed' && !signed){ signed = todayStr(); }
+        var payload = { office_id: officeId, date_sent: nn(document.getElementById('eoSent').value), status: status, signed_date: signed, notes: nn(document.getElementById('eoNotes').value) };
+        var btn = document.getElementById('eoSave'), span = btn.querySelector('span'); var label = span ? span.textContent : '';
+        btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
+        try{
+          var res = editing
+            ? await sb.from('eois').update(payload).eq('id', editing.id).select().single()
+            : await sb.from('eois').insert(payload).select().single();
+          if(res.error) throw res.error;
+          var wasEdit = !!editing; close();
+          toast(wasEdit ? 'EOI updated' : 'EOI added');
+          if(onSaved) onSaved();
+        }catch(e){ document.getElementById('eoErr').textContent = friendlyShort(e); }
+        finally{ btn.disabled = false; if(span) span.textContent = label || 'Save EOI'; }
+      }
+      return { open: open };
+    })();
+
+    /* ---- office drawer: EOI history ---- */
+    function renderOfficeEoiHistory(o){
+      var box = document.getElementById('ofEoiHistory'); if(!box) return;
+      if(!o){ box.innerHTML = '<div class="divider-lab">EOI history</div><p class="hist-hint">Save this office first, then you can record EOIs against it.</p>'; return; }
+      box.innerHTML = '<div class="hist-head"><div class="divider-lab">EOI history</div><button class="btn-soft" id="ofNewEoi">'+ic('plus')+' New EOI</button></div><div id="ofEoiList" class="hist"><div class="hist-loading">Loading\u2026</div></div>';
+      document.getElementById('ofNewEoi').addEventListener('click', function(){ EOIEditor.open(null, o.id, function(){ loadOfficeEoiHistory(o); }); });
+      loadOfficeEoiHistory(o);
+    }
+    async function loadOfficeEoiHistory(o){
+      var list = document.getElementById('ofEoiList'); if(!list) return;
+      list.innerHTML = '<div class="hist-loading">Loading\u2026</div>';
+      try{
+        var res = await sb.from('eois').select('*').eq('office_id', o.id).order('date_sent', { ascending:false, nullsFirst:false });
+        if(res.error) throw res.error;
+        var es = res.data || [];
+        if(es.length === 0){ list.innerHTML = '<p class="hist-empty">No EOIs recorded yet.</p>'; return; }
+        list.innerHTML = es.map(eoiHistItem).join('');
+        Array.prototype.forEach.call(list.querySelectorAll('[data-eoi]'), function(el){
+          el.addEventListener('click', function(){ var e = es.filter(function(x){ return String(x.id) === String(el.getAttribute('data-eoi')); })[0]; EOIEditor.open(e, o.id, function(){ loadOfficeEoiHistory(o); }); });
+        });
+      }catch(e){
+        var mm = ((e && e.message) || '').toLowerCase(); var setup = (mm.indexOf('schema cache') >= 0 || mm.indexOf('does not exist') >= 0 || mm.indexOf('could not find the table') >= 0 || (e && e.code) === 'PGRST205');
+        list.innerHTML = '<p class="hist-empty">'+(setup ? 'Run the eois setup SQL to enable EOI history.' : 'Couldn\u2019t load EOIs.')+'</p>';
+      }
+    }
+    function eoiHistItem(e){
+      var sm = eoiStatusMeta(e.status);
+      var when = e.date_sent ? ('Sent '+fmtDate(e.date_sent)) : 'Not sent yet';
+      var snip = e.notes || (e.signed_date ? ('Signed '+fmtDate(e.signed_date)) : '');
+      return '<div class="hist-item" data-eoi="'+esc(e.id)+'"><div class="hist-top"><span class="hist-when">'+esc(when)+'</span>'
+        + '<span class="spill-static" style="color:'+sm.c+';background-color:'+sm.bg+'">'+sm.label+'</span></div>'
+        + (snip ? '<div class="hist-snip">'+esc(snip)+'</div>' : '')
+        + '</div>';
+    }
+
+    /* =========================================================
+       DOCUMENTS — PDFs stored in Supabase Storage, linked to an
+       office. Metadata in public.documents; files in the
+       'office-documents' bucket. (run documents-setup.sql once)
+       ========================================================= */
+    var DOC_BUCKET = 'office-documents';
+    function fmtBytes(n){ n = +n || 0; if(n < 1024) return n+' B'; if(n < 1048576) return Math.round(n/1024)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+
+    function renderOfficeDocs(o){
+      var box = document.getElementById('ofDocs'); if(!box) return;
+      if(!o){ box.innerHTML = '<div class="divider-lab">Documents</div><p class="hist-hint">Save this office first, then you can upload documents for it.</p>'; return; }
+      box.innerHTML = '<div class="hist-head"><div class="divider-lab">Documents</div><button class="btn-soft" id="ofDocUpload">'+ic('upload')+' Upload PDF</button></div><div id="ofDocsList" class="docs"><div class="hist-loading">Loading\u2026</div></div>';
+      var input = document.getElementById('ofDocInput');
+      document.getElementById('ofDocUpload').addEventListener('click', function(){ if(input){ input.value = ''; input.click(); } });
+      if(input){ input.onchange = function(){ var f = input.files && input.files[0]; if(f) uploadDoc(o, f); }; }
+      loadOfficeDocs(o);
+    }
+    async function loadOfficeDocs(o){
+      var list = document.getElementById('ofDocsList'); if(!list) return;
+      list.innerHTML = '<div class="hist-loading">Loading\u2026</div>';
+      try{
+        var res = await sb.from('documents').select('*').eq('office_id', o.id).order('created_at', { ascending:false });
+        if(res.error) throw res.error;
+        var ds = res.data || [];
+        if(ds.length === 0){ list.innerHTML = '<p class="doc-empty">No documents yet.</p>'; return; }
+        list.innerHTML = ds.map(docItem).join('');
+        function pick(id){ return ds.filter(function(x){ return String(x.id) === String(id); })[0]; }
+        Array.prototype.forEach.call(list.querySelectorAll('[data-docview]'), function(b){ b.addEventListener('click', function(){ viewDoc(pick(b.getAttribute('data-docview'))); }); });
+        Array.prototype.forEach.call(list.querySelectorAll('[data-docdl]'), function(b){ b.addEventListener('click', function(){ downloadDoc(pick(b.getAttribute('data-docdl'))); }); });
+        Array.prototype.forEach.call(list.querySelectorAll('[data-docdel]'), function(b){ b.addEventListener('click', function(){ confirmDocDelete(o, pick(b.getAttribute('data-docdel'))); }); });
+      }catch(e){ list.innerHTML = '<p class="doc-empty">'+friendlyDocError(e)+'</p>'; }
+    }
+    function docItem(d){
+      return '<div class="doc-item" data-doc="'+esc(d.id)+'"><span class="doc-ic">'+ic('file')+'</span>'
+        + '<div class="doc-meta"><div class="doc-name">'+esc(d.name || 'Document.pdf')+'</div><div class="doc-sub">'+(d.size ? fmtBytes(d.size)+' \u00b7 ' : '')+esc(fmtDate(d.created_at))+'</div></div>'
+        + '<div class="doc-act">'
+        +   '<button class="ia" data-docview="'+esc(d.id)+'" title="View" aria-label="View">'+ic('eye')+'</button>'
+        +   '<button class="ia" data-docdl="'+esc(d.id)+'" title="Download" aria-label="Download">'+ic('download')+'</button>'
+        +   '<button class="ia danger" data-docdel="'+esc(d.id)+'" title="Delete" aria-label="Delete">'+SVG_TRASH+'</button>'
+        + '</div></div>';
+    }
+    async function uploadDoc(o, file){
+      if(!file) return;
+      var isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
+      if(!isPdf){ toast('Please choose a PDF file', 'err'); return; }
+      if(file.size > 26214400){ toast('That file is over 25 MB', 'err'); return; }
+      var btn = document.getElementById('ofDocUpload'); var blabel = btn ? btn.innerHTML : '';
+      if(btn){ btn.disabled = true; btn.innerHTML = ic('upload')+' Uploading\u2026'; }
+      try{
+        var safe = (file.name || 'document.pdf').replace(/[^a-zA-Z0-9._-]/g, '_');
+        var path = 'office-'+o.id+'/'+Date.now()+'-'+safe;
+        var up = await sb.storage.from(DOC_BUCKET).upload(path, file, { contentType:'application/pdf', upsert:false });
+        if(up.error) throw up.error;
+        var ins = await sb.from('documents').insert({ office_id:o.id, name:(file.name || safe), path:path, size:file.size, mime:'application/pdf' }).select().single();
+        if(ins.error){ try{ await sb.storage.from(DOC_BUCKET).remove([path]); }catch(_e){} throw ins.error; }
+        toast('Document uploaded'); loadOfficeDocs(o);
+      }catch(e){ toast(friendlyDocError(e), 'err'); }
+      finally{ if(btn){ btn.disabled = false; btn.innerHTML = blabel; } }
+    }
+    async function viewDoc(d){
+      if(!d) return;
+      try{ var r = await sb.storage.from(DOC_BUCKET).createSignedUrl(d.path, 3600); if(r.error) throw r.error; window.open(r.data.signedUrl, '_blank'); }
+      catch(e){ toast(friendlyDocError(e), 'err'); }
+    }
+    async function downloadDoc(d){
+      if(!d) return;
+      try{
+        var r = await sb.storage.from(DOC_BUCKET).createSignedUrl(d.path, 3600, { download: d.name || true });
+        if(r.error) throw r.error;
+        var a = document.createElement('a'); a.href = r.data.signedUrl; a.download = d.name || 'document.pdf'; document.body.appendChild(a); a.click(); a.remove();
+      }catch(e){ toast(friendlyDocError(e), 'err'); }
+    }
+    function confirmDocDelete(o, d){
+      if(!d) return;
+      confirmDialog('Delete document?', 'Delete <b>'+esc(d.name || 'this document')+'</b>? This permanently removes the file.', async function(){
+        try{ await sb.storage.from(DOC_BUCKET).remove([d.path]); }catch(_e){}
+        var del = await sb.from('documents').delete().eq('id', d.id);
+        if(del.error){ toast(friendlyShort(del.error), 'err'); throw del.error; }
+        toast('Document deleted'); loadOfficeDocs(o);
+      });
+    }
+    function friendlyDocError(e){
+      var m = ((e && (e.message || e.error || e.hint)) || '').toLowerCase(); var code = e && (e.statusCode || e.code);
+      if(m.indexOf('bucket not found') >= 0) return 'Document storage isn\u2019t set up yet. Run documents-setup.sql in your Supabase SQL editor.';
+      if(code === '42P01' || code === 'PGRST205' || m.indexOf('could not find the table') >= 0 || m.indexOf('schema cache') >= 0 || (m.indexOf('does not exist') >= 0 && m.indexOf('documents') >= 0))
+        return 'The documents table isn\u2019t set up yet. Run documents-setup.sql, then try again.';
+      if(code === '42501' || code === '403' || m.indexOf('row-level security') >= 0 || m.indexOf('permission') >= 0 || m.indexOf('unauthorized') >= 0)
+        return 'Storage blocked that action. Re-run documents-setup.sql to add the access rules.';
+      if(m.indexOf('exceeded') >= 0 || m.indexOf('too large') >= 0 || m.indexOf('maximum allowed size') >= 0) return 'That file is too large to upload.';
+      return 'Couldn\u2019t complete that document action. Please try again.';
+    }
 
     boot();
   })();
