@@ -1043,6 +1043,377 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
        VIEWS
        ========================================================= */
 
+/* ============================================================================
+   NOVA — FOUNDER BRIEFING  (dashboard card)
+   Architecture: the REASONING ENGINE and the UI are separate.
+     reason(data, ctx)  ->  briefing object   ... the only thing OpenAI replaces
+     render(briefing)   ->  HTML              ... stable; never changes
+
+   BRIEFING CONTRACT (every engine, rule-based or AI, returns exactly this):
+   {
+     greeting: "Good morning, Harsh.",
+     status:   { tone:'good'|'attention'|'mixed'|'new'|'setup', line:"…" },
+     actions:  [ { rank:1, label:"Confirm … meeting", detail:"Scheduled for …",
+                   goto:'meetings', score:90 } ],   // ranked, highest priority first
+     risks:         [ "…", "…" ],
+     opportunities: [ "…", "…" ],
+     meta: { generatedAt:<ms>, offices:<n>, founding:<n>, engine:'rule-v1' }
+   }
+
+   V1 = rule-based (below).  V2 = OpenAI (same shape).  V3 = conversational.
+   ============================================================================ */
+var NOVA = (function(){
+
+  /* ---------------- small helpers (local to NOVA) ---------------- */
+  function groupBy(arr, key){ var g={}; (arr||[]).forEach(function(r){ (g[r[key]]=g[r[key]]||[]).push(r); }); return g; }
+  function dOnly(s){ return s ? String(s).slice(0,10) : ''; }
+  function tOf(s){ s=dOnly(s); if(!s) return NaN; var t=new Date(s+'T00:00:00').getTime(); return isNaN(t)?NaN:t; }
+  function daysAgo(s){ var t=tOf(s); if(isNaN(t)) return Infinity; return Math.floor((Date.now()-t)/86400000); }
+  function mostRecent(dates){ var best='', bt=-Infinity; (dates||[]).forEach(function(d){ var t=tOf(d); if(!isNaN(t)&&t>bt){bt=t;best=d;} }); return best; }
+  function byDateAsc(arr,key){ return (arr||[]).slice().sort(function(a,b){ var x=tOf(a[key]),y=tOf(b[key]); x=isNaN(x)?Infinity:x; y=isNaN(y)?Infinity:y; return x-y; }); }
+  function earliest(arr,key){ return byDateAsc(arr,key)[0]; }
+  function plural(n,w){ return n+' '+w+(n===1?'':'s'); }
+  function fdate(d){ try{ return fmtDate(d); }catch(e){ return dOnly(d); } }
+  function ftime(t){ try{ return t?fmtTime(t):''; }catch(e){ return ''; } }
+  function isUpcoming(m){ try{ return isUpcomingMeeting(m); }catch(e){ return false; } }
+  function fuState(f){ try{ return fuEff(f); }catch(e){ return f && f.status==='completed' ? 'completed' : 'pending'; } }
+  function esq(s){ try{ return esc(s); }catch(e){ return String(s==null?'':s); } }
+
+  /* ============================================================================
+     V1 RULE ENGINE  —  interprets data into a briefing.
+     Scoring:  +50 EOI awaiting response   +45 EOI draft ready to send
+               +40 meeting scheduled        +30 follow-up overdue
+               +20 inactive 14+ days        +10 recent engagement
+     ============================================================================ */
+  /* Deterministic fact extraction — shared by the rule engine AND the AI payload. */
+  function analyzeOffices(data){
+    var O=data.offices||[], M=data.meetings||[], F=data.follows||[], E=data.eois||[];
+    var mByO=groupBy(M,'office_id'), fByO=groupBy(F,'office_id'), eByO=groupBy(E,'office_id');
+    return O.map(function(o){
+      var Mo=mByO[o.id]||[], Fo=fByO[o.id]||[], Eo=eByO[o.id]||[];
+      var dates=[o.updated_at,o.created_at];
+      Mo.forEach(function(m){ dates.push(m.meeting_date); });
+      Eo.forEach(function(x){ dates.push(x.date_sent); dates.push(x.signed_date); });
+      Fo.forEach(function(f){ dates.push(f.updated_at); dates.push(f.created_at); });
+      var last=mostRecent(dates), inactiveDays=daysAgo(last);
+      var eoAwait = Eo.filter(function(x){ return x.status==='sent'||x.status==='under_review'; });
+      var eoDraft = Eo.filter(function(x){ return x.status==='draft'; });
+      var upMeet  = Mo.filter(isUpcoming);
+      var ovFoll  = Fo.filter(function(f){ return fuState(f)==='overdue'; });
+      var recentMeet = Mo.filter(function(m){ var d=daysAgo(m.meeting_date); return d>=0 && d<=7; });
+      var terminal = (o.stage==='signed' || o.stage==='passed');
+      var recent = inactiveDays<=7;
+      var score=0;
+      if(eoAwait.length) score+=50;
+      if(eoDraft.length) score+=45;
+      if(upMeet.length)  score+=40;
+      if(ovFoll.length)  score+=30;
+      if(!terminal && inactiveDays>=14) score+=20;
+      if(recent) score+=10;
+      return { o:o, Mo:Mo, Fo:Fo, Eo:Eo, last:last, inactiveDays:inactiveDays,
+               eoAwait:eoAwait, eoDraft:eoDraft, upMeet:upMeet, ovFoll:ovFoll,
+               recentMeet:recentMeet, terminal:terminal, recent:recent, score:score };
+    });
+  }
+
+  function ruleEngineV1(data, ctx){
+    var greeting = greet(ctx && ctx.name);
+
+    if(ctx && ctx.notReady){
+      return { greeting:greeting,
+        status:{ tone:'setup', line:'I\u2019m ready when your data is. Run the setup SQL in Supabase and I\u2019ll start briefing you each morning.' },
+        actions:[], risks:[], opportunities:[],
+        meta:{ generatedAt:Date.now(), offices:0, founding:0, engine:'rule-v1' } };
+    }
+
+    var O = data.offices||[], M=data.meetings||[], F=data.follows||[], E=data.eois||[], FO=data.founding||[];
+
+    if(O.length===0){
+      return { greeting:greeting,
+        status:{ tone:'new', line:'Your network is just getting started. Add your first offices and I\u2019ll begin tracking what needs your attention.' },
+        actions:[], risks:[], opportunities:[],
+        meta:{ generatedAt:Date.now(), offices:0, founding:FO.length, engine:'rule-v1' } };
+    }
+
+    var scored = analyzeOffices(data);
+
+    /* ---- recommended actions: one primary action per office, ranked by score ---- */
+    function primary(s){
+      var name=s.o.name;
+      if(s.eoAwait.length){ var x=earliest(s.eoAwait,'date_sent'); var d=daysAgo(x.date_sent);
+        return { type:'chase_eoi', goto:'eois', label:'Follow up '+name+' on their EOI',
+          detail: isFinite(d)? 'Sent '+plural(d,'day')+' ago \u2014 awaiting their response.' : 'EOI awaiting their response.' }; }
+      if(s.eoDraft.length){ return { type:'send_eoi', goto:'eois', label:'Send '+name+' their EOI',
+          detail:'Draft is prepared \u2014 ready to send.' }; }
+      if(s.upMeet.length){ var m=earliest(s.upMeet,'meeting_date');
+        return { type:'confirm_meeting', goto:'meetings', label:'Confirm '+name+' meeting',
+          detail:'Scheduled for '+fdate(m.meeting_date)+(m.meeting_time?' at '+ftime(m.meeting_time):'')+'.' }; }
+      if(s.ovFoll.length){ var f=earliest(s.ovFoll,'due_date'); var dd=daysAgo(f.due_date);
+        return { type:'follow', goto:'followups', label:'Follow up '+name,
+          detail:'Follow-up overdue'+(isFinite(dd)&&dd>0?' by '+plural(dd,'day'):'')+'.' }; }
+      if(!s.terminal && s.inactiveDays>=14){
+        return { type:'contact', goto:'offices', label:'Reach out to '+name,
+          detail:'No contact in '+(isFinite(s.inactiveDays)?plural(s.inactiveDays,'day'):'a long time')+'.' }; }
+      return null;
+    }
+    var acts = scored.map(function(s){ var p=primary(s); return p?{ s:s, p:p }:null; })
+      .filter(Boolean)
+      .sort(function(a,b){ return (b.s.score-a.s.score) || (b.s.inactiveDays-a.s.inactiveDays); })
+      .slice(0,5)
+      .map(function(it,i){ return { rank:i+1, label:it.p.label, detail:it.p.detail, goto:it.p.goto, score:it.s.score }; });
+
+    /* ---- risks ---- */
+    var risks=[];
+    scored.forEach(function(s){
+      if(s.ovFoll.length){ var f=earliest(s.ovFoll,'due_date'); var dd=daysAgo(f.due_date);
+        risks.push({ w:(isFinite(dd)?dd:30)+40, t:s.o.name+' \u2014 follow-up overdue'+(isFinite(dd)&&dd>0?' by '+plural(dd,'day'):'')+'.' }); }
+      if(!s.terminal && s.inactiveDays>=14)
+        risks.push({ w:Math.min(s.inactiveDays,120)+10, t:s.o.name+' \u2014 no contact in '+(isFinite(s.inactiveDays)?plural(s.inactiveDays,'day'):'a long time')+'.' });
+      s.eoAwait.forEach(function(x){ var d=daysAgo(x.date_sent); if(isFinite(d)&&d>=10)
+        risks.push({ w:d+30, t:s.o.name+'\u2019s EOI has been awaiting a response for '+plural(d,'day')+'.' }); });
+    });
+    risks.sort(function(a,b){ return b.w-a.w; });
+    risks = risks.slice(0,4).map(function(r){ return r.t; });
+
+    /* ---- opportunities ---- */
+    var opps=[];
+    scored.forEach(function(s){
+      if(s.terminal) return;
+      var underReview = s.eoAwait.some(function(x){ return x.status==='under_review'; });
+      if(underReview) opps.push({ w:70, t:s.o.name+'\u2019s EOI is under review \u2014 close to signing.' });
+      else if(s.eoDraft.length) opps.push({ w:55, t:s.o.name+' has a draft EOI ready \u2014 close to EOI stage.' });
+      else if(s.o.stage==='proposal') opps.push({ w:48, t:s.o.name+' is at proposal stage \u2014 moving toward an EOI.' });
+      if(s.recentMeet.length) opps.push({ w:32, t:s.o.name+' \u2014 met within the last week; momentum is strong.' });
+    });
+    opps.sort(function(a,b){ return b.w-a.w; });
+    opps = opps.slice(0,4).map(function(o){ return o.t; });
+
+    /* ---- status summary tone ---- */
+    var nOverdue = scored.filter(function(s){ return s.ovFoll.length; }).length;
+    var nInactive = scored.filter(function(s){ return !s.terminal && s.inactiveDays>=14; }).length;
+    var nStalled = scored.filter(function(s){ return s.eoAwait.some(function(x){ return daysAgo(x.date_sent)>=10; }); }).length;
+    var attention = nOverdue + nInactive + nStalled;
+    var status;
+    if(attention===0 && acts.length===0) status={ tone:'good', line:'Everything is on track. Nothing needs your attention right now.' };
+    else if(attention===0) status={ tone:'good', line:'The business is progressing well \u2014 a few items to move forward when you\u2019re ready.' };
+    else if(attention>=3) status={ tone:'attention', line:'Several items currently require your attention.' };
+    else status={ tone:'mixed', line:'Steady progress, with '+plural(attention,'item')+' that need attention.' };
+
+    return { greeting:greeting, status:status, actions:acts, risks:risks, opportunities:opps,
+      meta:{ generatedAt:Date.now(), offices:O.length, founding:FO.length, engine:'rule-v1' } };
+  }
+
+  function greet(name){
+    var h=new Date().getHours();
+    var part = h<12 ? 'Good morning' : (h<17 ? 'Good afternoon' : 'Good evening');
+    return part + (name ? ', '+name : '') + '.';
+  }
+
+  /* ======================= ENGINE SELECTOR =======================
+     reason() is the ONLY place the engine is chosen; render() is identical for all.
+       V1  rule-based  (local, instant, always works)
+       V2  OpenAI via the /api/nova serverless function (API key stays server-side)
+     V2 runs only when window.LISTEDGE_NOVA_AI === true AND there is data to reason
+     about. ANY failure (no endpoint, no key, network, bad JSON) silently falls back
+     to the rule engine. To reach V3 (conversational) the same contract is reused. */
+  function aiOn(){ return (typeof window!=='undefined' && window.LISTEDGE_NOVA_AI===true); }
+  function aiEndpoint(){ return (typeof window!=='undefined' && window.LISTEDGE_NOVA_ENDPOINT) || '/api/nova'; }
+
+  function reason(data, ctx){
+    var noData = (ctx && ctx.notReady) || !((data.offices||[]).length);
+    if(noData || !aiOn()) return ruleEngineV1(data, ctx);
+    return openAIEngine(data, ctx).catch(function(){ return ruleEngineV1(data, ctx); });
+  }
+
+  /* Compact, PII-free facts sent to the model (no emails, phones, or note text). */
+  function buildFacts(data, ctx){
+    var scored = analyzeOffices(data).slice().sort(function(a,b){ return b.score-a.score; }).slice(0,25);
+    var O=data.offices||[], FO=data.founding||[], h=new Date().getHours();
+    var offices = scored.map(function(s){
+      var eoa = s.eoAwait.slice().sort(function(a,b){ return tOf(a.date_sent)-tOf(b.date_sent); })[0];
+      var upm = s.upMeet.slice().sort(function(a,b){ return tOf(a.meeting_date)-tOf(b.meeting_date); })[0];
+      var ovf = s.ovFoll.slice().sort(function(a,b){ return tOf(a.due_date)-tOf(b.due_date); })[0];
+      return {
+        name: s.o.name, stage: s.o.stage||'lead',
+        days_since_contact: isFinite(s.inactiveDays)? s.inactiveDays : null,
+        eoi_awaiting: s.eoAwait.length? { status:(eoa&&eoa.status)||null, days_since_sent:(eoa&&isFinite(daysAgo(eoa.date_sent)))?daysAgo(eoa.date_sent):null } : null,
+        eoi_draft_ready: s.eoDraft.length>0,
+        meeting_upcoming: upm? { date:dOnly(upm.meeting_date), time:upm.meeting_time||null } : null,
+        follow_up_overdue: ovf? { days_overdue:isFinite(daysAgo(ovf.due_date))?daysAgo(ovf.due_date):null } : null,
+        recent_engagement: !!s.recent,
+        priority_score: s.score
+      };
+    });
+    return {
+      time_of_day: h<12?'morning':(h<17?'afternoon':'evening'),
+      founder_name: (ctx&&ctx.name)||'',
+      totals: {
+        offices:O.length,
+        in_pipeline:O.filter(function(o){ return o.stage!=='signed'&&o.stage!=='passed'; }).length,
+        founding:FO.length,
+        meetings_upcoming:(data.meetings||[]).filter(isUpcoming).length,
+        follow_ups_overdue:(data.follows||[]).filter(function(f){ return fuState(f)==='overdue'; }).length,
+        eois_awaiting:(data.eois||[]).filter(function(x){ return x.status==='sent'||x.status==='under_review'; }).length
+      },
+      offices: offices
+    };
+  }
+
+  function openAIEngine(data, ctx){
+    var facts = buildFacts(data, ctx);
+    return fetch(aiEndpoint(), { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ facts:facts }) })
+      .then(function(r){ if(!r.ok) throw new Error('nova '+r.status); return r.json(); })
+      .then(function(j){ return normalizeBriefing(j, data, ctx); });
+  }
+
+  /* Coerce the model's JSON into the briefing contract; throw on junk so the
+     caller falls back to the rule engine. */
+  function normalizeBriefing(j, data, ctx){
+    if(!j || typeof j!=='object') throw new Error('empty');
+    var tones={good:1,attention:1,mixed:1,'new':1,setup:1}, gotos={offices:1,meetings:1,followups:1,eois:1,founding:1};
+    var st=j.status||{};
+    var actions = Array.isArray(j.actions)? j.actions : [];
+    var line = (typeof st.line==='string' && st.line.trim())? st.line.trim() : '';
+    if(!line && !actions.length) throw new Error('no content');
+    actions = actions.slice(0,5).map(function(a,i){ a=a||{}; return {
+      rank:i+1, label:String(a.label||'').slice(0,120), detail:String(a.detail||'').slice(0,160),
+      goto: gotos[a.goto]? a.goto : '', score:0 }; }).filter(function(a){ return a.label; });
+    function strs(arr){ return (Array.isArray(arr)?arr:[]).filter(function(x){ return typeof x==='string'&&x.trim(); }).slice(0,4).map(function(x){ return x.trim(); }); }
+    return { greeting:(typeof j.greeting==='string'&&j.greeting.trim())?j.greeting.trim():greet(ctx&&ctx.name),
+      status:{ tone: tones[st.tone]?st.tone:'mixed', line: line||'Here\u2019s where things stand.' },
+      actions:actions, risks:strs(j.risks), opportunities:strs(j.opportunities),
+      meta:{ generatedAt:Date.now(), offices:(data.offices||[]).length, founding:(data.founding||[]).length, engine:'openai' } };
+  }
+
+  /* ---------------- UI (stable across engine versions) ---------------- */
+  function glyph(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      + '<circle cx="12" cy="12" r="3.4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2.1 2.1M16.9 16.9 19 19M19 5l-2.1 2.1M7.1 16.9 5 19"/></svg>';
+  }
+  function toneWord(t){ return ({good:'On track',attention:'Needs attention',mixed:'In progress',new:'Getting started',setup:'Awaiting setup'})[t]||'Briefing'; }
+
+  function render(b){
+    var when=''; try{ when='Updated '+new Date(b.meta.generatedAt).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }catch(e){}
+    var h = '<section class="nova-card" aria-label="NOVA briefing">';
+    // dark header band
+    h += '<div class="nova-top nova-'+(b.status&&b.status.tone||'good')+'">'
+      +   '<div class="nova-bar"><span class="nova-id"><span class="nova-orb"></span><span class="nova-mark">'+glyph()+'</span>NOVA<span class="nova-tag">Briefing</span></span>'
+      +     '<span class="nova-when">'+esq(when)+'</span></div>'
+      +   '<h2 class="nova-greet">'+esq(b.greeting)+'</h2>'
+      +   '<p class="nova-status">'+esq(b.status?b.status.line:'')+'</p>'
+      + '</div>';
+    // body
+    h += '<div class="nova-body">';
+    if(b.actions && b.actions.length){
+      h += '<div class="nova-sec"><div class="nova-h">Recommended actions</div><ol class="nova-acts">';
+      b.actions.forEach(function(a){
+        h += '<li class="nova-act'+(a.rank===1?' lead':'')+'"'+(a.goto?' data-goto="'+esq(a.goto)+'" tabindex="0" role="button"':'')+'>'
+          +   '<span class="nova-rank">'+a.rank+'</span>'
+          +   '<span class="nova-act-tx"><span class="nova-act-l">'+esq(a.label)+'</span><span class="nova-act-d">'+esq(a.detail)+'</span></span>'
+          +   '<span class="nova-go" aria-hidden="true">\u2192</span>'
+          + '</li>';
+      });
+      h += '</ol></div>';
+    }
+    var hasR=b.risks&&b.risks.length, hasO=b.opportunities&&b.opportunities.length;
+    if(hasR||hasO){
+      h += '<div class="nova-grid">';
+      if(hasR){ h += '<div class="nova-col"><div class="nova-h">Risks</div><ul class="nova-list risk">'
+        + b.risks.map(function(t){ return '<li><span class="nova-dot"></span>'+esq(t)+'</li>'; }).join('') + '</ul></div>'; }
+      if(hasO){ h += '<div class="nova-col"><div class="nova-h">Opportunities</div><ul class="nova-list opp">'
+        + b.opportunities.map(function(t){ return '<li><span class="nova-dot"></span>'+esq(t)+'</li>'; }).join('') + '</ul></div>'; }
+      h += '</div>';
+    }
+    if(!(b.actions&&b.actions.length) && !hasR && !hasO){
+      var qt=(b.status&&b.status.tone)||'', qmsg;
+      if(qt==='good') qmsg='All clear. I\u2019ll let you know the moment something needs you.';
+      else if(qt==='new') qmsg='Add your first office from the sidebar and I\u2019ll start tracking priorities.';
+      else if(qt==='setup') qmsg='Once your data is connected, your daily briefing will appear here.';
+      else qmsg='Nothing needs your attention right now.';
+      h += '<div class="nova-quiet">'+glyph()+'<span>'+esq(qmsg)+'</span></div>';
+    }
+    h += '</div></section>';
+    return h;
+  }
+
+  function skeleton(){
+    return '<section class="nova-card"><div class="nova-top nova-good">'
+      + '<div class="nova-bar"><span class="nova-id"><span class="nova-orb"></span><span class="nova-mark">'+glyph()+'</span>NOVA<span class="nova-tag">Briefing</span></span></div>'
+      + '<div class="nova-sk nova-sk-1"></div><div class="nova-sk nova-sk-2"></div></div>'
+      + '<div class="nova-body"><div class="nova-sk nova-sk-3"></div><div class="nova-sk nova-sk-3"></div><div class="nova-sk nova-sk-3 short"></div></div></section>';
+  }
+
+  function ensureStyle(){
+    if(document.getElementById('nova-style')) return;
+    var st=document.createElement('style'); st.id='nova-style';
+    st.textContent=[
+      '.nova-card{background:#fff;border:1px solid rgba(11,40,30,.09);border-radius:20px;overflow:hidden;margin:0 0 22px;',
+        'box-shadow:0 1px 2px rgba(16,32,26,.04),0 18px 38px -26px rgba(10,50,34,.30)}',
+      '.nova-top{position:relative;overflow:hidden;padding:20px 24px 22px;color:#fff;',
+        'background:linear-gradient(135deg,#0A4630 0%,#073525 70%,#06301f 100%)}',
+      '.nova-top::after{content:"";position:absolute;right:-60px;top:-70px;width:230px;height:230px;border-radius:50%;',
+        'background:radial-gradient(circle,rgba(196,217,111,.20),transparent 68%);pointer-events:none}',
+      '.nova-top.nova-attention::after{background:radial-gradient(circle,rgba(245,189,90,.22),transparent 68%)}',
+      '.nova-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px;position:relative;z-index:1}',
+      '.nova-id{display:flex;align-items:center;gap:8px;font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;letter-spacing:.04em;font-size:14px}',
+      '.nova-mark{display:inline-flex;color:#C8F24A}.nova-mark svg{width:16px;height:16px}',
+      '.nova-orb{width:8px;height:8px;border-radius:50%;background:#C8F24A;box-shadow:0 0 0 0 rgba(196,217,111,.55);animation:novaPulse 2.4s ease-out infinite}',
+      '@keyframes novaPulse{0%{box-shadow:0 0 0 0 rgba(196,217,111,.5)}70%{box-shadow:0 0 0 9px rgba(196,217,111,0)}100%{box-shadow:0 0 0 0 rgba(196,217,111,0)}}',
+      '.nova-tag{margin-left:2px;font-family:\'Instrument Sans\',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55)}',
+      '.nova-when{font-size:11.5px;color:rgba(255,255,255,.55);font-weight:500;white-space:nowrap}',
+      '.nova-greet{font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;font-size:25px;line-height:1.08;margin:0 0 4px;letter-spacing:-.02em;position:relative;z-index:1}',
+      '.nova-status{margin:0;font-size:15px;line-height:1.45;color:rgba(255,255,255,.84);max-width:60ch;position:relative;z-index:1}',
+      '.nova-body{padding:18px 22px 20px}',
+      '.nova-sec{margin-bottom:6px}',
+      '.nova-h{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8a948c;font-weight:700;margin:0 0 10px}',
+      '.nova-acts{list-style:none;margin:0 0 4px;padding:0;display:flex;flex-direction:column;gap:7px}',
+      '.nova-act{display:flex;align-items:center;gap:13px;padding:11px 12px;border:1px solid rgba(11,40,30,.07);border-radius:13px;background:#fbfaf5;cursor:pointer;transition:transform .14s,border-color .14s,background .14s}',
+      '.nova-act:hover,.nova-act:focus{outline:none;background:#f4f6ec;border-color:rgba(10,70,48,.22);transform:translateX(2px)}',
+      '.nova-act.lead{background:linear-gradient(90deg,#f3f7e6,#fbfaf5);border-color:rgba(10,70,48,.18);box-shadow:inset 3px 0 0 #C8F24A}',
+      '.nova-rank{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;',
+        'font-family:\'Bricolage Grotesque\',sans-serif;font-weight:700;font-size:13px;color:#fff;background:#0A4630}',
+      '.nova-act.lead .nova-rank{background:#0A4630;color:#C8F24A}',
+      '.nova-act-tx{display:flex;flex-direction:column;min-width:0;flex:1}',
+      '.nova-act-l{font-size:14.5px;font-weight:650;color:#15211d;line-height:1.25}',
+      '.nova-act-d{font-size:12.5px;color:#67726b;margin-top:2px;line-height:1.3}',
+      '.nova-go{flex:0 0 auto;color:#aeb6af;font-size:16px;transition:color .14s,transform .14s}',
+      '.nova-act:hover .nova-go{color:#0A4630;transform:translateX(2px)}',
+      '.nova-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(11,40,30,.07)}',
+      '@media(min-width:720px){.nova-grid{grid-template-columns:1fr 1fr;gap:26px}}',
+      '.nova-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}',
+      '.nova-list li{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;line-height:1.4;color:#3f4a44}',
+      '.nova-dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;margin-top:5px}',
+      '.nova-list.risk .nova-dot{background:#E08A2B;box-shadow:0 0 0 3px rgba(224,138,43,.12)}',
+      '.nova-list.opp .nova-dot{background:#2FA56A;box-shadow:0 0 0 3px rgba(47,165,106,.12)}',
+      '.nova-quiet{display:flex;align-items:center;gap:10px;color:#67726b;font-size:14px;padding:6px 2px}.nova-quiet svg{width:18px;height:18px;color:#0A4630}',
+      '.nova-sk{height:13px;border-radius:7px;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.28),rgba(255,255,255,.12));background-size:200% 100%;animation:novaShine 1.3s linear infinite;margin:8px 0}',
+      '.nova-sk-1{width:42%;height:22px;margin-top:4px}.nova-sk-2{width:66%}',
+      '.nova-body .nova-sk{background:linear-gradient(90deg,#f0eee6,#f7f5ee,#f0eee6);background-size:200% 100%}.nova-sk-3{width:100%;height:16px}.nova-sk-3.short{width:55%}',
+      '@keyframes novaShine{to{background-position:-200% 0}}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+
+  return { reason:reason, render:render, skeleton:skeleton, ensureStyle:ensureStyle };
+})();
+
+/* orchestrator — reads the dashboard's DASH data, runs the engine, renders */
+function renderNova(){
+  var host=document.getElementById('novaBriefing'); if(!host) return;
+  NOVA.ensureStyle();
+  var data = { offices:(DASH.offices||[]), meetings:(DASH.meetings||[]), follows:(DASH.follows||[]),
+               eois:(DASH.eois||[]), founding:(DASH.founding||[]) };
+  var ctx = { now:Date.now(), name:(STATE&&STATE.name)||'', notReady:(DASH.offices===null) };
+  Promise.resolve(NOVA.reason(data, ctx)).then(function(b){
+    host.innerHTML = NOVA.render(b);
+    Array.prototype.forEach.call(host.querySelectorAll('[data-goto]'), function(el){
+      function go(){ var g=el.getAttribute('data-goto'); if(g) location.hash='#/'+g; }
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
+    });
+  }).catch(function(){ host.innerHTML=''; });
+}
+
     /* ---- DASHBOARD — live data pulled from your modules ---- */
     var DASH = {};
 
@@ -1050,6 +1421,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
       return ''
         + '<div class="view-head"><div class="vh-sub">Here\u2019s what\u2019s happening across ListEdge.</div>'
         +   '<span class="pill"><span class="dot"></span> Live data</span></div>'
+        + '<div id="novaBriefing">'+NOVA.skeleton()+'</div>'
         + '<div class="metrics" id="dashMetrics">'+dashMetricSkeletons()+'</div>'
         + '<div class="panels">'
         +   '<div class="panel"><div class="panel-head"><h2>Recent Activity</h2></div><div class="panel-body" id="dashActivity"><div class="panel-loading">Loading\u2026</div></div></div>'
@@ -1080,7 +1452,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
       var N = await safeRows('notes');
       var FO = await safeRows('founding_offices');
       DASH = { offices:O, meetings:M, follows:F, eois:E, notes:N, founding:FO, byId: buildOfficeMap(O) };
-      renderDashMetrics(); renderDashActivity(); renderDashUpcoming(); renderDashFollows();
+      renderDashMetrics(); renderDashActivity(); renderDashUpcoming(); renderDashFollows(); renderNova();
     }
     function buildOfficeMap(O){ var m={}; (O||[]).forEach(function(o){ m[o.id]=o; }); return m; }
 
@@ -1362,6 +1734,12 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
     var splash = document.getElementById('splash');
     var app    = document.getElementById('app');
     var sb, STATE = { email:'', initial:'A' };
+    // Multi-tenant ownership: id of the currently authenticated user.
+    // Implements (await sb.auth.getUser()).data.user.id with a boot-captured fallback.
+    async function ownerId(){
+      try{ var u = await sb.auth.getUser(); if(u && u.data && u.data.user && u.data.user.id) return u.data.user.id; }catch(e){}
+      return (STATE && STATE.uid) ? STATE.uid : null;
+    }
 
     function configured(){
       return cfg.url && cfg.anonKey &&
@@ -1381,6 +1759,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
 
       if(!session){ gotoLogin(); return; }   // protected: no session -> login
 
+      STATE.uid = (session.user && session.user.id) ? session.user.id : '';
       setProfile(session.user);
       buildNav();
       wire();
@@ -1398,6 +1777,10 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
       var email = (user && user.email) ? user.email : 'admin';
       STATE.email = email;
       STATE.initial = (email.charAt(0) || 'A').toUpperCase();
+      var meta = (user && user.user_metadata) || {};
+      var nm = String(meta.full_name || meta.name || '').trim();
+      if(!nm){ nm = String(email).split('@')[0].split(/[._+\-]/)[0]; }
+      STATE.name = nm ? (nm.charAt(0).toUpperCase()+nm.slice(1)) : '';
       document.getElementById('pemail').textContent = email;
       document.getElementById('pemail2').textContent = email;
       document.getElementById('avatar').textContent = STATE.initial;
@@ -1704,6 +2087,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
       var label = span ? span.textContent : '';
       btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
       try{
+        if(!OF.editing){ payload.user_id = await ownerId(); }
         var res = OF.editing
           ? await sb.from('offices').update(payload).eq('id', OF.editing.id).select().single()
           : await sb.from('offices').insert(payload).select().single();
@@ -2049,6 +2433,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
         var btn = document.getElementById('meSave'), span = btn.querySelector('span'); var label = span ? span.textContent : '';
         btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
         try{
+          if(!editing){ payload.user_id = await ownerId(); }
           var res = editing
             ? await sb.from('meetings').update(payload).eq('id', editing.id).select().single()
             : await sb.from('meetings').insert(payload).select().single();
@@ -2417,6 +2802,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
         var btn = document.getElementById('fuoSave'), span = btn.querySelector('span'); var label = span ? span.textContent : '';
         btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
         try{
+          if(!editing){ payload.user_id = await ownerId(); }
           var res = editing
             ? await sb.from('follow_ups').update(payload).eq('id', editing.id).select().single()
             : await sb.from('follow_ups').insert(payload).select().single();
@@ -2663,6 +3049,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
         var btn = document.getElementById('eoSave'), span = btn.querySelector('span'); var label = span ? span.textContent : '';
         btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
         try{
+          if(!editing){ payload.user_id = await ownerId(); }
           var res = editing
             ? await sb.from('eois').update(payload).eq('id', editing.id).select().single()
             : await sb.from('eois').insert(payload).select().single();
@@ -2764,7 +3151,8 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
         var path = 'office-'+o.id+'/'+Date.now()+'-'+safe;
         var up = await sb.storage.from(DOC_BUCKET).upload(path, file, { contentType:'application/pdf', upsert:false });
         if(up.error) throw up.error;
-        var ins = await sb.from('documents').insert({ office_id:o.id, name:(file.name || safe), path:path, size:file.size, mime:'application/pdf' }).select().single();
+        var owner = await ownerId();
+        var ins = await sb.from('documents').insert({ office_id:o.id, name:(file.name || safe), path:path, size:file.size, mime:'application/pdf', user_id:owner }).select().single();
         if(ins.error){ try{ await sb.storage.from(DOC_BUCKET).remove([path]); }catch(_e){} throw ins.error; }
         toast('Document uploaded'); loadOfficeDocs(o);
       }catch(e){ toast(friendlyDocError(e), 'err'); }
@@ -3022,6 +3410,7 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
         var btn = document.getElementById('ntSave'), span = btn.querySelector('span'); var label = span ? span.textContent : '';
         btn.disabled = true; if(span) span.textContent = 'Saving\u2026';
         try{
+          if(!editing){ payload.user_id = await ownerId(); }
           var res = editing
             ? await sb.from('notes').update(payload).eq('id', editing.id).select().single()
             : await sb.from('notes').insert(payload).select().single();
@@ -3173,10 +3562,10 @@ function territoryMount(){ activeTeardown = TERR.teardown; TERR.mount(); }
       return max + 1;
     }
     async function createFoundingOffice(officeId, officeName, dateSigned, notes){
-      var lastErr = null;
+      var lastErr = null, owner = await ownerId();
       for(var attempt = 0; attempt < 2; attempt++){
         var number = await nextFoundingNumber();
-        var ins = await sb.from('founding_offices').insert({ office_id:officeId, office_name:officeName, number:number, date_signed:dateSigned, notes:notes }).select().single();
+        var ins = await sb.from('founding_offices').insert({ office_id:officeId, office_name:officeName, number:number, date_signed:dateSigned, notes:notes, user_id:owner }).select().single();
         if(!ins.error) return ins;
         lastErr = ins.error; var code = ins.error.code || ''; var msg = (ins.error.message || '').toLowerCase();
         if(code === '23505' && msg.indexOf('number') >= 0){ continue; }   // number race — retry with fresh number
