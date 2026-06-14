@@ -1233,7 +1233,8 @@
         contact_phone: nn(val('ofContactPhone')),
         website: nn(val('ofWebsite')),
         next_follow_up: nn(val('ofFollow')),
-        notes: nn(val('ofNotes'))
+        notes: nn(val('ofNotes')),
+user_id: (await sb.auth.getUser()).data.user.id
       };
 
       var btn = document.getElementById('ovSave'), span = btn.querySelector('span');
