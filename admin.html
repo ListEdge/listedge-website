@@ -1287,7 +1287,7 @@ var NOVA = (function(){
 
   /* ---------------- UI (stable across engine versions) ---------------- */
   function glyph(){
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
       + '<circle cx="12" cy="12" r="3.4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2.1 2.1M16.9 16.9 19 19M19 5l-2.1 2.1M7.1 16.9 5 19"/></svg>';
   }
   function toneWord(t){ return ({good:'On track',attention:'Needs attention',mixed:'In progress',new:'Getting started',setup:'Awaiting setup'})[t]||'Briefing'; }
@@ -1418,6 +1418,7 @@ function renderNova(){
     var DASH = {};
 
     function renderDashboard(){
+      NOVA.ensureStyle();
       return ''
         + '<div class="view-head"><div class="vh-sub">Here\u2019s what\u2019s happening across ListEdge.</div>'
         +   '<span class="pill"><span class="dot"></span> Live data</span></div>'
