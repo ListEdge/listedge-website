@@ -1116,12 +1116,12 @@ var CAL = (function(){
       ? '<div class="cal-gnote"><b>Google Calendar isn\u2019t connected yet.</b> Once you set it up, your meetings and follow-ups here will sync automatically to Google Calendar. (Coming soon \u2014 we\u2019ll wire this up when you\u2019re ready.)</div>'
       : '';
     return '<div class="cal-head">'
-      + '<div class="cal-title"><span class="cal-month">'+MONTHS[state.m]+' '+state.y+'</span>'
-      +   '<span class="cal-sub">'+evs.length+' event'+(evs.length===1?'':'s')+' this month</span></div>'
       + '<div class="cal-nav">'
       +   '<button class="cal-ico" data-cal-nav="prev" aria-label="Previous month">'+chevron('prev')+'</button>'
-      +   '<button class="cal-today" data-cal-nav="today">Today</button>'
+      +   '<span class="cal-month">'+MONTHS[state.m]+' '+state.y+'</span>'
       +   '<button class="cal-ico" data-cal-nav="next" aria-label="Next month">'+chevron('next')+'</button>'
+      +   '<button class="cal-today" data-cal-nav="today">Today</button>'
+      +   '<span class="cal-sub">'+evs.length+' event'+(evs.length===1?'':'s')+' this month</span>'
       + '</div>'
       + '<div class="cal-spacer"></div>'
       + '<div class="cal-legend">'+legend+'</div>'
@@ -1234,9 +1234,9 @@ var CAL = (function(){
       '.cal-loading{padding:60px 0;text-align:center;color:#8a948c;font-size:14px}',
       '.cal-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}',
       '.cal-title{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}',
-      '.cal-month{font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;font-size:23px;letter-spacing:-.01em}',
+      '.cal-month{font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;font-size:23px;letter-spacing:-.01em;min-width:205px;text-align:center}',
       '.cal-sub{font-size:13px;color:#67726b}',
-      '.cal-nav{display:flex;align-items:center;gap:6px}',
+      '.cal-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
       '.cal-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(11,40,30,.12);background:#fff;border-radius:9px;color:#3f4a44;cursor:pointer;transition:.15s}',
       '.cal-ico:hover{background:#f4f6ec;border-color:rgba(10,70,48,.25);color:#0A4630}',
       '.cal-today{height:34px;padding:0 14px;border:1px solid rgba(11,40,30,.12);background:#fff;border-radius:9px;font:inherit;font-size:13px;font-weight:650;color:#15211d;cursor:pointer;transition:.15s}',
@@ -1252,10 +1252,10 @@ var CAL = (function(){
       '.cal-main{display:grid;grid-template-columns:1fr 322px;gap:18px;align-items:start}',
       '@media(max-width:900px){.cal-main{grid-template-columns:1fr}}',
       '.cal-cal{background:#fff;border:1px solid rgba(11,40,30,.09);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(16,32,26,.04)}',
-      '.cal-wk{display:grid;grid-template-columns:repeat(7,1fr);background:#f6f4ec;border-bottom:1px solid rgba(11,40,30,.08)}',
+      '.cal-wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#f6f4ec;border-bottom:1px solid rgba(11,40,30,.08)}',
       '.cal-wk span{padding:9px 10px;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8a948c}',
-      '.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}',
-      '.cal-cell{min-height:104px;border-right:1px solid rgba(11,40,30,.06);border-bottom:1px solid rgba(11,40,30,.06);padding:6px 6px 7px;cursor:pointer;display:flex;flex-direction:column;gap:3px;background:#fff;transition:background .12s}',
+      '.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}',
+      '.cal-cell{min-height:104px;min-width:0;overflow:hidden;border-right:1px solid rgba(11,40,30,.06);border-bottom:1px solid rgba(11,40,30,.06);padding:6px 6px 7px;cursor:pointer;display:flex;flex-direction:column;gap:3px;background:#fff;transition:background .12s}',
       '.cal-cell:hover{background:#fcfbf6}',
       '.cal-cell:nth-child(7n){border-right:0}',
       '.cal-cell.out{background:#faf9f4}',
@@ -1263,11 +1263,11 @@ var CAL = (function(){
       '.cal-daynum{align-self:flex-start;width:25px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12.5px;font-weight:600;color:#3f4a44}',
       '.cal-cell.out .cal-daynum{color:#bcc3bc}',
       '.cal-daynum.today{background:#0A4630;color:#C8F24A;font-weight:700}',
-      '.cal-ev{display:flex;align-items:center;gap:5px;width:100%;text-align:left;border:none;border-left:3px solid var(--c);border-radius:6px;padding:2px 6px;font:inherit;font-size:11.5px;font-weight:600;color:var(--c);background:var(--bg);cursor:pointer;overflow:hidden;white-space:nowrap}',
+      '.cal-ev{display:flex;align-items:center;gap:5px;width:100%;max-width:100%;min-width:0;text-align:left;border:none;border-left:3px solid var(--c);border-radius:6px;padding:2px 6px;font:inherit;font-size:11.5px;font-weight:600;color:var(--c);background:var(--bg);cursor:pointer;overflow:hidden;white-space:nowrap}',
       '.cal-ev:hover{filter:brightness(.96)}',
       '.cal-ev.done{opacity:.55;text-decoration:line-through}',
       '.cal-ev-tm{font-variant-numeric:tabular-nums;font-weight:700;opacity:.9;flex:0 0 auto}',
-      '.cal-ev-tx{overflow:hidden;text-overflow:ellipsis}',
+      '.cal-ev-tx{min-width:0;overflow:hidden;text-overflow:ellipsis}',
       '.cal-more{font-size:11px;font-weight:600;color:#67726b;padding:1px 6px;cursor:pointer}',
       '.cal-more:hover{color:#0A4630}',
       '.cal-panel{background:#fff;border:1px solid rgba(11,40,30,.09);border-radius:16px;padding:15px 16px;box-shadow:0 1px 2px rgba(16,32,26,.04)}',
