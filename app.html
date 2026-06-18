@@ -15,8 +15,8 @@
      Use the SAME two values as Founder HQ (see assets/admin/supabase-config.js).
      The anon key is a public client key — safe to keep here. */
   window.LISTEDGE_SUPABASE = {
-    url:     "https://szqtmvvxyoypbralobmk.supabase.co",
-    anonKey: "sb_publishable_g0Az9muzYSzthynORNkRgQ_JXWyqZKP"
+    url:     "https://YOUR-PROJECT.supabase.co",
+    anonKey: "YOUR-ANON-KEY"
   };
   /* ▲▲▲  FILL THESE IN  ▲▲▲ */
 </script>
@@ -148,8 +148,6 @@
   .opp-row:hover{background:#F8F6EF}
   .opp-ic{width:32px;height:32px;border-radius:9px;background:#EAF4EC;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
   .opp-tx{flex:1;font-size:14.5px;font-weight:600;color:var(--ink)}
-  .opp-n{min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:var(--green);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
-  .opp-n.zero{background:#EEE9DC;color:#9aa49c}
   /* ---- snapshot ---- */
   .snap h3{margin:0 0 2px}
   .snap-sub{font-size:12.5px;margin:0 0 16px;line-height:1.45}
@@ -270,6 +268,54 @@
   .dt-agent{font-size:13px;color:var(--ink);padding-top:13px;border-top:1px solid var(--line);}
   .dt-hint{font-size:12.5px;color:var(--sub);line-height:1.45;margin-top:12px;background:#F8F6EF;border:1px solid var(--line);border-radius:11px;padding:11px 13px;}
   .dt-done{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--green-dk);background:#EAF4EC;border:1px solid #CADFD0;border-radius:999px;padding:8px 13px;margin-top:11px;}
+
+  /* ===== prototype-style Home dashboard ===== */
+  .dash-sub{font-size:13px;color:var(--sub);margin:4px 0 0;}
+  .dash-h1{font-family:var(--display);font-weight:700;font-size:24px;color:var(--ink);letter-spacing:-.02em;margin:2px 0 0;line-height:1.1;}
+  .summary{background:linear-gradient(150deg,#0E5A3C,#0A4630);border-radius:18px;padding:17px 18px;margin:16px 0 4px;display:flex;align-items:center;gap:15px;position:relative;overflow:hidden;}
+  .sglow{position:absolute;right:-40px;top:-30px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(200,242,74,.18),rgba(200,242,74,0) 70%);}
+  .big{font-family:var(--display);font-weight:700;font-size:38px;line-height:.9;color:var(--citron);position:relative;}
+  .stxt{color:#fff;position:relative;}
+  .ssub{color:#C5D7CB;font-size:12.5px;margin-top:2px;}
+  .dash-lab{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--sub);margin:22px 0 9px;}
+  .opp{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .opp-row{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;border:none;border-bottom:1px solid var(--line);width:100%;text-align:left;background:#fff;font:inherit;}
+  .opp-row:last-child{border-bottom:none;}
+  .opp-row:hover{background:#F8F6EF;}
+  .opp-ic{width:34px;height:34px;border-radius:10px;background:#EAF4EC;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .opp-ic svg{width:17px;height:17px;}
+  .opp-tx{flex:1;font-size:14px;font-weight:600;color:var(--ink);}
+  .opp-n{font-family:var(--display);font-weight:700;font-size:18px;color:var(--green);}
+  .opp-n.zero{color:#AEB7AE;}
+  .opp-row>svg{width:16px;height:16px;flex:0 0 auto;}
+  .infoline{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:13.5px;color:var(--ink);line-height:1.6;}
+  .infoline b{color:var(--green-dk);}
+  .stat2{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 8px;text-align:center;}
+  .stat2 .n{font-family:var(--display);font-weight:700;font-size:24px;color:var(--green);}
+  .stat2 .l{font-size:12px;color:var(--sub);margin-top:2px;}
+  .heatmap{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;}
+  .heat-tile{border-radius:12px;padding:11px 8px 10px;text-align:center;border:1px solid rgba(0,0,0,.04);}
+  .heat-tile .hs{font-size:12px;font-weight:600;line-height:1.2;}
+  .heat-tile .hn{font-family:var(--display);font-weight:700;font-size:20px;margin-top:2px;line-height:1;}
+  .heat-leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--sub);margin:9px 2px 0;}
+  .swatch{width:14px;height:10px;border-radius:3px;}
+  .snap-launch{width:100%;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;cursor:pointer;text-align:left;margin-top:11px;font:inherit;}
+  .snap-launch:hover{background:#F8F6EF;}
+  .sl-ic{width:38px;height:38px;border-radius:11px;background:#EAF4EC;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sl-ic svg{width:18px;height:18px;}
+  .sl-t{flex:1;}
+  .sl-t b{display:block;font-size:14.5px;font-weight:700;color:var(--ink);}
+  .sl-t span{font-size:12.5px;color:var(--sub);}
+  .snap-launch>svg{width:18px;height:18px;flex:0 0 auto;}
+  .qa{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .qa .btn{width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;background:var(--green);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;}
+  .qa .btn svg{width:17px;height:17px;}
+  .qa .btn.ghost{background:var(--card);color:var(--green);border:1px solid var(--line);}
+  .qa .btn.ghost:hover{background:#F8F6EF;}
+  /* snapshot in an overlay sheet */
+  .snap-sheet{padding-top:30px;}
+  .snap-x{position:absolute;top:14px;right:14px;}
+  .snap-sheet h3{margin:0 0 2px;font-family:var(--display);font-weight:700;font-size:19px;color:var(--ink);}
 </style>
 </head>
 <body>
@@ -280,7 +326,7 @@
   "use strict";
   var cfg = window.LISTEDGE_SUPABASE || {};
   var sb = null;
-  var ST = { user:null, profile:null, view:"app", tab:"home", menu:false, briefs:[], snap:{suburb:"",beds:3,baths:2,type:"Any"}, postMsg:"", listings:[], intros:[], openListing:null, listMsg:"", briefDraft:{beds:3,baths:1,priceMin:"",priceMax:"",landMin:"",landMax:"",subs:[],types:[],notes:"",consent:false}, detail:null, filter:{open:false,suburb:"Any",beds:0,type:"Any"} };
+  var ST = { user:null, profile:null, view:"app", tab:"home", menu:false, briefs:[], snap:{suburb:"",beds:3,baths:2,type:"Any"}, postMsg:"", listings:[], intros:[], openListing:null, listMsg:"", briefDraft:{beds:3,baths:1,priceMin:"",priceMax:"",landMin:"",landMax:"",subs:[],types:[],notes:"",consent:false}, detail:null, filter:{open:false,suburb:"Any",beds:0,type:"Any"}, lastLogin:null, snapOpen:false };
   var screen = document.getElementById("screen");
 
   // ---- tiny helpers ----
@@ -507,20 +553,48 @@
   function briefWho(b){ return b.agent_name ? ('<b>'+esc(b.agent_name)+'</b>'+(b.agency_name?'<span class="muted"> · '+esc(b.agency_name)+'</span>':'')) : '<b>A member office</b>'; }
   function briefCard(b){ return '<div class="bcard" data-act="open-detail" data-id="'+b.id+'"><div class="bcard-top"><div class="price">'+priceRange(b)+'</div><span class="when">'+ic(I.clock,2,"#5C6760")+' '+ago(b.created_at)+'</span></div><div class="statline">'+briefStatline(b)+'</div><div class="chiprow">'+briefChips(b)+'</div>'+(b.note?'<p class="bcard-note">'+esc(b.note)+'</p>':'')+'<div class="cardfoot"><div class="foot-who">'+briefWho(b)+'</div><span class="viewlink">View '+ic(I.chev,2.2,"#0E5A3C")+'</span></div></div>'; }
   function filterBriefs(){ var f=ST.filter; var arr=ST.briefs.filter(function(b){ if(f.suburb&&f.suburb!=="Any" && briefSubs(b).indexOf(f.suburb)<0) return false; if(f.beds && (b.beds||0)>f.beds) return false; if(f.type&&f.type!=="Any"){ var ts=briefTypes(b); if(ts.length && ts.indexOf(f.type)<0) return false; } return true; }); arr.sort(function(a,b){return (b.created_at||"").localeCompare(a.created_at||"");}); return arr; }
-  function oppRow(tab,icon,label,n){ return '<button class="opp-row" data-tab="'+tab+'"><span class="opp-ic">'+ic(I[icon],2,"#0E5A3C")+'</span><span class="opp-tx">'+label+'</span><span class="opp-n'+(n?"":" zero")+'">'+n+'</span></button>'; }
-  function snapshotCard(){ var c=ST.snap, m=snapMatches(), count=m.length; var typeWord=(c.type&&c.type!=="Any")?c.type.toLowerCase():"home"; var hero; if(!c.suburb){ hero='<div class="snap-empty">Pick a suburb to see how many buyers in the network are already looking for a home like it.</div>'; } else { var budg=""; var mins=m.map(function(b){return b.price_min;}).filter(function(x){return x!=null;}); var maxs=m.map(function(b){return b.price_max;}).filter(function(x){return x!=null;}); if(count&&mins.length&&maxs.length){ budg='<div class="snap-budg">Budgets from <b>'+fp(Math.min.apply(null,mins))+'</b> to <b>'+fp(Math.max.apply(null,maxs))+'</b></div>'; } hero='<div class="snap-hero"><div class="snap-big">'+count+'</div><div class="snap-state">active buyer'+(count===1?"":"s")+' in the network '+(count===1?"is":"are")+' looking for a <b>'+c.beds+'-bed, '+c.baths+'-bath '+esc(typeWord)+'</b> in <b>'+esc(c.suburb)+'</b> right now.</div>'+budg+'</div>'; } return '<div class="card snap"><h3>Buyer demand snapshot</h3><p class="muted snap-sub">Set the property you’re appraising — show the vendor the buyers already waiting in the ListEdge network.</p>'+hero+'<div class="snap-form"><label class="fld"><span class="lab">Suburb</span><select data-snap="suburb">'+selOpts(SUBURBS,c.suburb,"Select a suburb")+'</select></label><div class="fld2"><label class="fld"><span class="lab">Bedrooms</span><select data-snap="beds">'+selOpts(BEDS,c.beds)+'</select></label><label class="fld"><span class="lab">Bathrooms</span><select data-snap="baths">'+selOpts(BATHS,c.baths)+'</select></label></div><label class="fld"><span class="lab">Property type</span><select data-snap="type">'+selOpts(TYPES,c.type)+'</select></label></div></div>'; }
+  function greeting(){ var h=new Date().getHours(); return h<12?"Good morning":(h<17?"Good afternoon":"Good evening"); }
+  function matchedBuyerBriefs(){ var seen={}, out=[]; myActiveListings().forEach(function(l){ matchesForListing(l).forEach(function(b){ if(!seen[b.id]){ seen[b.id]=1; out.push(b); } }); }); return out; }
+  function suburbDemand(){ var t={}; ST.briefs.forEach(function(b){ if(b.status&&b.status!=="active") return; briefSubs(b).forEach(function(x){ t[x]=(t[x]||0)+1; }); }); return Object.keys(t).map(function(x){return {s:x,n:t[x]};}).sort(function(a,b){return b.n-a.n;}); }
+  function heatStyle(n,max){ var r=max?n/max:0,bg,fg; if(r>=0.85){bg="#0E5A3C";fg="#FFFFFF";} else if(r>=0.6){bg="#2F7B53";fg="#FFFFFF";} else if(r>=0.4){bg="#7FB394";fg="#0A3D28";} else if(r>=0.2){bg="#C2DBCB";fg="#0A3D28";} else {bg="#E7F0EA";fg="#5C7A68";} return "background:"+bg+";color:"+fg+";"; }
+  function oppRow(tab,icon,label,n){ return '<button class="opp-row" data-tab="'+tab+'"><span class="opp-ic">'+ic(I[icon],2,"#0E5A3C")+'</span><span class="opp-tx">'+label+'</span><span class="opp-n'+(n?"":" zero")+'">'+n+'</span>'+ic(I.chev,2,"#5C6760")+'</button>'; }
+  function snapshotBody(){ var c=ST.snap, m=snapMatches(), count=m.length; var typeWord=(c.type&&c.type!=="Any")?c.type.toLowerCase():"home"; var hero; if(!c.suburb){ hero='<div class="snap-empty">Pick a suburb to see how many buyers in the network are already looking for a home like it.</div>'; } else { var budg=""; var mins=m.map(function(b){return b.price_min;}).filter(function(x){return x!=null;}); var maxs=m.map(function(b){return b.price_max;}).filter(function(x){return x!=null;}); if(count&&mins.length&&maxs.length){ budg='<div class="snap-budg">Budgets from <b>'+fp(Math.min.apply(null,mins))+'</b> to <b>'+fp(Math.max.apply(null,maxs))+'</b></div>'; } hero='<div class="snap-hero"><div class="snap-big">'+count+'</div><div class="snap-state">active buyer'+(count===1?"":"s")+' in the network '+(count===1?"is":"are")+' looking for a <b>'+c.beds+'-bed, '+c.baths+'-bath '+esc(typeWord)+'</b> in <b>'+esc(c.suburb)+'</b> right now.</div>'+budg+'</div>'; } return '<h3>Buyer demand snapshot</h3><p class="muted snap-sub">Set the property you’re appraising — show the vendor the buyers already waiting in the ListEdge network.</p>'+hero+'<div class="snap-form"><label class="fld"><span class="lab">Suburb</span><select data-snap="suburb">'+selOpts(SUBURBS,c.suburb,"Select a suburb")+'</select></label><div class="fld2"><label class="fld"><span class="lab">Bedrooms</span><select data-snap="beds">'+selOpts(BEDS,c.beds)+'</select></label><label class="fld"><span class="lab">Bathrooms</span><select data-snap="baths">'+selOpts(BATHS,c.baths)+'</select></label></div><label class="fld"><span class="lab">Property type</span><select data-snap="type">'+selOpts(TYPES,c.type)+'</select></label></div>'; }
+  function snapshotCard(){ return '<div class="card snap">'+snapshotBody()+'</div>'; }
+  function snapshotOverlay(){ if(!ST.snapOpen) return ""; return '<div class="overlay"><div class="backdrop" data-act="close-snapshot"></div><div class="sheet snap-sheet"><button class="sheet-x snap-x" data-act="close-snapshot" aria-label="Close">'+ic(I.x,2.2,"#16191A")+'</button>'+snapshotBody()+'</div></div>'; }
   function briefRow(b){ var t=(b.property_type&&b.property_type!=="Any")?b.property_type.toLowerCase():"home"; var hasB=(b.price_min!=null||b.price_max!=null); var budg=hasB?'<span class="bf-budg">'+fp(b.price_min)+(b.price_max!=null?" – "+fp(b.price_max):"")+'</span>':''; var mine=b.agent_id===ST.user.id; return '<div class="bf"><div class="bf-h">'+(b.beds||0)+'-bed, '+(b.baths||0)+'-bath '+esc(t)+' in <b>'+esc(b.suburb)+'</b></div><div class="bf-sub">'+budg+(mine?'<span class="bf-mine">Your brief</span>':'<span class="bf-via">A member office</span>')+'</div></div>'; }
   function tabHome(){
     var p=ST.profile;
-    return '<div class="greet">Kia ora, '+esc(firstName(p.full_name,p.email))+'.</div>'+
-      '<p class="greet-sub">'+esc(p.agency_name||"Your office")+'</p>'+
-      snapshotCard()+
-      '<div class="opp">'+
-        oppRow("listings","user","Buyers matching your listings",buyerMatchCount())+
-        oppRow("listings","tag","Your listings with matches",listingsWithMatches())+
-        oppRow("activity","clip","Introductions awaiting contact",pendingIntros())+
-      '</div>'+
-      '<p class="panel-note">Buyer demand is live, and your listings are matched against buyer briefs across the whole network in real time.</p>';
+    if(ST.lastLogin==null){ try{ var key="le_seen_"+me(); var prev=localStorage.getItem(key); ST.lastLogin=prev?parseInt(prev,10):Date.now(); localStorage.setItem(key,String(Date.now())); }catch(e){ ST.lastLogin=Date.now(); } }
+    var name=esc(firstName(p.full_name,p.email));
+    var mb=matchedBuyerBriefs(); var opp=mb.length;
+    var listingMatches=listingsWithMatches(); var awaiting=pendingIntros();
+    var ll=ST.lastLogin||0; function newer(d){ var t=Date.parse(d); return t&&t>ll; }
+    var newBuyers=ST.briefs.filter(function(b){ return newer(b.created_at); }).length;
+    var newMatches=mb.filter(function(b){ return newer(b.created_at); }).length;
+    var newIntros=ST.intros.filter(function(it){ return newer(it.created_at); }).length;
+    var summary = opp>0
+      ? '<div class="summary"><div class="sglow"></div><div class="big">'+opp+'</div><div class="stxt"><div style="font-size:15px;font-weight:700">new '+(opp===1?"opportunity":"opportunities")+'</div><div class="ssub">Buyers are looking for what you’re selling.</div></div></div>'
+      : '<div class="summary"><div class="sglow"></div><div class="stxt"><div style="font-size:16px;font-weight:700;color:#fff">You’re all caught up</div><div class="ssub">Add a listing to start matching with buyers across the network.</div></div></div>';
+    var opps='<div class="opp">'+
+      oppRow("listings","user","New buyer matches",opp)+
+      oppRow("listings","tag","Your listings with matches",listingMatches)+
+      oppRow("activity","clip","Introductions awaiting contact",awaiting)+'</div>';
+    var dm=suburbDemand(); var maxN=dm.length?dm[0].n:0;
+    var heat = dm.length ? '<div class="dash-lab">Buyer demand heatmap</div><div class="heatmap">'+dm.slice(0,9).map(function(d){ return '<div class="heat-tile" style="'+heatStyle(d.n,maxN)+'"><div class="hs">'+esc(d.s)+'</div><div class="hn">'+d.n+'</div></div>'; }).join("")+'</div><div class="heat-leg"><span>Fewer</span><span class="swatch" style="background:#E7F0EA"></span><span class="swatch" style="background:#7FB394"></span><span class="swatch" style="background:#2F7B53"></span><span class="swatch" style="background:#0E5A3C"></span><span>More buyers</span></div>' : "";
+    return '<div class="dash-sub">'+greeting()+',</div><div class="dash-h1">'+name+'</div>'+
+      summary+
+      '<div class="dash-lab">Opportunities</div>'+opps+
+      '<div class="dash-lab">Since you last logged in</div>'+
+      '<div class="infoline"><b>'+newBuyers+'</b> new buyer brief'+(newBuyers===1?"":"s")+' · <b>'+newMatches+'</b> match your listings · <b>'+newIntros+'</b> new introduction'+(newIntros===1?"":"s")+'</div>'+
+      '<div class="dash-lab">My activity</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'+
+        '<div class="stat2"><div class="n">'+myActiveBriefs().length+'</div><div class="l">Active buyers</div></div>'+
+        '<div class="stat2"><div class="n">'+myListings().length+'</div><div class="l">Active listings</div></div>'+
+        '<div class="stat2"><div class="n">'+ST.intros.length+'</div><div class="l">Intros made</div></div></div>'+
+      heat+
+      '<button class="snap-launch" data-act="open-snapshot"><span class="sl-ic">'+ic(I.search,2,"#0E5A3C")+'</span><span class="sl-t"><b>Buyer demand snapshot</b><span>For listing presentations &amp; appraisals</span></span>'+ic(I.chev,2,"#5C6760")+'</button>'+
+      '<div class="dash-lab">Quick actions</div>'+
+      '<div class="qa"><button class="btn ghost" data-act="qa-post">'+ic(I.plus,2,"#0E5A3C")+' Post a buyer</button><button class="btn" data-act="qa-listing">'+ic(I.plus,2,"#fff")+' Add a listing</button></div>';
   }
   function bedFilterOpts(v){ var o='<option value="0"'+(!v?' selected':'')+'>Any</option>'; for(var n=1;n<=6;n++){ o+='<option value="'+n+'"'+(v===n?' selected':'')+'>'+n+(n===6?'+':'')+'</option>'; } return o; }
   function tabBoard(){
@@ -664,7 +738,7 @@
       screen.innerHTML = topbar(isManager) + '<div class="shell"><main class="main"><div class="appwrap office">' + officeView() + '</div></main></div>';
       loadTeam();
     } else {
-      screen.innerHTML = topbar(isManager) + '<div class="shell">' + sideNav() + '<main class="main"><div class="appwrap">' + tabContent() + '</div></main></div>' + tabbar() + detailOverlay();
+      screen.innerHTML = topbar(isManager) + '<div class="shell">' + sideNav() + '<main class="main"><div class="appwrap">' + tabContent() + '</div></main></div>' + tabbar() + detailOverlay() + snapshotOverlay();
     }
   }
 
@@ -727,6 +801,10 @@
       if(a==="intro-from-detail"){ ST.detail=null; logIntro("listing", act.getAttribute("data-listing"), act.getAttribute("data-brief")); return; }
       if(a==="toggle-filter"){ ST.filter.open=!ST.filter.open; renderApp(); return; }
       if(a==="filter-clear"){ ST.filter={open:true,suburb:"Any",beds:0,type:"Any"}; renderApp(); return; }
+      if(a==="open-snapshot"){ ST.snapOpen=true; renderApp(); return; }
+      if(a==="close-snapshot"){ ST.snapOpen=false; renderApp(); return; }
+      if(a==="qa-post"){ ST.tab="post"; ST.postMsg=""; renderApp(); return; }
+      if(a==="qa-listing"){ ST.tab="listings"; ST.listMsg=""; renderApp(); return; }
     }
     var v = t.closest ? t.closest("[data-view]") : null;
     if(v){ ST.view = v.getAttribute("data-view"); ST.menu=false; renderApp(); return; }
