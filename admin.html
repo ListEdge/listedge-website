@@ -1330,7 +1330,7 @@ async function adminCall(action, params){
 }
 
 var NET = (function(){
-  var D={ offices:[], byAgency:{}, open:null, msg:'', busy:false };
+  var D={ offices:[], byAgency:{}, open:null, confirmDel:null, msg:'', busy:false };
   function q(id){ return document.getElementById(id); }
   function esc2(s){ try{return esc(s);}catch(e){return String(s==null?'':s);} }
   function genPw(){ var c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789',s='Le-'; for(var i=0;i<8;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
@@ -1382,9 +1382,13 @@ var NET = (function(){
     var head='<div class="net-o-head">'+
       '<div class="net-o-i"><div class="net-o-nm">'+esc2(o.name)+'</div>'+
         '<div class="net-o-sub">'+pill(on?'Active':'Inactive', on?'on':'off')+' &nbsp;'+nU+' user'+(nU===1?'':'s')+'</div></div>'+
-      '<div class="net-o-act">'+actBtn+'<button class="net-mini" data-net="toggle" data-id="'+esc2(o.id)+'">'+(open?'Hide team':'Manage team')+'</button></div></div>';
+      '<div class="net-o-act">'+actBtn+'<button class="net-mini" data-net="toggle" data-id="'+esc2(o.id)+'">'+(open?'Hide team':'Manage team')+'</button>'+
+        '<button class="net-mini danger" data-net="delete-office" data-id="'+esc2(o.id)+'">Delete</button></div></div>';
+    var confirm = (D.confirmDel===o.id) ? '<div class="net-confirm"><span>Permanently delete <b>'+esc2(o.name)+'</b> and all '+nU+' user'+(nU===1?'':'s')+'? This cannot be undone.</span>'+
+        '<button class="net-mini danger" data-net="confirm-delete" data-id="'+esc2(o.id)+'">Delete permanently</button>'+
+        '<button class="net-mini" data-net="cancel-delete">Cancel</button></div>' : '';
     var body = open ? '<div class="net-o-body">'+(users.length?users.map(userRow).join(''):'<div class="net-empty">No users in this office yet.</div>')+addUserForm(o.id)+'</div>' : '';
-    return '<div class="net-o'+(on?'':' off')+'">'+head+body+'</div>';
+    return '<div class="net-o'+(on?'':' off')+'">'+head+confirm+body+'</div>';
   }
 
   function render(){
@@ -1404,6 +1408,10 @@ var NET = (function(){
     if(a==='create-office'){ var nm=((q('netNewOffice')||{}).value||'').trim(); if(!nm){ D.msg='Enter an office name first.'; render(); return; }
       act(function(done){ adminCall('create-office',{name:nm}).then(function(){done('Office added.');}).catch(function(er){done(null,er.message);}); }); return; }
     if(a==='toggle'){ var id=b.getAttribute('data-id'); D.open=(D.open===id)?null:id; render(); return; }
+    if(a==='delete-office'){ D.confirmDel=b.getAttribute('data-id'); render(); return; }
+    if(a==='cancel-delete'){ D.confirmDel=null; render(); return; }
+    if(a==='confirm-delete'){ var did=b.getAttribute('data-id'); D.confirmDel=null;
+      act(function(done){ adminCall('delete-office',{officeId:did}).then(function(){done('Office deleted.');}).catch(function(er){done(null,er.message);}); }); return; }
     if(a==='office-active'){ var oid=b.getAttribute('data-id'), on=b.getAttribute('data-active')==='1';
       act(function(done){ adminCall('set-office-active',{officeId:oid,active:on}).then(function(){done(on?'Office activated.':'Office deactivated \u2014 everyone in it can no longer sign in.');}).catch(function(er){done(null,er.message);}); }); return; }
     if(a==='add-user'){ var aid=b.getAttribute('data-agency');
@@ -1455,7 +1463,9 @@ var NET = (function(){
       '.net-add-h{font-weight:650;font-size:13.5px;margin-bottom:9px}',
       '.net-add-grid{display:flex;gap:8px;flex-wrap:wrap}',
       '.net-add-grid .net-in{flex:1;min-width:150px}',
-      '.net-add-note{font-size:12px;color:#8a948c;margin-top:8px;line-height:1.5}'
+      '.net-add-note{font-size:12px;color:#8a948c;margin-top:8px;line-height:1.5}',
+      '.net-confirm{background:#FBECEA;border:1px solid #f0cfc9;border-radius:10px;padding:11px 14px;margin:0 16px 14px;font-size:13px;color:#7a2e22;display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.45}',
+      '.net-confirm b{color:#5a1f16}'
     ].join('');
     document.head.appendChild(st);
   }

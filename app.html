@@ -15,8 +15,8 @@
      Use the SAME two values as Founder HQ (see assets/admin/supabase-config.js).
      The anon key is a public client key — safe to keep here. */
   window.LISTEDGE_SUPABASE = {
-    url:     "https://szqtmvvxyoypbralobmk.supabase.co",
-    anonKey: "sb_publishable_g0Az9muzYSzthynORNkRgQ_JXWyqZKP"
+    url:     "https://YOUR-PROJECT.supabase.co",
+    anonKey: "YOUR-ANON-KEY"
   };
   /* ▲▲▲  FILL THESE IN  ▲▲▲ */
 </script>
@@ -96,6 +96,20 @@
   .empty .t{font-weight:650;color:var(--ink);font-size:14.5px;margin-bottom:3px}
   .empty .d{font-size:13px;max-width:360px;line-height:1.5}
   .soon{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green);background:#EAF4EC;border-radius:999px;padding:3px 9px;margin-left:8px;vertical-align:middle}
+  .appwrap{max-width:480px;margin:0 auto;padding:22px 16px 96px}
+  .ph{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.01em;margin:4px 0 16px}
+  .tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:480px;display:flex;background:#fff;border-top:1px solid var(--line);padding:6px 4px;padding-bottom:calc(6px + env(safe-area-inset-bottom));z-index:30;box-shadow:0 -2px 12px rgba(16,32,26,.05)}
+  .navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:#8a948c;font:inherit;font-size:10.5px;font-weight:600;padding:6px 2px;cursor:pointer;border-radius:10px}
+  .navbtn.on{color:var(--green-dk)}
+  .navbtn:hover{background:#F6F4EC}
+  .prof .prof-top{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+  .av.lg{width:48px;height:48px;border-radius:50%;font-size:17px}
+  .prof-nm{font-family:var(--display);font-weight:700;font-size:18px}
+  .prof-rl{font-size:13px;color:var(--sub)}
+  .prof-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:14px}
+  .prof-row span{color:var(--sub)} .prof-row b{font-weight:600}
+  .signout-btn{width:100%;height:46px;margin-top:16px;border:1px solid var(--line);background:#fff;border-radius:11px;font:inherit;font-size:14.5px;font-weight:650;color:#9a3527;cursor:pointer}
+  .signout-btn:hover{background:#FBECEA}
 
   /* ---------- OFFICE / TEAM ---------- */
   .secthead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 14px}
@@ -131,7 +145,7 @@
   "use strict";
   var cfg = window.LISTEDGE_SUPABASE || {};
   var sb = null;
-  var ST = { user:null, profile:null, view:"app", menu:false };
+  var ST = { user:null, profile:null, view:"app", tab:"home", menu:false };
   var screen = document.getElementById("screen");
 
   // ---- tiny helpers ----
@@ -143,6 +157,10 @@
   function ic(p,sw,c){ return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+(c||"currentColor")+'" stroke-width="'+(sw||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
   var I = {
     house:'<path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/>',
+    grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+    tag:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.4"/>',
+    clip:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1H9z"/><path d="M9 11h6M9 15h4"/>',
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
     out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
     home:'<path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/>',
@@ -293,19 +311,58 @@
     '</div>';
   }
 
-  function agentApp(){
+  var TABS = [["home","Home","house"],["board","Board","grid"],["listings","Listings","tag"],["post","Post","plus"],["activity","Activity","clip"],["profile","Profile","user"]];
+  function tabbar(){
+    return '<div class="tabbar">'+TABS.map(function(it){var on=ST.tab===it[0];
+      return '<button class="navbtn'+(on?" on":"")+'" data-tab="'+it[0]+'">'+ic(I[it[2]],on?2.4:2,on?"#0A4630":"#8a948c")+'<span>'+it[1]+'</span></button>';}).join('')+'</div>';
+  }
+  function tabHome(){
     var p = ST.profile;
-    return '<div class="wrap">'+
-      '<div class="greet">Kia ora, '+esc(firstName(p.full_name,p.email))+'.</div>'+
+    return '<div class="greet">Kia ora, '+esc(firstName(p.full_name,p.email))+'.</div>'+
       '<p class="greet-sub">'+esc(p.agency_name||"Your office")+'</p>'+
       '<div class="card"><h3>Your buyer briefs <span class="soon">Coming soon</span></h3>'+
         '<div class="empty">'+ic(I.inbox,1.8,"#A6C0B1")+'<div class="t">No buyer briefs yet</div>'+
           '<div class="d">Post what your buyers are looking for and ListEdge matches them against private listings in other offices.</div></div></div>'+
-      '<div class="card"><h3>Listings matched to your buyers <span class="soon">Coming soon</span></h3>'+
+      '<div class="card"><h3>Matches <span class="soon">Coming soon</span></h3>'+
         '<div class="empty">'+ic(I.home,1.8,"#A6C0B1")+'<div class="t">No matches yet</div>'+
-          '<div class="d">When a listing in the network fits one of your buyer briefs, it shows up here with a way to introduce.</div></div></div>'+
-      '<p class="panel-note">Posting, matching and introductions are being switched on next. Your sign-in, office and permissions are live now.</p>'+
-    '</div>';
+          '<div class="d">When a listing in the network fits one of your buyer briefs, it shows up here with a way to introduce.</div></div></div>';
+  }
+  function tabBoard(){
+    return '<div class="ph">Board <span class="soon">Coming soon</span></div>'+
+      '<div class="card"><div class="empty">'+ic(I.grid,1.8,"#A6C0B1")+'<div class="t">The board is empty</div>'+
+        '<div class="d">The board shows live buyer demand and private listings across the network, matched both ways.</div></div></div>';
+  }
+  function tabListings(){
+    return '<div class="ph">Private listings <span class="soon">Coming soon</span></div>'+
+      '<div class="card"><div class="empty">'+ic(I.tag,1.8,"#A6C0B1")+'<div class="t">No listings yet</div>'+
+        '<div class="d">Add a private, pre-market listing and meet the buyers already waiting for it.</div></div></div>';
+  }
+  function tabPost(){
+    return '<div class="ph">Post</div>'+
+      '<div class="card"><h3>Post a buyer brief <span class="soon">Coming soon</span></h3><p class="muted">Share what your buyer wants — anonymised — and it works like a listing for other offices.</p></div>'+
+      '<div class="card"><h3>Add a private listing <span class="soon">Coming soon</span></h3><p class="muted">List a property privately to the network before it goes public.</p></div>';
+  }
+  function tabActivity(){
+    return '<div class="ph">Activity <span class="soon">Coming soon</span></div>'+
+      '<div class="card"><div class="empty">'+ic(I.clip,1.8,"#A6C0B1")+'<div class="t">No activity yet</div>'+
+        '<div class="d">Your introductions and shared conjunctional records will appear here.</div></div></div>';
+  }
+  function tabProfile(){
+    var p = ST.profile;
+    return '<div class="ph">Profile</div>'+
+      '<div class="card prof"><div class="prof-top"><span class="av lg">'+esc(initials(p.full_name,p.email))+'</span>'+
+        '<div><div class="prof-nm">'+esc(p.full_name||firstName(p.full_name,p.email))+'</div><div class="prof-rl">'+esc(p.role==="manager"?"Office manager":"Agent")+'</div></div></div>'+
+        '<div class="prof-row"><span>Email</span><b>'+esc(p.email||"")+'</b></div>'+
+        '<div class="prof-row"><span>Office</span><b>'+esc(p.agency_name||"—")+'</b></div>'+
+        '<button class="signout-btn" data-act="signout">Sign out</button></div>';
+  }
+  function tabContent(){
+    if(ST.tab==="board") return tabBoard();
+    if(ST.tab==="listings") return tabListings();
+    if(ST.tab==="post") return tabPost();
+    if(ST.tab==="activity") return tabActivity();
+    if(ST.tab==="profile") return tabProfile();
+    return tabHome();
   }
 
   function officeView(){
@@ -320,9 +377,12 @@
   function renderApp(){
     var isManager = ST.profile.role==="manager";
     if(!isManager) ST.view = "app";
-    var body = ST.view==="office" ? officeView() : agentApp();
-    screen.innerHTML = topbar(isManager) + body;
-    if(ST.view==="office") loadTeam();
+    if(isManager && ST.view==="office"){
+      screen.innerHTML = topbar(isManager) + officeView();
+      loadTeam();
+    } else {
+      screen.innerHTML = topbar(isManager) + '<div class="appwrap">' + tabContent() + '</div>' + tabbar();
+    }
   }
 
   function loadTeam(){
@@ -361,6 +421,8 @@
   // ---- delegated events for the app chrome ----
   screen.addEventListener("click", function(e){
     var t = e.target;
+    var _tab = t.closest ? t.closest("[data-tab]") : null;
+    if(_tab){ ST.tab = _tab.getAttribute("data-tab"); ST.menu=false; renderApp(); return; }
     var act = t.closest ? t.closest("[data-act]") : null;
     if(act){
       var a = act.getAttribute("data-act");
