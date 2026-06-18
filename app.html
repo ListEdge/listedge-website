@@ -15,8 +15,8 @@
      Use the SAME two values as Founder HQ (see assets/admin/supabase-config.js).
      The anon key is a public client key — safe to keep here. */
   window.LISTEDGE_SUPABASE = {
-    url:     "https://szqtmvvxyoypbralobmk.supabase.co",
-    anonKey: "sb_publishable_g0Az9muzYSzthynORNkRgQ_JXWyqZKP"
+    url:     "https://YOUR-PROJECT.supabase.co",
+    anonKey: "YOUR-ANON-KEY"
   };
   /* ▲▲▲  FILL THESE IN  ▲▲▲ */
 </script>
@@ -135,6 +135,57 @@
   .lnk.danger:hover{background:#FbeceA}
   .panel-note{background:#F3F7E6;border:1px solid rgba(10,70,48,.16);border-radius:11px;padding:11px 14px;font-size:13px;line-height:1.5;color:#33402f}
   .loading{padding:50px 0;text-align:center;color:var(--sub);font-size:14px}
+
+  /* ---- responsive shell ---- */
+  .topbar{position:sticky;top:0;z-index:40}
+  .shell{display:flex;align-items:flex-start}
+  .main{flex:1;min-width:0}
+  .side{display:none}
+  /* ---- opportunities ---- */
+  .opp{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+  .opp-row{display:flex;align-items:center;gap:12px;width:100%;border:none;background:none;font:inherit;padding:14px 16px;cursor:pointer;border-top:1px solid var(--line);text-align:left}
+  .opp-row:first-child{border-top:none}
+  .opp-row:hover{background:#F8F6EF}
+  .opp-ic{width:32px;height:32px;border-radius:9px;background:#EAF4EC;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .opp-tx{flex:1;font-size:14.5px;font-weight:600;color:var(--ink)}
+  .opp-n{min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:var(--green);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .opp-n.zero{background:#EEE9DC;color:#9aa49c}
+  /* ---- snapshot ---- */
+  .snap h3{margin:0 0 2px}
+  .snap-sub{font-size:12.5px;margin:0 0 16px;line-height:1.45}
+  .snap-empty{background:#F4F1E8;border:1px dashed var(--line);border-radius:12px;padding:18px;font-size:13.5px;color:var(--sub);line-height:1.5;text-align:center;margin-bottom:16px}
+  .snap-hero{position:relative;background:linear-gradient(150deg,var(--green-dk),var(--green-deep));border-radius:14px;padding:20px;color:#fff;margin-bottom:16px;overflow:hidden}
+  .snap-big{font-family:var(--display);font-weight:800;font-size:46px;line-height:1}
+  .snap-state{font-size:14px;line-height:1.5;color:#DCE9E0;margin-top:4px}
+  .snap-state b{color:#fff}
+  .snap-budg{margin-top:12px;font-size:13px;color:#C8F24A;border-top:1px solid rgba(255,255,255,.15);padding-top:10px}
+  .snap-budg b{color:#fff}
+  .snap-form{display:flex;flex-direction:column;gap:12px}
+  .fld{display:flex;flex-direction:column;gap:6px}
+  .fld2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .lab{font-size:12px;font-weight:600;color:var(--sub)}
+  .snap-form select,.card select,.card input[type=number]{width:100%;height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit;font-size:14.5px;background:#fff;color:var(--ink)}
+  .card input[type=number]{-moz-appearance:textfield}
+  /* ---- briefs ---- */
+  .bf{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+  .bf-h{font-size:14.5px;font-weight:600;color:var(--ink)}
+  .bf-sub{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap}
+  .bf-budg{font-size:13px;font-weight:700;color:var(--green)}
+  .bf-mine{font-size:11px;font-weight:700;color:var(--green-dk);background:#EAF4EC;border-radius:999px;padding:2px 9px}
+  .bf-via{font-size:11.5px;color:var(--sub)}
+  .post-ok{background:#EAF4EC;border:1px solid #BFE0CC;color:#0A4630;border-radius:11px;padding:12px 14px;font-size:13.5px;margin-bottom:14px}
+  /* ---- desktop ---- */
+  @media(min-width:760px){
+    .side{display:flex;flex-direction:column;gap:4px;width:222px;flex:0 0 222px;padding:22px 14px;position:sticky;top:60px;align-self:flex-start}
+    .sidebtn{display:flex;align-items:center;gap:12px;width:100%;border:none;background:none;font:inherit;font-size:14.5px;font-weight:600;color:var(--sub);padding:11px 13px;border-radius:11px;cursor:pointer;text-align:left}
+    .sidebtn.on{background:#EAF4EC;color:var(--green-dk)}
+    .sidebtn:hover{background:#F6F4EC}
+    .sidebtn svg{flex:0 0 auto}
+    .appwrap{max-width:760px!important;margin:0 0 0 8px!important;padding:26px 30px 48px!important}
+    .appwrap.office{max-width:900px!important;margin:0 auto!important}
+    .tabbar{display:none}
+  }
+  @media(min-width:1100px){ .appwrap{max-width:860px!important} }
 </style>
 </head>
 <body>
@@ -145,7 +196,7 @@
   "use strict";
   var cfg = window.LISTEDGE_SUPABASE || {};
   var sb = null;
-  var ST = { user:null, profile:null, view:"app", tab:"home", menu:false };
+  var ST = { user:null, profile:null, view:"app", tab:"home", menu:false, briefs:[], snap:{suburb:"",beds:3,baths:2,type:"Any"}, postMsg:"" };
   var screen = document.getElementById("screen");
 
   // ---- tiny helpers ----
@@ -197,9 +248,9 @@
           var ag = (a && a.data) ? a.data : null;
           if(ag && ag.active===false){ renderOfficePaused(); return; }
           ST.profile.agency_name = (ag && ag.name) ? ag.name : "";
-          renderApp();
-        }).catch(function(){ renderApp(); });
-      } else { renderApp(); }
+          loadBriefs(renderApp);
+        }).catch(function(){ loadBriefs(renderApp); });
+      } else { loadBriefs(renderApp); }
     }).catch(function(){ renderNoProfile("We couldn’t load your account just now. Please try again in a moment."); });
   }
 
@@ -312,25 +363,37 @@
   }
 
   var TABS = [["home","Home","house"],["board","Board","grid"],["listings","Listings","tag"],["post","Post","plus"],["activity","Activity","clip"],["profile","Profile","user"]];
-  function tabbar(){
-    return '<div class="tabbar">'+TABS.map(function(it){var on=ST.tab===it[0];
-      return '<button class="navbtn'+(on?" on":"")+'" data-tab="'+it[0]+'">'+ic(I[it[2]],on?2.4:2,on?"#0A4630":"#8a948c")+'<span>'+it[1]+'</span></button>';}).join('')+'</div>';
-  }
+  var SUBURBS=["Addington","Aranui","Avondale","Avonhead","Belfast","Bishopdale","Bromley","Bryndwr","Burnside","Burwood","Cashmere","Casebrook","Cust","Darfield","Dunsandel","Edgeware","Fendalton","Fernside","Halswell","Harewood","Heathcote","Hei Hei","Hillmorton","Hoon Hay","Hornby","Huntsbury","Ilam","Kaiapoi","Kirwee","Leeston","Lincoln","Linwood","Loburn","Lyttelton","Mairehau","Mandeville","Marshland","Merivale","Middleton","New Brighton","Northwood","Ohoka","Opawa","Oxford","Papanui","Parklands","Pegasus","Phillipstown","Prebbleton","Rangiora","Redcliffs","Redwood","Riccarton","Richmond","Rolleston","Russley","Sefton","Shirley","Sockburn","Somerfield","Southbridge","Spreydon","Springston","St Albans","St Martins","Strowan","Sumner","Swannanoa","Sydenham","Tai Tapu","Templeton","Upper Riccarton","Wainoni","Waikuku","Waltham","West Melton","Westmorland","Wigram","Woodend","Woolston","Yaldhurst"];
+  var TYPES=["Any","House","Townhouse","Unit","Apartment","Section","Lifestyle"];
+  var BEDS=[{l:"1",v:1},{l:"2",v:2},{l:"3",v:3},{l:"4",v:4},{l:"5+",v:5}];
+  var BATHS=[{l:"1",v:1},{l:"2",v:2},{l:"3+",v:3}];
+  function fp(n){ if(n==null||isNaN(n)) return ""; return n>=1e6?("$"+(n/1e6).toFixed(2).replace(/\.?0+$/,"")+"m"):("$"+Math.round(n/1000)+"k"); }
+  function selOpts(arr,val,ph){ var o=ph?'<option value="">'+ph+'</option>':''; for(var i=0;i<arr.length;i++){ var x=arr[i]; var v=(typeof x==="object")?x.v:x; var l=(typeof x==="object")?x.l:x; o+='<option value="'+v+'"'+((""+v)===(""+val)?" selected":"")+'>'+l+'</option>'; } return o; }
+  function snapMatches(){ var c=ST.snap; if(!c.suburb) return []; return ST.briefs.filter(function(b){ if(b.suburb!==c.suburb) return false; if(c.beds && (b.beds||0)>c.beds) return false; if(c.baths && (b.baths||0)>c.baths) return false; if(c.type && c.type!=="Any" && b.property_type && b.property_type!=="Any" && b.property_type!==c.type) return false; return true; }); }
+  function loadBriefs(cb){ if(!sb){ if(cb) cb(); return; } sb.from("buyer_briefs").select("id,suburb,beds,baths,property_type,price_min,price_max,agent_id,created_at").eq("status","active").then(function(r){ ST.briefs=(r&&r.data)?r.data:[]; if(cb) cb(); }).catch(function(){ ST.briefs=[]; if(cb) cb(); }); }
+  function postBrief(){ var suburb=el("bf-suburb").value, beds=parseInt(el("bf-beds").value||"0",10)||0, baths=parseInt(el("bf-baths").value||"0",10)||0, type=el("bf-type").value||"Any"; var pmin=el("bf-pmin").value!==""?parseInt(el("bf-pmin").value,10):null; var pmax=el("bf-pmax").value!==""?parseInt(el("bf-pmax").value,10):null; var err=el("bf-err"); err.textContent=""; if(!suburb){ err.textContent="Choose a suburb."; return; } if(pmin!=null&&pmax!=null&&pmax<pmin){ err.textContent="The ‘to’ budget should be higher than the ‘from’ budget."; return; } var btn=document.querySelector('[data-act="post-brief"]'); if(btn){ btn.disabled=true; btn.textContent="Posting…"; } sb.from("buyer_briefs").insert({ agent_id:ST.user.id, agency_id:ST.profile.agency_id||null, suburb:suburb, beds:beds, baths:baths, property_type:type, price_min:pmin, price_max:pmax, status:"active" }).then(function(r){ if(r&&r.error){ if(btn){btn.disabled=false;btn.textContent="Post brief to the network";} err.textContent="Couldn’t post that just now. Please try again."; return; } ST.postMsg="Brief posted — it’s now part of live network demand."; loadBriefs(function(){ renderApp(); }); }).catch(function(){ if(btn){btn.disabled=false;btn.textContent="Post brief to the network";} err.textContent="Something went wrong. Please try again."; }); }
+  function navItems(cls){ return TABS.map(function(it){var on=ST.tab===it[0]; return '<button class="'+cls+(on?" on":"")+'" data-tab="'+it[0]+'">'+ic(I[it[2]],on?2.4:2,on?"#0A4630":"#8a948c")+'<span>'+it[1]+'</span></button>';}).join(""); }
+  function tabbar(){ return '<nav class="tabbar">'+navItems("navbtn")+'</nav>'; }
+  function sideNav(){ return '<nav class="side">'+navItems("sidebtn")+'</nav>'; }
+  function oppRow(tab,icon,label,n){ return '<button class="opp-row" data-tab="'+tab+'"><span class="opp-ic">'+ic(I[icon],2,"#0E5A3C")+'</span><span class="opp-tx">'+label+'</span><span class="opp-n'+(n?"":" zero")+'">'+n+'</span></button>'; }
+  function snapshotCard(){ var c=ST.snap, m=snapMatches(), count=m.length; var typeWord=(c.type&&c.type!=="Any")?c.type.toLowerCase():"home"; var hero; if(!c.suburb){ hero='<div class="snap-empty">Pick a suburb to see how many buyers in the network are already looking for a home like it.</div>'; } else { var budg=""; var mins=m.map(function(b){return b.price_min;}).filter(function(x){return x!=null;}); var maxs=m.map(function(b){return b.price_max;}).filter(function(x){return x!=null;}); if(count&&mins.length&&maxs.length){ budg='<div class="snap-budg">Budgets from <b>'+fp(Math.min.apply(null,mins))+'</b> to <b>'+fp(Math.max.apply(null,maxs))+'</b></div>'; } hero='<div class="snap-hero"><div class="snap-big">'+count+'</div><div class="snap-state">active buyer'+(count===1?"":"s")+' in the network '+(count===1?"is":"are")+' looking for a <b>'+c.beds+'-bed, '+c.baths+'-bath '+esc(typeWord)+'</b> in <b>'+esc(c.suburb)+'</b> right now.</div>'+budg+'</div>'; } return '<div class="card snap"><h3>Buyer demand snapshot</h3><p class="muted snap-sub">Set the property you’re appraising — show the vendor the buyers already waiting in the ListEdge network.</p>'+hero+'<div class="snap-form"><label class="fld"><span class="lab">Suburb</span><select data-snap="suburb">'+selOpts(SUBURBS,c.suburb,"Select a suburb")+'</select></label><div class="fld2"><label class="fld"><span class="lab">Bedrooms</span><select data-snap="beds">'+selOpts(BEDS,c.beds)+'</select></label><label class="fld"><span class="lab">Bathrooms</span><select data-snap="baths">'+selOpts(BATHS,c.baths)+'</select></label></div><label class="fld"><span class="lab">Property type</span><select data-snap="type">'+selOpts(TYPES,c.type)+'</select></label></div></div>'; }
+  function briefRow(b){ var t=(b.property_type&&b.property_type!=="Any")?b.property_type.toLowerCase():"home"; var hasB=(b.price_min!=null||b.price_max!=null); var budg=hasB?'<span class="bf-budg">'+fp(b.price_min)+(b.price_max!=null?" – "+fp(b.price_max):"")+'</span>':''; var mine=b.agent_id===ST.user.id; return '<div class="bf"><div class="bf-h">'+(b.beds||0)+'-bed, '+(b.baths||0)+'-bath '+esc(t)+' in <b>'+esc(b.suburb)+'</b></div><div class="bf-sub">'+budg+(mine?'<span class="bf-mine">Your brief</span>':'<span class="bf-via">A member office</span>')+'</div></div>'; }
   function tabHome(){
-    var p = ST.profile;
+    var p=ST.profile;
     return '<div class="greet">Kia ora, '+esc(firstName(p.full_name,p.email))+'.</div>'+
       '<p class="greet-sub">'+esc(p.agency_name||"Your office")+'</p>'+
-      '<div class="card"><h3>Your buyer briefs <span class="soon">Coming soon</span></h3>'+
-        '<div class="empty">'+ic(I.inbox,1.8,"#A6C0B1")+'<div class="t">No buyer briefs yet</div>'+
-          '<div class="d">Post what your buyers are looking for and ListEdge matches them against private listings in other offices.</div></div></div>'+
-      '<div class="card"><h3>Matches <span class="soon">Coming soon</span></h3>'+
-        '<div class="empty">'+ic(I.home,1.8,"#A6C0B1")+'<div class="t">No matches yet</div>'+
-          '<div class="d">When a listing in the network fits one of your buyer briefs, it shows up here with a way to introduce.</div></div></div>';
+      snapshotCard()+
+      '<div class="opp">'+
+        oppRow("board","user","New buyer matches",0)+
+        oppRow("listings","tag","Your listings with matches",0)+
+        oppRow("activity","clip","Introductions awaiting contact",0)+
+      '</div>'+
+      '<p class="panel-note">Matches and introductions switch on with private listings next. Buyer demand above is live — it counts real active briefs across the network.</p>';
   }
   function tabBoard(){
-    return '<div class="ph">Board <span class="soon">Coming soon</span></div>'+
-      '<div class="card"><div class="empty">'+ic(I.grid,1.8,"#A6C0B1")+'<div class="t">The board is empty</div>'+
-        '<div class="d">The board shows live buyer demand and private listings across the network, matched both ways.</div></div></div>';
+    var list=ST.briefs.slice().sort(function(a,b){return (b.created_at||"").localeCompare(a.created_at||"");});
+    var body = list.length ? list.map(briefRow).join("") : '<div class="card"><div class="empty">'+ic(I.grid,1.8,"#A6C0B1")+'<div class="t">No active buyer briefs yet</div><div class="d">As agents across the network post buyer briefs, they appear here — anonymised. Post one from the Post tab.</div></div></div>';
+    return '<div class="ph">Buyer demand</div><p class="muted" style="margin:-8px 0 16px">Anonymised buyer briefs from across the ListEdge network.</p>'+body;
   }
   function tabListings(){
     return '<div class="ph">Private listings <span class="soon">Coming soon</span></div>'+
@@ -338,8 +401,14 @@
         '<div class="d">Add a private, pre-market listing and meet the buyers already waiting for it.</div></div></div>';
   }
   function tabPost(){
-    return '<div class="ph">Post</div>'+
-      '<div class="card"><h3>Post a buyer brief <span class="soon">Coming soon</span></h3><p class="muted">Share what your buyer wants — anonymised — and it works like a listing for other offices.</p></div>'+
+    var msg = ST.postMsg ? '<div class="post-ok">'+esc(ST.postMsg)+'</div>' : '';
+    return '<div class="ph">Post a buyer brief</div><p class="muted" style="margin:-8px 0 16px">Tell the network what your buyer wants. It stays anonymised and adds to live demand for every member office.</p>'+msg+
+      '<div class="card"><label class="fld"><span class="lab">Suburb</span><select id="bf-suburb">'+selOpts(SUBURBS,"","Select a suburb")+'</select></label>'+
+      '<div class="fld2" style="margin-top:12px"><label class="fld"><span class="lab">Min bedrooms</span><select id="bf-beds">'+selOpts(BEDS,3)+'</select></label><label class="fld"><span class="lab">Min bathrooms</span><select id="bf-baths">'+selOpts(BATHS,1)+'</select></label></div>'+
+      '<label class="fld" style="margin-top:12px"><span class="lab">Property type</span><select id="bf-type">'+selOpts(TYPES,"Any")+'</select></label>'+
+      '<div class="fld2" style="margin-top:12px"><label class="fld"><span class="lab">Budget from ($)</span><input id="bf-pmin" type="number" inputmode="numeric" placeholder="700000"></label><label class="fld"><span class="lab">Budget to ($)</span><input id="bf-pmax" type="number" inputmode="numeric" placeholder="900000"></label></div>'+
+      '<div id="bf-err" class="err" style="margin-top:8px"></div>'+
+      '<button class="signin-btn" style="margin-top:14px" data-act="post-brief">Post brief to the network</button></div>'+
       '<div class="card"><h3>Add a private listing <span class="soon">Coming soon</span></h3><p class="muted">List a property privately to the network before it goes public.</p></div>';
   }
   function tabActivity(){
@@ -378,10 +447,10 @@
     var isManager = ST.profile.role==="manager";
     if(!isManager) ST.view = "app";
     if(isManager && ST.view==="office"){
-      screen.innerHTML = topbar(isManager) + officeView();
+      screen.innerHTML = topbar(isManager) + '<div class="shell"><main class="main"><div class="appwrap office">' + officeView() + '</div></main></div>';
       loadTeam();
     } else {
-      screen.innerHTML = topbar(isManager) + '<div class="appwrap">' + tabContent() + '</div>' + tabbar();
+      screen.innerHTML = topbar(isManager) + '<div class="shell">' + sideNav() + '<main class="main"><div class="appwrap">' + tabContent() + '</div></main></div>' + tabbar();
     }
   }
 
@@ -422,12 +491,13 @@
   screen.addEventListener("click", function(e){
     var t = e.target;
     var _tab = t.closest ? t.closest("[data-tab]") : null;
-    if(_tab){ ST.tab = _tab.getAttribute("data-tab"); ST.menu=false; renderApp(); return; }
+    if(_tab){ ST.tab = _tab.getAttribute("data-tab"); ST.menu=false; ST.postMsg=""; renderApp(); return; }
     var act = t.closest ? t.closest("[data-act]") : null;
     if(act){
       var a = act.getAttribute("data-act");
       if(a==="menu"){ ST.menu=!ST.menu; renderApp(); return; }
       if(a==="signout"){ signOut(); return; }
+      if(a==="post-brief"){ postBrief(); return; }
       if(a==="invite"){ var n=el("officeNote"); if(n){ n.textContent="Adding teammates from inside ListEdge is coming next. For now, new accounts are created for your office by ListEdge."; } return; }
     }
     var v = t.closest ? t.closest("[data-view]") : null;
@@ -438,6 +508,15 @@
     if(re){ setActive(re.getAttribute("data-react"), true); return; }
     // close the account menu when clicking elsewhere
     if(ST.menu && !(t.closest && t.closest(".acct"))){ ST.menu=false; renderApp(); }
+  });
+
+  screen.addEventListener("change", function(e){
+    var t=e.target;
+    if(t && t.getAttribute && t.getAttribute("data-snap")!=null){
+      var k=t.getAttribute("data-snap"), v=t.value;
+      if(k==="beds"||k==="baths") v=parseInt(v||"0",10)||0;
+      ST.snap[k]=v; renderApp(); return;
+    }
   });
 
   boot();
