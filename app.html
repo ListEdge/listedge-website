@@ -15,8 +15,8 @@
      Use the SAME two values as Founder HQ (see assets/admin/supabase-config.js).
      The anon key is a public client key — safe to keep here. */
   window.LISTEDGE_SUPABASE = {
-    url:     "https://szqtmvvxyoypbralobmk.supabase.co",
-    anonKey: "sb_publishable_g0Az9muzYSzthynORNkRgQ_JXWyqZKP"
+    url:     "https://YOUR-PROJECT.supabase.co",
+    anonKey: "YOUR-ANON-KEY"
   };
   /* ▲▲▲  FILL THESE IN  ▲▲▲ */
 </script>
@@ -215,6 +215,61 @@
   .intro-contact a{color:var(--green-dk);font-weight:600;text-decoration:none}
   .intro-wait{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:12.5px;color:var(--sub)}
   .intro .mini-btn{margin-top:11px}
+
+  /* ===== prototype-style buyer board ===== */
+  .fld2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .bcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;cursor:pointer;box-shadow:0 1px 2px rgba(20,30,24,.04);transition:border-color .12s,box-shadow .12s;}
+  .bcard:hover{border-color:#CFE0D3;box-shadow:0 3px 10px rgba(20,30,24,.07);}
+  .bcard-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .price{font-family:var(--display);font-weight:700;font-size:19px;color:var(--ink);letter-spacing:-.01em;}
+  .when{display:inline-flex;align-items:center;gap:4px;color:var(--sub);font-size:11.5px;white-space:nowrap;}
+  .when svg{width:13px;height:13px;}
+  .statline{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 11px;}
+  .stat{display:inline-flex;align-items:center;gap:5px;color:var(--ink);font-size:13px;font-weight:600;}
+  .statline .stat svg{width:14px;height:14px;}
+  .chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px;align-items:center;}
+  .pinic{display:inline-flex;align-items:center;}
+  .pinic svg{width:13px;height:13px;}
+  .tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap;background:#FBFAF6;color:var(--sub);border:1px solid var(--line);}
+  .tag.green{background:#EAF4EC;color:var(--green);border:1px solid #CADFD0;}
+  .bcard-note{margin:0 0 12px;font-size:13px;color:var(--sub);line-height:1.45;}
+  .cardfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:11px;}
+  .foot-who{font-size:12.5px;color:var(--ink);}
+  .viewlink{display:inline-flex;align-items:center;gap:2px;color:var(--green);font-weight:700;font-size:13px;white-space:nowrap;}
+  .viewlink svg{width:15px;height:15px;}
+  /* filter panel */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:14px;}
+  .panelhead{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 15px;background:none;border:none;cursor:pointer;text-align:left;}
+  .panelhead .stat svg{width:16px;height:16px;}
+  .panelbody{padding:2px 15px 15px;display:grid;gap:12px;}
+  .lab-n{font-weight:600;color:var(--green);}
+  .chipwrap{display:flex;flex-wrap:wrap;gap:8px;}
+  .chosen{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:8px 13px;border-radius:999px;background:#FBFAF6;color:var(--ink);border:1px solid var(--line);cursor:pointer;}
+  .chip svg{width:12px;height:12px;}
+  .chip.on{background:#EAF4EC;color:var(--green);border-color:#CADFD0;}
+  .linklike{justify-self:start;background:none;border:none;color:var(--green);font-weight:700;font-size:13px;cursor:pointer;padding:0;}
+  .results-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px;}
+  .rh-count{font-size:13px;font-weight:700;color:var(--ink);}
+  .rh-live{font-size:12px;color:var(--sub);}
+  .rh-live svg{width:13px;height:13px;}
+  /* consent */
+  .consent{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;cursor:pointer;margin-top:14px;}
+  .consent.on{border-color:var(--green);}
+  .cbox{width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:1px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+  .consent.on .cbox{background:var(--green);border-color:var(--green);}
+  .cbox svg{width:14px;height:14px;}
+  .ctxt{font-size:12.5px;color:var(--ink);line-height:1.45;}
+  /* detail overlay */
+  .overlay{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .backdrop{position:absolute;inset:0;background:rgba(8,18,12,.46);backdrop-filter:blur(2px);}
+  .sheet{position:relative;z-index:1;background:var(--card);border:1px solid var(--line);border-radius:18px;max-width:460px;width:100%;padding:20px;max-height:86vh;overflow:auto;box-shadow:0 24px 60px rgba(8,18,12,.32);}
+  .sheet-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
+  .sheet-x{flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .sheet-x svg{width:18px;height:18px;}
+  .dt-agent{font-size:13px;color:var(--ink);padding-top:13px;border-top:1px solid var(--line);}
+  .dt-hint{font-size:12.5px;color:var(--sub);line-height:1.45;margin-top:12px;background:#F8F6EF;border:1px solid var(--line);border-radius:11px;padding:11px 13px;}
+  .dt-done{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--green-dk);background:#EAF4EC;border:1px solid #CADFD0;border-radius:999px;padding:8px 13px;margin-top:11px;}
 </style>
 </head>
 <body>
@@ -225,7 +280,7 @@
   "use strict";
   var cfg = window.LISTEDGE_SUPABASE || {};
   var sb = null;
-  var ST = { user:null, profile:null, view:"app", tab:"home", menu:false, briefs:[], snap:{suburb:"",beds:3,baths:2,type:"Any"}, postMsg:"", listings:[], intros:[], openListing:null, listMsg:"" };
+  var ST = { user:null, profile:null, view:"app", tab:"home", menu:false, briefs:[], snap:{suburb:"",beds:3,baths:2,type:"Any"}, postMsg:"", listings:[], intros:[], openListing:null, listMsg:"", briefDraft:{beds:3,baths:1,priceMin:"",priceMax:"",landMin:"",landMax:"",subs:[],types:[],notes:"",consent:false}, detail:null, filter:{open:false,suburb:"Any",beds:0,type:"Any"} };
   var screen = document.getElementById("screen");
 
   // ---- tiny helpers ----
@@ -237,14 +292,24 @@
   function ic(p,sw,c){ return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+(c||"currentColor")+'" stroke-width="'+(sw||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
   var I = {
     house:'<path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/>',
-    grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
-    tag:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.4"/>',
-    clip:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1H9z"/><path d="M9 11h6M9 15h4"/>',
-    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+    grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+    tag:'<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.4 2.4 0 0 0 3.42 0l6.58-6.58a2.4 2.4 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
+    clip:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+    user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
     out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
     inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
     home:'<path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/>',
-    plus:'<path d="M12 5v14M5 12h14"/>'
+    plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',
+    bed:'<path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/>',
+    bath:'<path d="M4 12h16v3a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/><path d="M6 12V6a2 2 0 0 1 2-2"/><path d="M5 19l-1 2"/><path d="M20 19l1 2"/>',
+    ruler:'<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>',
+    pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+    sliders:'<path d="M21 6H10"/><path d="M6 6H3"/><path d="M21 12h-7"/><path d="M10 12H3"/><path d="M21 18h-3"/><path d="M14 18H3"/><circle cx="8" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="16" cy="18" r="2"/>',
+    chev:'<path d="m9 18 6-6-6-6"/>',
+    x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    check:'<path d="M20 6 9 17l-5-5"/>'
   };
 
   // ============================ AUTH ============================
@@ -398,11 +463,20 @@
   var BATHS=[{l:"1",v:1},{l:"2",v:2},{l:"3+",v:3}];
   function fp(n){ if(n==null||isNaN(n)) return ""; return n>=1e6?("$"+(n/1e6).toFixed(2).replace(/\.?0+$/,"")+"m"):("$"+Math.round(n/1000)+"k"); }
   function selOpts(arr,val,ph){ var o=ph?'<option value="">'+ph+'</option>':''; for(var i=0;i<arr.length;i++){ var x=arr[i]; var v=(typeof x==="object")?x.v:x; var l=(typeof x==="object")?x.l:x; o+='<option value="'+v+'"'+((""+v)===(""+val)?" selected":"")+'>'+l+'</option>'; } return o; }
-  function snapMatches(){ var c=ST.snap; if(!c.suburb) return []; return ST.briefs.filter(function(b){ if(b.suburb!==c.suburb) return false; if(c.beds && (b.beds||0)>c.beds) return false; if(c.baths && (b.baths||0)>c.baths) return false; if(c.type && c.type!=="Any" && b.property_type && b.property_type!=="Any" && b.property_type!==c.type) return false; return true; }); }
+  function snapMatches(){ var c=ST.snap; if(!c.suburb) return []; return ST.briefs.filter(function(b){ if(briefSubs(b).indexOf(c.suburb)<0) return false; if(c.beds && (b.beds||0)>c.beds) return false; if(c.baths && (b.baths||0)>c.baths) return false; if(c.type && c.type!=="Any"){ var ts=briefTypes(b); if(ts.length && ts.indexOf(c.type)<0) return false; } return true; }); }
   function loadBriefs(cb){ if(!sb){ if(cb) cb(); return; } sb.from("buyer_briefs").select("id,suburb,beds,baths,property_type,price_min,price_max,agent_id,created_at").eq("status","active").then(function(r){ ST.briefs=(r&&r.data)?r.data:[]; if(cb) cb(); }).catch(function(){ ST.briefs=[]; if(cb) cb(); }); }
-  function postBrief(){ var suburb=el("bf-suburb").value, beds=parseInt(el("bf-beds").value||"0",10)||0, baths=parseInt(el("bf-baths").value||"0",10)||0, type=el("bf-type").value||"Any"; var pmin=el("bf-pmin").value!==""?parseInt(el("bf-pmin").value,10):null; var pmax=el("bf-pmax").value!==""?parseInt(el("bf-pmax").value,10):null; var err=el("bf-err"); err.textContent=""; if(!suburb){ err.textContent="Choose a suburb."; return; } if(pmin!=null&&pmax!=null&&pmax<pmin){ err.textContent="The ‘to’ budget should be higher than the ‘from’ budget."; return; } var btn=document.querySelector('[data-act="post-brief"]'); if(btn){ btn.disabled=true; btn.textContent="Posting…"; } sb.from("buyer_briefs").insert({ agent_id:ST.user.id, agency_id:ST.profile.agency_id||null, suburb:suburb, beds:beds, baths:baths, property_type:type, price_min:pmin, price_max:pmax, status:"active" }).then(function(r){ if(r&&r.error){ if(btn){btn.disabled=false;btn.textContent="Post brief to the network";} err.textContent="Couldn’t post that just now. Please try again."; return; } ST.postMsg="Brief posted — it’s now part of live network demand."; loadBriefs(function(){ renderApp(); }); }).catch(function(){ if(btn){btn.disabled=false;btn.textContent="Post brief to the network";} err.textContent="Something went wrong. Please try again."; }); }
+  function postBrief(){ var d=ST.briefDraft; var err=el("bf-err"); if(err) err.textContent="";
+    if(!d.subs.length){ if(err) err.textContent="Add at least one suburb."; return; }
+    if(!d.types.length){ if(err) err.textContent="Choose at least one property type."; return; }
+    var pmin=d.priceMin!==""?parseInt(d.priceMin,10):null, pmax=d.priceMax!==""?parseInt(d.priceMax,10):null;
+    if(pmin!=null&&pmax!=null&&pmax<pmin){ if(err) err.textContent="The ‘to’ budget should be higher than the ‘from’ budget."; return; }
+    if(!d.consent){ if(err) err.textContent="Please confirm you have your client’s consent."; return; }
+    var lmin=d.landMin!==""?parseInt(d.landMin,10):null, lmax=d.landMax!==""?parseInt(d.landMax,10):null;
+    var btn=document.querySelector('[data-act="post-brief"]'); if(btn){ btn.disabled=true; btn.textContent="Posting…"; }
+    var rec={ agent_id:me(), agency_id:ST.profile.agency_id||null, suburb:d.subs[0], suburbs:d.subs, property_type:d.types[0], types:d.types, beds:parseInt(d.beds||"0",10)||0, baths:parseInt(d.baths||"0",10)||0, price_min:pmin, price_max:pmax, land_min:lmin, land_max:lmax, note:d.notes||null, agent_name:(ST.profile.full_name||firstName(ST.profile.full_name,ST.profile.email)), agency_name:ST.profile.agency_name||null, status:"active" };
+    sb.from("buyer_briefs").insert(rec).then(function(r){ if(r&&r.error){ if(btn){btn.disabled=false;btn.textContent="Post brief to the network";} if(err) err.textContent="Couldn’t post that just now. Please try again."; return; } ST.postMsg="Brief posted — it’s now live on the board and counts toward network demand."; ST.briefDraft={beds:3,baths:1,priceMin:"",priceMax:"",landMin:"",landMax:"",subs:[],types:[],notes:"",consent:false}; loadBriefs(function(){ renderApp(); }); }).catch(function(){ if(btn){btn.disabled=false;btn.textContent="Post brief to the network";} if(err) err.textContent="Something went wrong. Please try again."; }); }
   function me(){ return ST.user ? ST.user.id : null; }
-  function matchLB(L,Br){ if(!L||!Br) return false; if(L.suburb!==Br.suburb) return false; if((L.beds||0)<(Br.beds||0)) return false; if((L.baths||0)<(Br.baths||0)) return false; if(Br.property_type&&Br.property_type!=="Any"&&L.property_type&&L.property_type!=="Any"&&L.property_type!==Br.property_type) return false; if(L.price!=null&&Br.price_max!=null&&L.price>Br.price_max) return false; return true; }
+  function matchLB(L,Br){ if(!L||!Br) return false; if(briefSubs(Br).indexOf(L.suburb)<0) return false; if((L.beds||0)<(Br.beds||0)) return false; if((L.baths||0)<(Br.baths||0)) return false; var ts=briefTypes(Br); if(ts.length && L.property_type && ts.indexOf(L.property_type)<0) return false; if(L.price!=null&&Br.price_max!=null&&L.price>Br.price_max) return false; return true; }
   function myListings(){ return ST.listings.filter(function(l){return l.agent_id===me();}); }
   function myActiveListings(){ return myListings().filter(function(l){return l.status==="active";}); }
   function otherActiveListings(){ return ST.listings.filter(function(l){return l.status==="active"&&l.agent_id!==me();}); }
@@ -423,6 +497,16 @@
   function navItems(cls){ return TABS.map(function(it){var on=ST.tab===it[0]; return '<button class="'+cls+(on?" on":"")+'" data-tab="'+it[0]+'">'+ic(I[it[2]],on?2.4:2,on?"#0A4630":"#8a948c")+'<span>'+it[1]+'</span></button>';}).join(""); }
   function tabbar(){ return '<nav class="tabbar">'+navItems("navbtn")+'</nav>'; }
   function sideNav(){ return '<nav class="side">'+navItems("sidebtn")+'</nav>'; }
+  function briefSubs(b){ return (b.suburbs&&b.suburbs.length)?b.suburbs:(b.suburb?[b.suburb]:[]); }
+  function briefTypes(b){ return (b.types&&b.types.length)?b.types:((b.property_type&&b.property_type!=="Any")?[b.property_type]:[]); }
+  function priceRange(b){ if(b.price_min!=null&&b.price_max!=null) return fp(b.price_min)+"–"+fp(b.price_max); if(b.price_max!=null) return "up to "+fp(b.price_max); if(b.price_min!=null) return fp(b.price_min)+"+"; return "Flexible budget"; }
+  function landTxt(b){ var a=b.land_min,c=b.land_max; if(!a&&!c) return "Any land"; if(a&&c) return a+"–"+c+" m²"; if(c) return "up to "+c+" m²"; return a+"+ m²"; }
+  function ago(d){ var t=(typeof d==="number")?d:Date.parse(d); if(!t) return ""; var s=(Date.now()-t)/1000; if(s<60) return "just now"; var m=s/60; if(m<60) return Math.floor(m)+"m ago"; var h=m/60; if(h<24) return Math.floor(h)+"h ago"; return Math.floor(h/24)+"d ago"; }
+  function briefStatline(b){ return '<span class="stat">'+ic(I.bed,2.2,"#0E5A3C")+' '+(b.beds||0)+'+ bed</span><span class="stat">'+ic(I.bath,2.2,"#0E5A3C")+' '+(b.baths||0)+'+ bath</span><span class="stat">'+ic(I.ruler,2.2,"#0E5A3C")+' '+landTxt(b)+'</span>'; }
+  function briefChips(b){ var subs=briefSubs(b); var subTags=subs.slice(0,3).map(function(x){return '<span class="tag">'+esc(x)+'</span>';}).join(""); if(subs.length>3) subTags+='<span class="tag">+'+(subs.length-3)+'</span>'; var typeTags=briefTypes(b).map(function(t){return '<span class="tag green">'+esc(t)+'</span>';}).join(""); return '<span class="pinic">'+ic(I.pin,2,"#0E5A3C")+'</span>'+subTags+typeTags; }
+  function briefWho(b){ return b.agent_name ? ('<b>'+esc(b.agent_name)+'</b>'+(b.agency_name?'<span class="muted"> · '+esc(b.agency_name)+'</span>':'')) : '<b>A member office</b>'; }
+  function briefCard(b){ return '<div class="bcard" data-act="open-detail" data-id="'+b.id+'"><div class="bcard-top"><div class="price">'+priceRange(b)+'</div><span class="when">'+ic(I.clock,2,"#5C6760")+' '+ago(b.created_at)+'</span></div><div class="statline">'+briefStatline(b)+'</div><div class="chiprow">'+briefChips(b)+'</div>'+(b.note?'<p class="bcard-note">'+esc(b.note)+'</p>':'')+'<div class="cardfoot"><div class="foot-who">'+briefWho(b)+'</div><span class="viewlink">View '+ic(I.chev,2.2,"#0E5A3C")+'</span></div></div>'; }
+  function filterBriefs(){ var f=ST.filter; var arr=ST.briefs.filter(function(b){ if(f.suburb&&f.suburb!=="Any" && briefSubs(b).indexOf(f.suburb)<0) return false; if(f.beds && (b.beds||0)>f.beds) return false; if(f.type&&f.type!=="Any"){ var ts=briefTypes(b); if(ts.length && ts.indexOf(f.type)<0) return false; } return true; }); arr.sort(function(a,b){return (b.created_at||"").localeCompare(a.created_at||"");}); return arr; }
   function oppRow(tab,icon,label,n){ return '<button class="opp-row" data-tab="'+tab+'"><span class="opp-ic">'+ic(I[icon],2,"#0E5A3C")+'</span><span class="opp-tx">'+label+'</span><span class="opp-n'+(n?"":" zero")+'">'+n+'</span></button>'; }
   function snapshotCard(){ var c=ST.snap, m=snapMatches(), count=m.length; var typeWord=(c.type&&c.type!=="Any")?c.type.toLowerCase():"home"; var hero; if(!c.suburb){ hero='<div class="snap-empty">Pick a suburb to see how many buyers in the network are already looking for a home like it.</div>'; } else { var budg=""; var mins=m.map(function(b){return b.price_min;}).filter(function(x){return x!=null;}); var maxs=m.map(function(b){return b.price_max;}).filter(function(x){return x!=null;}); if(count&&mins.length&&maxs.length){ budg='<div class="snap-budg">Budgets from <b>'+fp(Math.min.apply(null,mins))+'</b> to <b>'+fp(Math.max.apply(null,maxs))+'</b></div>'; } hero='<div class="snap-hero"><div class="snap-big">'+count+'</div><div class="snap-state">active buyer'+(count===1?"":"s")+' in the network '+(count===1?"is":"are")+' looking for a <b>'+c.beds+'-bed, '+c.baths+'-bath '+esc(typeWord)+'</b> in <b>'+esc(c.suburb)+'</b> right now.</div>'+budg+'</div>'; } return '<div class="card snap"><h3>Buyer demand snapshot</h3><p class="muted snap-sub">Set the property you’re appraising — show the vendor the buyers already waiting in the ListEdge network.</p>'+hero+'<div class="snap-form"><label class="fld"><span class="lab">Suburb</span><select data-snap="suburb">'+selOpts(SUBURBS,c.suburb,"Select a suburb")+'</select></label><div class="fld2"><label class="fld"><span class="lab">Bedrooms</span><select data-snap="beds">'+selOpts(BEDS,c.beds)+'</select></label><label class="fld"><span class="lab">Bathrooms</span><select data-snap="baths">'+selOpts(BATHS,c.baths)+'</select></label></div><label class="fld"><span class="lab">Property type</span><select data-snap="type">'+selOpts(TYPES,c.type)+'</select></label></div></div>'; }
   function briefRow(b){ var t=(b.property_type&&b.property_type!=="Any")?b.property_type.toLowerCase():"home"; var hasB=(b.price_min!=null||b.price_max!=null); var budg=hasB?'<span class="bf-budg">'+fp(b.price_min)+(b.price_max!=null?" – "+fp(b.price_max):"")+'</span>':''; var mine=b.agent_id===ST.user.id; return '<div class="bf"><div class="bf-h">'+(b.beds||0)+'-bed, '+(b.baths||0)+'-bath '+esc(t)+' in <b>'+esc(b.suburb)+'</b></div><div class="bf-sub">'+budg+(mine?'<span class="bf-mine">Your brief</span>':'<span class="bf-via">A member office</span>')+'</div></div>'; }
@@ -438,15 +522,47 @@
       '</div>'+
       '<p class="panel-note">Buyer demand is live, and your listings are matched against buyer briefs across the whole network in real time.</p>';
   }
+  function bedFilterOpts(v){ var o='<option value="0"'+(!v?' selected':'')+'>Any</option>'; for(var n=1;n<=6;n++){ o+='<option value="'+n+'"'+(v===n?' selected':'')+'>'+n+(n===6?'+':'')+'</option>'; } return o; }
   function tabBoard(){
     var pairs=[]; myActiveBriefs().forEach(function(Br){ matchesForBrief(Br).forEach(function(L){ pairs.push({L:L,Br:Br}); }); });
     var homes="";
     if(pairs.length){
-      homes='<div class="ph">Homes for your buyers</div><p class="muted" style="margin:-8px 0 14px">Private listings in the network that fit a buyer brief you posted.</p>'+pairs.map(function(pr){ var L=pr.L,Br=pr.Br; var ex=findIntro(L.id,Br.id); var tag=ex?'<span class="intro-done">'+(ex.status==="contacted"?"Contacted":"Introduced")+'</span>':'<button class="mini-btn" data-act="log-intro" data-side="buyer" data-listing="'+L.id+'" data-brief="'+Br.id+'">Log introduction</button>'; return '<div class="bf"><div class="bf-h">'+(L.beds||0)+'-bed, '+(L.baths||0)+'-bath '+esc((L.property_type||"home").toLowerCase())+' in <b>'+esc(L.suburb)+'</b>'+(L.price!=null?' · '+fp(L.price):'')+'</div><div class="bf-sub"><span class="bf-via">fits your buyer · '+(Br.beds||0)+'-bed '+esc(Br.suburb)+'</span>'+tag+'</div></div>'; }).join("")+'<div style="height:18px"></div>';
+      homes='<div class="ph">Homes for your buyers</div><p class="muted" style="margin:-8px 0 14px">Private listings in the network that fit a buyer brief you posted.</p>'+pairs.map(function(pr){ var L=pr.L,Br=pr.Br; var ex=findIntro(L.id,Br.id); var tag=ex?'<span class="intro-done">'+(ex.status==="contacted"?"Contacted":"Introduced")+'</span>':'<button class="mini-btn" data-act="log-intro" data-side="buyer" data-listing="'+L.id+'" data-brief="'+Br.id+'">Log introduction</button>'; return '<div class="bf"><div class="bf-h">'+(L.beds||0)+'-bed, '+(L.baths||0)+'-bath '+esc((L.property_type||"home").toLowerCase())+' in <b>'+esc(L.suburb)+'</b>'+(L.price!=null?' · '+fp(L.price):'')+'</div><div class="bf-sub"><span class="bf-via">fits your buyer · '+(Br.beds||0)+'-bed '+esc(briefSubs(Br)[0]||"")+'</span>'+tag+'</div></div>'; }).join("")+'<div style="height:22px"></div>';
     }
-    var list=ST.briefs.slice().sort(function(a,b){return (b.created_at||"").localeCompare(a.created_at||"");});
-    var demand = list.length ? list.map(briefRow).join("") : '<div class="card"><div class="empty">'+ic(I.grid,1.8,"#A6C0B1")+'<div class="t">No active buyer briefs yet</div><div class="d">As agents across the network post buyer briefs, they appear here — anonymised.</div></div></div>';
-    return homes+'<div class="ph">Buyer demand</div><p class="muted" style="margin:-8px 0 16px">Anonymised buyer briefs from across the ListEdge network.</p>'+demand;
+    var f=ST.filter; var filtering=(f.suburb&&f.suburb!=="Any")||f.beds||(f.type&&f.type!=="Any");
+    var panelBody="";
+    if(f.open){
+      panelBody='<div class="panelbody">'+
+        '<p class="muted" style="margin:0;font-size:12.5px;line-height:1.45">Narrow the board to find specific buyers. To match a property you’re selling, add it under Listings.</p>'+
+        '<label class="fld"><span class="lab">Suburb</span><select data-filter="suburb">'+selOpts(["Any"].concat(SUBURBS),f.suburb)+'</select></label>'+
+        '<label class="fld"><span class="lab">Min bedrooms</span><select data-filter="beds">'+bedFilterOpts(f.beds)+'</select></label>'+
+        '<div class="fld"><span class="lab">Type</span><div class="chipwrap">'+TYPES.map(function(t){var on=(f.type===t)||(t==="Any"&&(!f.type||f.type==="Any"));return '<button class="chip'+(on?" on":"")+'" data-ftype="'+t+'">'+t+'</button>';}).join("")+'</div></div>'+
+        (filtering?'<button class="linklike" data-act="filter-clear">Clear filters</button>':'')+
+      '</div>';
+    }
+    var panel='<div class="panel"><button class="panelhead" data-act="toggle-filter"><span class="stat" style="font-size:14.5px;font-weight:700;color:var(--ink)">'+ic(I.sliders,2,"#0E5A3C")+' Filter buyers</span><span style="font-size:12.5px;font-weight:700;color:'+(filtering?"var(--green)":"var(--sub)")+'">'+(f.open?"Hide":(filtering?"Active":"Filter"))+'</span></button>'+panelBody+'</div>';
+    var list=filterBriefs();
+    var head='<div class="results-head"><span class="rh-count">'+(filtering?(list.length+" buyer"+(list.length===1?"":"s")+" match"):(list.length+" active buyer brief"+(list.length===1?"":"s")))+'</span><span class="stat rh-live">'+ic(I.search,2,"#5C6760")+' Live</span></div>';
+    var cards = list.length ? list.map(briefCard).join("") : '<div class="card"><div class="empty">'+ic(I.search,1.8,"#A6C0B1")+'<div class="t">'+(filtering?"No buyers match that filter":"No active buyer briefs yet")+'</div><div class="d">'+(filtering?"Try widening your suburb or bedroom filter.":"As agents across the network post buyer briefs, they appear here — anonymised.")+'</div></div></div>';
+    return homes+panel+head+cards;
+  }
+  function detailBrief(){ if(!ST.detail) return null; for(var i=0;i<ST.briefs.length;i++){ if(ST.briefs[i].id===ST.detail) return ST.briefs[i]; } return null; }
+  function detailOverlay(){
+    var b=detailBrief(); if(!b) return "";
+    var introBlock="";
+    if(b.agent_id===me()){ introBlock='<div class="dt-hint">This is your office’s buyer brief.</div>'; }
+    else { var ms=myActiveListings().filter(function(l){return matchLB(l,b);});
+      if(ms.length){ introBlock=ms.map(function(l){ var ex=findIntro(l.id,b.id); var label=esc(l.title||((l.beds||0)+"-bed "+l.suburb)); return ex?'<div class="dt-done">'+ic(I.check,2.4,"#0A4630")+' Introduced · '+label+'</div>':'<button class="signin-btn" style="margin-top:10px" data-act="intro-from-detail" data-listing="'+l.id+'" data-brief="'+b.id+'">Introduce your listing: '+label+'</button>'; }).join(""); }
+      else { introBlock='<div class="dt-hint">You don’t have a listing matching this brief yet. Add one under Listings to introduce.</div>'; }
+    }
+    return '<div class="overlay"><div class="backdrop" data-act="close-detail"></div><div class="sheet">'+
+      '<div class="sheet-top"><div class="price">'+priceRange(b)+'</div><button class="sheet-x" data-act="close-detail" aria-label="Close">'+ic(I.x,2.2,"#16191A")+'</button></div>'+
+      '<div class="when" style="margin:-2px 0 13px">'+ic(I.clock,2,"#5C6760")+' '+ago(b.created_at)+'</div>'+
+      '<div class="statline">'+briefStatline(b)+'</div>'+
+      '<div class="chiprow">'+briefChips(b)+'</div>'+
+      (b.note?'<p class="bcard-note" style="margin-bottom:14px">'+esc(b.note)+'</p>':'')+
+      '<div class="dt-agent">'+briefWho(b)+'</div>'+introBlock+
+    '</div></div>';
   }
   function listingCard(L){
     var ms=matchesForListing(L); var open=ST.openListing===L.id;
@@ -462,21 +578,8 @@
     return '<div class="lcard">'+head+body+'</div>';
   }
   function tabListings(){
-    var mine=myListings();
-    var body = mine.length ? mine.map(listingCard).join("") : '<div class="card"><div class="empty">'+ic(I.tag,1.8,"#A6C0B1")+'<div class="t">No listings yet</div><div class="d">Add a private listing from the Post tab and meet the buyers already waiting for it.</div></div></div>';
-    return '<div class="ph">Your listings</div><p class="muted" style="margin:-8px 0 16px">Private, pre-market listings — tap one to see matching buyers and introduce.</p>'+body;
-  }
-  function tabPost(){
-    var msg = ST.postMsg ? '<div class="post-ok">'+esc(ST.postMsg)+'</div>' : '';
     var lmsg = ST.listMsg ? '<div class="post-ok">'+esc(ST.listMsg)+'</div>' : '';
-    return '<div class="ph">Post a buyer brief</div><p class="muted" style="margin:-8px 0 16px">Tell the network what your buyer wants. It stays anonymised and adds to live demand for every member office.</p>'+msg+
-      '<div class="card"><label class="fld"><span class="lab">Suburb</span><select id="bf-suburb">'+selOpts(SUBURBS,"","Select a suburb")+'</select></label>'+
-      '<div class="fld2" style="margin-top:12px"><label class="fld"><span class="lab">Min bedrooms</span><select id="bf-beds">'+selOpts(BEDS,3)+'</select></label><label class="fld"><span class="lab">Min bathrooms</span><select id="bf-baths">'+selOpts(BATHS,1)+'</select></label></div>'+
-      '<label class="fld" style="margin-top:12px"><span class="lab">Property type</span><select id="bf-type">'+selOpts(TYPES,"Any")+'</select></label>'+
-      '<div class="fld2" style="margin-top:12px"><label class="fld"><span class="lab">Budget from ($)</span><input id="bf-pmin" type="number" inputmode="numeric" placeholder="700000"></label><label class="fld"><span class="lab">Budget to ($)</span><input id="bf-pmax" type="number" inputmode="numeric" placeholder="900000"></label></div>'+
-      '<div id="bf-err" class="err" style="margin-top:8px"></div>'+
-      '<button class="signin-btn" style="margin-top:14px" data-act="post-brief">Post brief to the network</button></div>'+
-      '<div class="ph" style="margin-top:26px">Add a private listing</div><p class="muted" style="margin:-8px 0 16px">Share a property privately with the network before it goes public — and meet the buyers already waiting.</p>'+lmsg+
+    var addForm='<div class="ph">Add a private listing</div><p class="muted" style="margin:-8px 0 16px">Share a property privately with the network before it goes public — and meet the buyers already waiting.</p>'+lmsg+
       '<div class="card"><label class="fld"><span class="lab">Label (optional)</span><input id="ls-title" type="text" placeholder="e.g. Sunny 4-bed near the park"></label>'+
       '<label class="fld" style="margin-top:12px"><span class="lab">Suburb</span><select id="ls-suburb">'+selOpts(SUBURBS,"","Select a suburb")+'</select></label>'+
       '<div class="fld2" style="margin-top:12px"><label class="fld"><span class="lab">Bedrooms</span><select id="ls-beds">'+selOpts(BEDS,4)+'</select></label><label class="fld"><span class="lab">Bathrooms</span><select id="ls-baths">'+selOpts(BATHS,2)+'</select></label></div>'+
@@ -484,6 +587,29 @@
       '<label class="fld" style="margin-top:12px"><span class="lab">Guide price ($)</span><input id="ls-price" type="number" inputmode="numeric" placeholder="850000"></label>'+
       '<div id="ls-err" class="err" style="margin-top:8px"></div>'+
       '<button class="signin-btn" style="margin-top:14px" data-act="add-listing">Add listing to the network</button></div>';
+    var mine=myListings();
+    var list = mine.length ? mine.map(listingCard).join("") : '<div class="card"><div class="empty">'+ic(I.tag,1.8,"#A6C0B1")+'<div class="t">No listings yet</div><div class="d">Add one above and meet the buyers already waiting for it.</div></div></div>';
+    return addForm+'<div class="ph" style="margin-top:26px">Your listings</div><p class="muted" style="margin:-8px 0 16px">Tap a listing to see matching buyers and introduce.</p>'+list;
+  }
+  function tabPost(){
+    var d=ST.briefDraft;
+    var msg = ST.postMsg ? '<div class="post-ok">'+esc(ST.postMsg)+'</div>' : '';
+    var subChips = d.subs.length ? '<div class="chosen">'+d.subs.map(function(x){return '<button class="chip on" data-act="rm-sub" data-val="'+esc(x)+'">'+esc(x)+' '+ic(I.x,2.6,"#0E5A3C")+'</button>';}).join("")+'</div>' : '';
+    var addOpts='<option value="">Add a suburb…</option>'+SUBURBS.filter(function(x){return d.subs.indexOf(x)<0;}).map(function(x){return '<option value="'+x+'">'+x+'</option>';}).join("");
+    var typeChips=TYPES.filter(function(t){return t!=="Any";}).map(function(t){var on=d.types.indexOf(t)>=0;return '<button class="chip'+(on?" on":"")+'" data-act="toggle-type" data-val="'+t+'">'+t+'</button>';}).join("");
+    var consent='<div class="consent'+(d.consent?" on":"")+'" data-act="toggle-consent"><span class="cbox">'+(d.consent?ic(I.check,3,"#fff"):"")+'</span><span class="ctxt">I confirm I have my client’s consent to share these requirements anonymously with the network.</span></div>';
+    return '<div class="ph">Post a buyer brief</div><p class="muted" style="margin:-8px 0 16px">Post an anonymised brief for one of your buyers — no client names are shared, and it adds to live demand across the network.</p>'+msg+
+      '<div class="card">'+
+        '<div class="fld2"><label class="fld"><span class="lab">Min bedrooms</span><select data-bfield="beds">'+selOpts(BEDS,d.beds)+'</select></label><label class="fld"><span class="lab">Min bathrooms</span><select data-bfield="baths">'+selOpts(BATHS,d.baths)+'</select></label></div>'+
+        '<div class="fld2" style="margin-top:12px"><label class="fld"><span class="lab">Budget from ($)</span><input data-bfield="priceMin" type="number" inputmode="numeric" placeholder="700000" value="'+esc(d.priceMin)+'"></label><label class="fld"><span class="lab">Budget to ($)</span><input data-bfield="priceMax" type="number" inputmode="numeric" placeholder="900000" value="'+esc(d.priceMax)+'"></label></div>'+
+        '<div class="fld2" style="margin-top:12px"><label class="fld"><span class="lab">Land from (m²)</span><input data-bfield="landMin" type="number" inputmode="numeric" placeholder="optional" value="'+esc(d.landMin)+'"></label><label class="fld"><span class="lab">Land to (m²)</span><input data-bfield="landMax" type="number" inputmode="numeric" placeholder="optional" value="'+esc(d.landMax)+'"></label></div>'+
+        '<div class="fld" style="margin-top:12px"><span class="lab">Suburbs <span class="lab-n">· '+d.subs.length+' selected</span></span><select data-addsub="1">'+addOpts+'</select>'+subChips+'</div>'+
+        '<div class="fld" style="margin-top:12px"><span class="lab">Property type <span class="lab-n">· '+d.types.length+' selected</span></span><div class="chipwrap">'+typeChips+'</div></div>'+
+        '<label class="fld" style="margin-top:12px"><span class="lab">Notes for listing agents</span><textarea data-bfield="notes" rows="3" placeholder="Pre-approved, flexible settlement, school zone a must…">'+esc(d.notes)+'</textarea></label>'+
+        consent+
+        '<div id="bf-err" class="err" style="margin-top:8px"></div>'+
+        '<button class="signin-btn" style="margin-top:14px" data-act="post-brief">Post brief to the network</button>'+
+      '</div>';
   }
   function introCard(x){
     var amListing=x.listing_agent_id===me();
@@ -538,7 +664,7 @@
       screen.innerHTML = topbar(isManager) + '<div class="shell"><main class="main"><div class="appwrap office">' + officeView() + '</div></main></div>';
       loadTeam();
     } else {
-      screen.innerHTML = topbar(isManager) + '<div class="shell">' + sideNav() + '<main class="main"><div class="appwrap">' + tabContent() + '</div></main></div>' + tabbar();
+      screen.innerHTML = topbar(isManager) + '<div class="shell">' + sideNav() + '<main class="main"><div class="appwrap">' + tabContent() + '</div></main></div>' + tabbar() + detailOverlay();
     }
   }
 
@@ -579,7 +705,9 @@
   screen.addEventListener("click", function(e){
     var t = e.target;
     var _tab = t.closest ? t.closest("[data-tab]") : null;
-    if(_tab){ ST.tab = _tab.getAttribute("data-tab"); ST.menu=false; ST.postMsg=""; ST.listMsg=""; renderApp(); return; }
+    if(_tab){ ST.tab = _tab.getAttribute("data-tab"); ST.menu=false; ST.postMsg=""; ST.listMsg=""; ST.detail=null; renderApp(); return; }
+    var _ft = t.closest ? t.closest("[data-ftype]") : null;
+    if(_ft){ ST.filter.type=_ft.getAttribute("data-ftype"); renderApp(); return; }
     var act = t.closest ? t.closest("[data-act]") : null;
     if(act){
       var a = act.getAttribute("data-act");
@@ -591,6 +719,14 @@
       if(a==="log-intro"){ logIntro(act.getAttribute("data-side"), act.getAttribute("data-listing"), act.getAttribute("data-brief")); return; }
       if(a==="mark-contacted"){ markContacted(act.getAttribute("data-intro")); return; }
       if(a==="invite"){ var n=el("officeNote"); if(n){ n.textContent="Adding teammates from inside ListEdge is coming next. For now, new accounts are created for your office by ListEdge."; } return; }
+      if(a==="rm-sub"){ var rv=act.getAttribute("data-val"); ST.briefDraft.subs=ST.briefDraft.subs.filter(function(x){return x!==rv;}); renderApp(); return; }
+      if(a==="toggle-type"){ var tv=act.getAttribute("data-val"); var ti=ST.briefDraft.types.indexOf(tv); if(ti>=0) ST.briefDraft.types.splice(ti,1); else ST.briefDraft.types.push(tv); renderApp(); return; }
+      if(a==="toggle-consent"){ ST.briefDraft.consent=!ST.briefDraft.consent; renderApp(); return; }
+      if(a==="open-detail"){ ST.detail=act.getAttribute("data-id"); renderApp(); return; }
+      if(a==="close-detail"){ ST.detail=null; renderApp(); return; }
+      if(a==="intro-from-detail"){ ST.detail=null; logIntro("listing", act.getAttribute("data-listing"), act.getAttribute("data-brief")); return; }
+      if(a==="toggle-filter"){ ST.filter.open=!ST.filter.open; renderApp(); return; }
+      if(a==="filter-clear"){ ST.filter={open:true,suburb:"Any",beds:0,type:"Any"}; renderApp(); return; }
     }
     var v = t.closest ? t.closest("[data-view]") : null;
     if(v){ ST.view = v.getAttribute("data-view"); ST.menu=false; renderApp(); return; }
@@ -603,12 +739,18 @@
   });
 
   screen.addEventListener("change", function(e){
-    var t=e.target;
-    if(t && t.getAttribute && t.getAttribute("data-snap")!=null){
-      var k=t.getAttribute("data-snap"), v=t.value;
-      if(k==="beds"||k==="baths") v=parseInt(v||"0",10)||0;
-      ST.snap[k]=v; renderApp(); return;
-    }
+    var t=e.target; if(!t||!t.getAttribute) return;
+    if(t.getAttribute("data-snap")!=null){ var k=t.getAttribute("data-snap"), v=t.value; if(k==="beds"||k==="baths") v=parseInt(v||"0",10)||0; ST.snap[k]=v; renderApp(); return; }
+    var bf=t.getAttribute("data-bfield");
+    if(bf!=null){ ST.briefDraft[bf]=(bf==="beds"||bf==="baths")?(parseInt(t.value||"0",10)||0):t.value; return; }
+    if(t.getAttribute("data-addsub")!=null){ var sv=t.value; if(sv && ST.briefDraft.subs.indexOf(sv)<0) ST.briefDraft.subs.push(sv); renderApp(); return; }
+    var fk=t.getAttribute("data-filter");
+    if(fk!=null){ ST.filter[fk]=(fk==="beds")?(parseInt(t.value||"0",10)||0):t.value; renderApp(); return; }
+  })
+  screen.addEventListener("input", function(e){
+    var t=e.target; if(!t||!t.getAttribute) return;
+    var bf=t.getAttribute("data-bfield");
+    if(bf!=null && bf!=="beds" && bf!=="baths"){ ST.briefDraft[bf]=t.value; return; }
   });
 
   boot();
