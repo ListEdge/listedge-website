@@ -542,6 +542,7 @@
        ICONS — small inline SVGs used across the dashboard.
        ========================================================= */
     var P = {
+      network:'<circle cx="6" cy="6" r="2.6"/><circle cx="18" cy="18" r="2.6"/><circle cx="18" cy="6" r="2.6"/><path d="M8.4 6H15M6 8.4V15a3 3 0 0 0 3 3h6"/>',
       grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
       building:'<path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M19 21v-9a1 1 0 0 0-1-1h-3"/><path d="M9 7h2M9 11h2M9 15h2"/>',
       calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
@@ -1307,6 +1308,165 @@ var CAL = (function(){
 function calendarView(){ return CAL.html(); }
 function calendarMount(){ CAL.mount(); }
 
+/* ============================================================================
+   NETWORK — owner-only admin module (Founder HQ)
+   Manage the live ListEdge network: offices (agencies) and their users.
+   READS use the authenticated client (owner RLS sees everything). Every WRITE
+   goes through the server function /api/admin (service-role, owner-verified) —
+   the browser can never create accounts or change permissions on its own.
+   Deactivating an office instantly cuts off all of its users (the member app
+   checks the office's active flag at sign-in).
+   ============================================================================ */
+async function adminCall(action, params){
+  var token='';
+  try{ var s=await sb.auth.getSession(); token=(s&&s.data&&s.data.session)?s.data.session.access_token:''; }catch(e){}
+  var res, data={};
+  try{
+    res=await fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(Object.assign({action:action},params||{}))});
+    try{ data=await res.json(); }catch(e){}
+  }catch(e){ throw new Error('Couldn\u2019t reach the server. Is the admin function deployed?'); }
+  if(!res.ok || (data&&data.error)){ throw new Error((data&&data.error)||'That action failed.'); }
+  return data.data;
+}
+
+var NET = (function(){
+  var D={ offices:[], byAgency:{}, open:null, msg:'', busy:false };
+  function q(id){ return document.getElementById(id); }
+  function esc2(s){ try{return esc(s);}catch(e){return String(s==null?'':s);} }
+  function genPw(){ var c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789',s='Le-'; for(var i=0;i<8;i++) s+=c[Math.floor(Math.random()*c.length)]; return s; }
+  function pill(t,cls){ return '<span class="net-pill '+cls+'">'+t+'</span>'; }
+
+  function load(cb){
+    if(typeof sb==='undefined'||!sb){ D.offices=[]; D.byAgency={}; cb&&cb(); return; }
+    Promise.all([ sb.from('agencies').select('*'), sb.from('profiles').select('id,email,full_name,agency_id,role,active') ])
+      .then(function(r){
+        var ag=(r[0]&&r[0].data)?r[0].data:[], pf=(r[1]&&r[1].data)?r[1].data:[];
+        ag.sort(function(a,b){return (a.name||'').localeCompare(b.name||'');});
+        var by={}; pf.forEach(function(p){ var k=p.agency_id||'_none'; (by[k]=by[k]||[]).push(p); });
+        Object.keys(by).forEach(function(k){ by[k].sort(function(a,b){ var d=(b.role==='manager')-(a.role==='manager'); return d||(a.full_name||a.email||'').localeCompare(b.full_name||b.email||''); }); });
+        D.offices=ag; D.byAgency=by; cb&&cb();
+      }).catch(function(){ D.offices=[]; D.byAgency={}; cb&&cb(); });
+  }
+
+  function userRow(u){
+    var act = u.active!==false
+      ? '<button class="net-mini danger" data-net="user-active" data-id="'+esc2(u.id)+'" data-active="0">Deactivate</button>'
+      : '<button class="net-mini" data-net="user-active" data-id="'+esc2(u.id)+'" data-active="1">Reactivate</button>';
+    var toRole = u.role==='manager'?'agent':'manager';
+    var roleBtn = '<button class="net-mini" data-net="user-role" data-id="'+esc2(u.id)+'" data-role="'+toRole+'">Make '+toRole+'</button>';
+    return '<div class="net-u">'+
+      '<div class="net-u-i"><div class="net-u-nm">'+esc2(u.full_name||'\u2014')+'</div><div class="net-u-em">'+esc2(u.email||'')+'</div></div>'+
+      pill(u.role==='manager'?'Manager':'Agent', u.role==='manager'?'mgr':'agt')+
+      pill(u.active!==false?'Active':'Inactive', u.active!==false?'on':'off')+
+      '<div class="net-u-act">'+roleBtn+act+'</div></div>';
+  }
+
+  function addUserForm(aid){
+    return '<div class="net-add">'+
+      '<div class="net-add-h">Add a person to this office</div>'+
+      '<div class="net-add-grid">'+
+        '<input id="nu-nm-'+aid+'" placeholder="Full name" class="net-in">'+
+        '<input id="nu-em-'+aid+'" type="email" placeholder="Work email" class="net-in">'+
+        '<input id="nu-pw-'+aid+'" value="'+genPw()+'" class="net-in" title="Temporary password to share with them">'+
+        '<select id="nu-rl-'+aid+'" class="net-in"><option value="agent">Agent</option><option value="manager">Office manager</option></select>'+
+        '<button class="net-btn" data-net="add-user" data-agency="'+aid+'">Create</button>'+
+      '</div>'+
+      '<div class="net-add-note">They sign in to the app with this email and temporary password. Office managers also get the Office Dashboard.</div></div>';
+  }
+
+  function officeCard(o){
+    var users=D.byAgency[o.id]||[], nU=users.length, open=D.open===o.id, on=o.active!==false;
+    var actBtn = on
+      ? '<button class="net-mini danger" data-net="office-active" data-id="'+esc2(o.id)+'" data-active="0">Deactivate office</button>'
+      : '<button class="net-mini ok" data-net="office-active" data-id="'+esc2(o.id)+'" data-active="1">Activate office</button>';
+    var head='<div class="net-o-head">'+
+      '<div class="net-o-i"><div class="net-o-nm">'+esc2(o.name)+'</div>'+
+        '<div class="net-o-sub">'+pill(on?'Active':'Inactive', on?'on':'off')+' &nbsp;'+nU+' user'+(nU===1?'':'s')+'</div></div>'+
+      '<div class="net-o-act">'+actBtn+'<button class="net-mini" data-net="toggle" data-id="'+esc2(o.id)+'">'+(open?'Hide team':'Manage team')+'</button></div></div>';
+    var body = open ? '<div class="net-o-body">'+(users.length?users.map(userRow).join(''):'<div class="net-empty">No users in this office yet.</div>')+addUserForm(o.id)+'</div>' : '';
+    return '<div class="net-o'+(on?'':' off')+'">'+head+body+'</div>';
+  }
+
+  function render(){
+    var body=q('netBody'); if(!body) return;
+    var msg = D.msg ? '<div class="net-msg">'+esc2(D.msg)+'</div>' : '';
+    var add = '<div class="net-newoffice"><input id="netNewOffice" class="net-in" placeholder="New office name (e.g. Harcourts Halswell)"><button class="net-btn" data-net="create-office">Add office</button></div>';
+    var list = D.offices.length ? D.offices.map(officeCard).join('') : '<div class="net-empty">No offices yet. Add the first office that has signed up.</div>';
+    body.innerHTML = '<div class="net-intro">Activate the offices that have signed up, add their people and set permissions, and switch an office off the moment they cancel \u2014 which immediately revokes everyone in it.</div>'+add+msg+'<div class="net-list">'+list+'</div>';
+  }
+  function reload(){ load(function(){ render(); }); }
+  function act(run){ if(D.busy) return; D.busy=true; D.msg='Working\u2026'; render();
+    run(function(okMsg,errMsg){ D.busy=false; D.msg=errMsg||okMsg||''; reload(); }); }
+
+  function onClick(e){
+    var t=e.target, b=t.closest?t.closest('[data-net]'):null; if(!b) return;
+    var a=b.getAttribute('data-net');
+    if(a==='create-office'){ var nm=((q('netNewOffice')||{}).value||'').trim(); if(!nm){ D.msg='Enter an office name first.'; render(); return; }
+      act(function(done){ adminCall('create-office',{name:nm}).then(function(){done('Office added.');}).catch(function(er){done(null,er.message);}); }); return; }
+    if(a==='toggle'){ var id=b.getAttribute('data-id'); D.open=(D.open===id)?null:id; render(); return; }
+    if(a==='office-active'){ var oid=b.getAttribute('data-id'), on=b.getAttribute('data-active')==='1';
+      act(function(done){ adminCall('set-office-active',{officeId:oid,active:on}).then(function(){done(on?'Office activated.':'Office deactivated \u2014 everyone in it can no longer sign in.');}).catch(function(er){done(null,er.message);}); }); return; }
+    if(a==='add-user'){ var aid=b.getAttribute('data-agency');
+      var nm2=((q('nu-nm-'+aid)||{}).value||''), em=((q('nu-em-'+aid)||{}).value||''), pw=((q('nu-pw-'+aid)||{}).value||''), rl=((q('nu-rl-'+aid)||{}).value||'agent');
+      if(!em.trim()){ D.msg='Enter the person\u2019s email.'; render(); return; }
+      act(function(done){ adminCall('create-user',{email:em.trim(),full_name:nm2.trim(),password:pw,agency_id:aid,role:rl}).then(function(){done('User created. Share their email and temporary password so they can sign in.');}).catch(function(er){done(null,er.message);}); }); return; }
+    if(a==='user-active'){ var uid=b.getAttribute('data-id'), ua=b.getAttribute('data-active')==='1';
+      act(function(done){ adminCall('set-user-active',{userId:uid,active:ua}).then(function(){done();}).catch(function(er){done(null,er.message);}); }); return; }
+    if(a==='user-role'){ var uid2=b.getAttribute('data-id'), role=b.getAttribute('data-role');
+      act(function(done){ adminCall('set-user-role',{userId:uid2,role:role}).then(function(){done();}).catch(function(er){done(null,er.message);}); }); return; }
+  }
+
+  function ensureStyle(){
+    if(q('net-style')) return; var st=document.createElement('style'); st.id='net-style';
+    st.textContent=[
+      '.net-root{font-family:\'Instrument Sans\',system-ui,sans-serif;color:#15211d}',
+      '.net-empty{padding:26px 6px;color:#8a948c;font-size:14px;text-align:center}',
+      '.net-intro{color:#5C6760;font-size:14px;line-height:1.5;max-width:720px;margin-bottom:16px}',
+      '.net-newoffice{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}',
+      '.net-in{height:42px;border:1px solid #E2DCCE;border-radius:10px;padding:0 12px;font:inherit;font-size:14px;background:#fff;outline:none;min-width:0;color:#15211d}',
+      '.net-in:focus{border-color:#0A4630}',
+      '.net-newoffice .net-in{flex:1;min-width:220px}',
+      '.net-btn{height:42px;border:none;border-radius:10px;background:#0A4630;color:#fff;font:inherit;font-weight:650;font-size:14px;padding:0 16px;cursor:pointer}',
+      '.net-btn:hover{background:#0E5A3C}',
+      '.net-msg{background:#F3F7E6;border:1px solid rgba(10,70,48,.18);border-radius:10px;padding:10px 14px;font-size:13.5px;color:#33402f;margin-bottom:14px}',
+      '.net-list{display:flex;flex-direction:column;gap:12px}',
+      '.net-o{background:#fff;border:1px solid #E2DCCE;border-radius:14px;overflow:hidden}',
+      '.net-o.off{background:#FAF8F2}',
+      '.net-o-head{display:flex;align-items:center;gap:12px;padding:14px 16px;flex-wrap:wrap}',
+      '.net-o-i{flex:1;min-width:160px}',
+      '.net-o-nm{font-family:\'Bricolage Grotesque\',sans-serif;font-weight:700;font-size:17px}',
+      '.net-o-sub{font-size:12.5px;color:#5C6760;margin-top:3px}',
+      '.net-o-act{display:flex;gap:8px;flex-wrap:wrap}',
+      '.net-o-body{border-top:1px solid #EFE9DC;padding:4px 16px 16px;background:#FCFBF6}',
+      '.net-u{display:flex;align-items:center;gap:11px;padding:11px 2px;border-bottom:1px solid #EFE9DC;flex-wrap:wrap}',
+      '.net-u:last-of-type{border-bottom:0}',
+      '.net-u-i{flex:1;min-width:150px}',
+      '.net-u-nm{font-weight:650;font-size:14px}',
+      '.net-u-em{font-size:12px;color:#5C6760}',
+      '.net-u-act{display:flex;gap:7px;flex-wrap:wrap}',
+      '.net-pill{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}',
+      '.net-pill.mgr{color:#1F5C46;background:#E1F1E7}.net-pill.agt{color:#3a4a55;background:#E9EEF2}',
+      '.net-pill.on{color:#1F7A52;background:#E6F4EC}.net-pill.off{color:#9a5a1a;background:#FAECD8}',
+      '.net-mini{border:1px solid #E2DCCE;background:#fff;border-radius:9px;font:inherit;font-size:12.5px;font-weight:600;color:#15211d;padding:7px 11px;cursor:pointer}',
+      '.net-mini:hover{background:#F4F6EC}',
+      '.net-mini.danger{color:#9a3527}.net-mini.danger:hover{background:#FBECEA}',
+      '.net-mini.ok{color:#1F7A52;border-color:#cfe6d8}.net-mini.ok:hover{background:#EAF6EF}',
+      '.net-add{margin-top:12px;background:#fff;border:1px dashed #D8CFBE;border-radius:11px;padding:13px 14px}',
+      '.net-add-h{font-weight:650;font-size:13.5px;margin-bottom:9px}',
+      '.net-add-grid{display:flex;gap:8px;flex-wrap:wrap}',
+      '.net-add-grid .net-in{flex:1;min-width:150px}',
+      '.net-add-note{font-size:12px;color:#8a948c;margin-top:8px;line-height:1.5}'
+    ].join('');
+    document.head.appendChild(st);
+  }
+
+  function html(){ return '<div class="net-root"><div id="netBody"><div class="net-empty">Loading the network\u2026</div></div></div>'; }
+  function mount(){ ensureStyle(); D.msg=''; var body=q('netBody'); if(!body) return; body.addEventListener('click', onClick); reload(); }
+  return { html:html, mount:mount };
+})();
+function networkView(){ return NET.html(); }
+function networkMount(){ NET.mount(); }
+
     var MODULES = [
       { id:'dashboard', label:'Dashboard',        icon:'grid',     title:'Dashboard',        render: renderDashboard, mount: dashboardMount },
       { id:'offices',   label:'Offices',          icon:'building', title:'Offices',          render: officesView, mount: officesMount },
@@ -1316,6 +1476,7 @@ function calendarMount(){ CAL.mount(); }
       { id:'calendar',  label:'Calendar',         icon:'calendar', title:'Calendar',         render: calendarView,  mount: calendarMount },
       { id:'notes',     label:'Notes',            icon:'note',     title:'Notes',            render: notesView, mount: notesMount },
       { id:'founding',  label:'Founding Offices', icon:'star',     title:'Founding Offices', render: foundingView, mount: foundingMount },
+      { id:'network',   label:'Network',          icon:'network',  title:'Network \u00b7 Offices & Users', render: networkView,   mount: networkMount },
       { id:'territory', label:'Territory',        icon:'territory',title:'Territory',        render: territoryView, mount: territoryMount },
       { id:'settings',  label:'Settings',         icon:'gear',     title:'Settings',         render: settingsView, mount: settingsMount }
     ];
@@ -2030,6 +2191,16 @@ function renderEdge(){
     }
     function gotoLogin(){ location.replace('login.html'); }
 
+    function showOwnerDenied(){
+      var msg = '<div style="max-width:430px;margin:14vh auto 0;padding:0 24px;text-align:center;font-family:\'Instrument Sans\',system-ui,sans-serif;color:#16191A">'
+        +'<div style="font-family:\'Bricolage Grotesque\',sans-serif;font-weight:800;font-size:26px;margin-bottom:8px">Owner access only</div>'
+        +'<p style="color:#5C6760;font-size:15px;line-height:1.55;margin:0 0 22px">Founder HQ is for the ListEdge platform owner. This account isn\u2019t set up as the owner yet \u2014 if it should be, set its role to <b>owner</b> in your database.</p>'
+        +'<button id="ownerOut" style="height:46px;padding:0 20px;border:none;border-radius:11px;background:#0A4630;color:#fff;font:inherit;font-weight:650;font-size:15px;cursor:pointer">Sign out</button></div>';
+      try{ splash.innerHTML = msg; splash.hidden = false; }catch(e){ document.body.innerHTML = msg; }
+      try{ app.hidden = true; }catch(e){}
+      var ob = document.getElementById('ownerOut'); if(ob){ ob.onclick = function(){ try{ sb.auth.signOut(); }catch(e){} gotoLogin(); }; }
+    }
+
     async function boot(){
       if(!window.supabase || !configured()){ gotoLogin(); return; }
       try{ sb = window.supabase.createClient(cfg.url, cfg.anonKey); }
@@ -2043,6 +2214,10 @@ function renderEdge(){
 
       STATE.uid = (session.user && session.user.id) ? session.user.id : '';
       setProfile(session.user);
+      var _role = null;
+      try{ var _pr = await sb.from('profiles').select('role').eq('id', STATE.uid).maybeSingle(); _role = (_pr && _pr.data) ? _pr.data.role : null; }catch(e){ _role = null; }
+      STATE.role = _role;
+      if(_role !== 'owner'){ showOwnerDenied(); return; }
       buildNav();
       wire();
       splash.hidden = true;

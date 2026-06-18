@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ListEdge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /* ▼▼▼  FILL THESE IN  ▼▼▼
+     Use the SAME two values as Founder HQ (see assets/admin/supabase-config.js).
+     The anon key is a public client key — safe to keep here. */
+  window.LISTEDGE_SUPABASE = {
+    url:     "https://YOUR-PROJECT.supabase.co",
+    anonKey: "YOUR-ANON-KEY"
+  };
+  /* ▲▲▲  FILL THESE IN  ▲▲▲ */
+</script>
+
+<style>
+  :root{
+    --green:#0E5A3C; --green-dk:#0A4630; --green-deep:#063225;
+    --citron:#C8F24A; --bone:#F2EFE7; --ink:#16191A; --sub:#5C6760;
+    --sage:#A6C0B1; --line:#E2DCCE; --card:#FFFFFF;
+    --display:'Bricolage Grotesque','Instrument Sans',sans-serif;
+    --body:'Instrument Sans',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:var(--body);color:var(--ink);background:var(--bone);-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer}
+  .hidden{display:none!important}
+
+  /* ---------- LOGIN ---------- */
+  .login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(120% 120% at 50% 0%, var(--green) 0%, var(--green-dk) 45%, var(--green-deep) 100%);}
+  .login-card{width:100%;max-width:400px}
+  .lb{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+  .lb-tile{width:40px;height:40px;border-radius:11px;background:var(--green-dk);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+  .lb-word{font-family:var(--display);font-weight:800;font-size:23px;color:#fff;letter-spacing:-.01em}
+  .lb-word b{color:var(--citron);font-weight:800}
+  .login h1{font-family:var(--display);font-weight:800;font-size:30px;line-height:1.1;color:#fff;margin:0 0 8px}
+  .login p.sub{color:#BFD8C9;font-size:14.5px;line-height:1.5;margin:0 0 26px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:#CFE3D7;margin-bottom:6px}
+  .field input{width:100%;height:46px;border-radius:11px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);color:#fff;font-size:15px;padding:0 14px;outline:none;transition:.15s}
+  .field input::placeholder{color:#8FB0A0}
+  .field input:focus{border-color:var(--citron);background:rgba(255,255,255,.1)}
+  .signin-btn{width:100%;height:48px;border:none;border-radius:11px;background:var(--citron);color:var(--green-deep);
+    font-size:15.5px;font-weight:700;margin-top:8px;transition:.15s}
+  .signin-btn:hover{filter:brightness(1.04)}
+  .signin-btn:disabled{opacity:.6;cursor:default}
+  .login .err{min-height:20px;color:#FFD7C2;font-size:13.5px;margin:12px 2px 0;line-height:1.45}
+  .login .note{color:#9FBBAC;font-size:12.5px;margin-top:22px;text-align:center;line-height:1.5}
+  .login .note a{color:#CFE3D7}
+  .cfgwarn{max-width:420px;background:#fff;border-radius:14px;padding:20px 22px;color:var(--ink);font-size:14px;line-height:1.55}
+  .cfgwarn b{font-family:var(--display)}
+  .cfgwarn code{background:#F2EFE7;border-radius:5px;padding:1px 5px;font-size:12.5px}
+
+  /* ---------- APP CHROME ---------- */
+  .topbar{height:60px;display:flex;align-items:center;gap:14px;padding:0 18px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .tb-brand{display:flex;align-items:center;gap:9px}
+  .tb-tile{width:32px;height:32px;border-radius:9px;background:var(--green-dk);display:flex;align-items:center;justify-content:center}
+  .tb-word{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.01em}
+  .tb-word b{color:var(--green)}
+  .seg{display:inline-flex;background:#EEF1EA;border-radius:11px;padding:3px;gap:2px}
+  .seg button{border:none;background:transparent;font-size:13.5px;font-weight:600;color:var(--sub);padding:7px 14px;border-radius:8px;transition:.15s}
+  .seg button.on{background:#fff;color:var(--green-dk);box-shadow:0 1px 2px rgba(16,32,26,.12)}
+  .sp{flex:1}
+  .acct{position:relative}
+  .acct-chip{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:#fff;border-radius:11px;padding:5px 10px 5px 5px}
+  .av{width:30px;height:30px;border-radius:50%;background:var(--green-dk);color:var(--citron);font-weight:700;font-size:12.5px;display:flex;align-items:center;justify-content:center}
+  .acct-meta{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+  .acct-meta b{font-size:13px;font-weight:650}
+  .acct-meta span{font-size:11.5px;color:var(--sub)}
+  .menu{position:absolute;right:0;top:48px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(16,32,26,.16);min-width:190px;padding:6px;z-index:30}
+  .menu button{display:flex;width:100%;align-items:center;gap:9px;border:none;background:none;text-align:left;font-size:13.5px;color:var(--ink);padding:9px 10px;border-radius:8px}
+  .menu button:hover{background:#F4F6EC}
+  .menu .who{padding:9px 10px 10px;border-bottom:1px solid var(--line);margin-bottom:4px}
+  .menu .who b{display:block;font-size:13.5px}
+  .menu .who span{font-size:12px;color:var(--sub)}
+
+  .wrap{max-width:940px;margin:0 auto;padding:26px 18px 80px}
+  .greet{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.01em;margin:6px 0 2px}
+  .greet-sub{color:var(--sub);font-size:14px;margin:0 0 22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px;margin-bottom:16px;box-shadow:0 1px 2px rgba(16,32,26,.04)}
+  .card h3{font-family:var(--display);font-weight:700;font-size:16px;margin:0 0 4px}
+  .card .muted{color:var(--sub);font-size:13.5px;line-height:1.5;margin:0}
+  .empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 16px;color:var(--sub)}
+  .empty svg{margin-bottom:10px}
+  .empty .t{font-weight:650;color:var(--ink);font-size:14.5px;margin-bottom:3px}
+  .empty .d{font-size:13px;max-width:360px;line-height:1.5}
+  .soon{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--green);background:#EAF4EC;border-radius:999px;padding:3px 9px;margin-left:8px;vertical-align:middle}
+
+  /* ---------- OFFICE / TEAM ---------- */
+  .secthead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 14px}
+  .secthead h2{font-family:var(--display);font-weight:800;font-size:22px;margin:0}
+  .secthead .office{color:var(--sub);font-size:13.5px}
+  .btn-primary{border:none;border-radius:10px;background:var(--green-dk);color:#fff;font-weight:650;font-size:13.5px;padding:10px 15px}
+  .btn-primary:hover{background:var(--green)}
+  .team{display:flex;flex-direction:column}
+  .row{display:flex;align-items:center;gap:13px;padding:13px 4px;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .nm{font-weight:650;font-size:14.5px}
+  .row .em{font-size:12.5px;color:var(--sub)}
+  .rinfo{min-width:0;flex:1}
+  .pill{font-size:11px;font-weight:700;letter-spacing:.02em;border-radius:999px;padding:3px 9px}
+  .pill.mgr{color:#1F5C46;background:#E1F1E7}
+  .pill.agt{color:#3a4a55;background:#E9EEF2}
+  .pill.on{color:#1F7A52;background:#E6F4EC}
+  .pill.off{color:#9a5a1a;background:#Faecd8}
+  .rowact{display:flex;align-items:center;gap:8px}
+  .lnk{border:1px solid var(--line);background:#fff;border-radius:9px;font-size:12.5px;font-weight:600;color:var(--ink);padding:7px 11px}
+  .lnk:hover{background:#F4F6EC}
+  .lnk.danger{color:#9a3527}
+  .lnk.danger:hover{background:#FbeceA}
+  .panel-note{background:#F3F7E6;border:1px solid rgba(10,70,48,.16);border-radius:11px;padding:11px 14px;font-size:13px;line-height:1.5;color:#33402f}
+  .loading{padding:50px 0;text-align:center;color:var(--sub);font-size:14px}
+</style>
+</head>
+<body>
+<div id="screen"><div class="login"><div class="loading" style="color:#BFD8C9">Loading…</div></div></div>
+
+<script>
+(function(){
+  "use strict";
+  var cfg = window.LISTEDGE_SUPABASE || {};
+  var sb = null;
+  var ST = { user:null, profile:null, view:"app", menu:false };
+  var screen = document.getElementById("screen");
+
+  // ---- tiny helpers ----
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+  function initials(name,email){ var n=(name||"").trim(); if(n){var p=n.split(/\s+/);return ((p[0]||"")[0]||"").toUpperCase()+((p[1]||"")[0]||"").toUpperCase();} return ((email||"?")[0]||"?").toUpperCase(); }
+  function firstName(name,email){ var n=(name||"").trim(); return n? n.split(/\s+/)[0] : (email||"there").split("@")[0]; }
+  function configured(){ return cfg.url && cfg.anonKey && cfg.url.indexOf("YOUR-PROJECT")===-1 && cfg.anonKey.indexOf("YOUR-")===-1; }
+  function ic(p,sw,c){ return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="'+(c||"currentColor")+'" stroke-width="'+(sw||2)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
+  var I = {
+    house:'<path d="M4 19V8l8-5 8 5v11"/><path d="M9 19v-6h6v6"/>',
+    out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+    inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+    home:'<path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>'
+  };
+
+  // ============================ AUTH ============================
+  function boot(){
+    if(!window.supabase || !configured()){ renderConfig(); return; }
+    try{ sb = window.supabase.createClient(cfg.url, cfg.anonKey); }
+    catch(e){ renderConfig(); return; }
+    sb.auth.getSession().then(function(r){
+      var session = (r && r.data) ? r.data.session : null;
+      if(session && session.user){ ST.user = session.user; afterAuth(); }
+      else { renderLogin(); }
+    }).catch(function(){ renderLogin(); });
+    sb.auth.onAuthStateChange(function(evt, sess){
+      if(evt==="SIGNED_OUT" || !sess){ ST.user=null; ST.profile=null; renderLogin(); }
+    });
+  }
+
+  function afterAuth(){
+    renderBusy("Signing you in…");
+    sb.from("profiles").select("*").eq("id", ST.user.id).maybeSingle().then(function(r){
+      if(r.error){ renderNoProfile("We couldn’t load your account just now. Please try again in a moment."); return; }
+      var p = r.data;
+      if(!p){ renderNoProfile(); return; }
+      if(p.active===false){ renderDeactivated(); return; }
+      ST.profile = p;
+      ST.view = "app";
+      // load agency name (best-effort)
+      if(p.agency_id){
+        sb.from("agencies").select("name,active").eq("id", p.agency_id).maybeSingle().then(function(a){
+          var ag = (a && a.data) ? a.data : null;
+          if(ag && ag.active===false){ renderOfficePaused(); return; }
+          ST.profile.agency_name = (ag && ag.name) ? ag.name : "";
+          renderApp();
+        }).catch(function(){ renderApp(); });
+      } else { renderApp(); }
+    }).catch(function(){ renderNoProfile("We couldn’t load your account just now. Please try again in a moment."); });
+  }
+
+  function signIn(){
+    var email = el("email").value.trim(), pw = el("password").value;
+    var btn = el("signinBtn"), err = el("loginErr");
+    err.textContent = "";
+    if(!email || !pw){ err.textContent = "Enter your email and password."; return; }
+    btn.disabled = true; btn.textContent = "Signing in…";
+    sb.auth.signInWithPassword({ email:email, password:pw }).then(function(r){
+      if(r.error){
+        btn.disabled=false; btn.textContent="Sign in";
+        err.textContent = "That email and password didn’t match. Please try again.";
+        return;
+      }
+      ST.user = r.data.user; afterAuth();
+    }).catch(function(){
+      btn.disabled=false; btn.textContent="Sign in";
+      err.textContent = "Something went wrong signing in. Please try again.";
+    });
+  }
+
+  function signOut(){ if(sb){ sb.auth.signOut(); } ST.user=null; ST.profile=null; renderLogin(); }
+
+  // ============================ VIEWS ============================
+  function renderBusy(msg){ screen.innerHTML = '<div class="login"><div class="loading" style="color:#BFD8C9">'+esc(msg||"Loading…")+'</div></div>'; }
+
+  function renderConfig(){
+    screen.innerHTML =
+      '<div class="login"><div class="cfgwarn">'+
+        '<b>Almost there.</b><br><br>This app needs your Supabase details before it can sign anyone in. '+
+        'Open <code>app.html</code> and paste your project <code>url</code> and <code>anonKey</code> '+
+        '(the same two values as Founder HQ) into the block near the top, then redeploy.'+
+      '</div></div>';
+  }
+
+  function renderLogin(){
+    ST.menu=false;
+    screen.innerHTML =
+      '<div class="login"><div class="login-card">'+
+        '<div class="lb"><span class="lb-tile">'+ic(I.house,2.4,"#C8F24A")+'</span>'+
+          '<span class="lb-word">List<b>Edge</b></span></div>'+
+        '<h1>Sign in to ListEdge.</h1>'+
+        '<p class="sub">The private conjunctional network for New Zealand agents.</p>'+
+        '<div class="field"><label for="email">Email</label>'+
+          '<input id="email" type="email" autocomplete="username" placeholder="you@youroffice.co.nz"></div>'+
+        '<div class="field"><label for="password">Password</label>'+
+          '<input id="password" type="password" autocomplete="current-password" placeholder="••••••••"></div>'+
+        '<button id="signinBtn" class="signin-btn">Sign in</button>'+
+        '<div id="loginErr" class="err"></div>'+
+        '<p class="note">Accounts are created by your office. Trouble signing in? Contact your office manager.</p>'+
+      '</div></div>';
+    el("signinBtn").addEventListener("click", signIn);
+    var onEnter = function(e){ if(e.key==="Enter"){ signIn(); } };
+    el("email").addEventListener("keydown", onEnter);
+    el("password").addEventListener("keydown", onEnter);
+    el("email").focus();
+  }
+
+  function renderNoProfile(msg){
+    screen.innerHTML =
+      '<div class="login"><div class="login-card">'+
+        '<div class="lb"><span class="lb-tile">'+ic(I.house,2.4,"#C8F24A")+'</span><span class="lb-word">List<b>Edge</b></span></div>'+
+        '<h1>Account not set up yet.</h1>'+
+        '<p class="sub">'+esc(msg||"Your sign-in works, but your ListEdge profile hasn’t been set up by your office yet. Please contact your office manager.")+'</p>'+
+        '<button id="soBtn" class="signin-btn">Back to sign in</button>'+
+      '</div></div>';
+    el("soBtn").addEventListener("click", signOut);
+  }
+
+  function renderDeactivated(){
+    screen.innerHTML =
+      '<div class="login"><div class="login-card">'+
+        '<div class="lb"><span class="lb-tile">'+ic(I.house,2.4,"#C8F24A")+'</span><span class="lb-word">List<b>Edge</b></span></div>'+
+        '<h1>Your access is paused.</h1>'+
+        '<p class="sub">This account has been deactivated by your office. Please contact your office manager if you think this is a mistake.</p>'+
+        '<button id="soBtn" class="signin-btn">Back to sign in</button>'+
+      '</div></div>';
+    el("soBtn").addEventListener("click", signOut);
+  }
+
+  function renderOfficePaused(){
+    screen.innerHTML =
+      '<div class="login"><div class="login-card">'+
+        '<div class="lb"><span class="lb-tile">'+ic(I.house,2.4,"#C8F24A")+'</span><span class="lb-word">List<b>Edge</b></span></div>'+
+        '<h1>Your office is paused.</h1>'+
+        '<p class="sub">Your office\u2019s ListEdge access has been switched off. Please contact your office manager or ListEdge.</p>'+
+        '<button id="soBtn" class="signin-btn">Back to sign in</button>'+
+      '</div></div>';
+    el("soBtn").addEventListener("click", signOut);
+  }
+
+  function topbar(isManager){
+    var p = ST.profile;
+    var seg = isManager ?
+      '<div class="seg">'+
+        '<button data-view="app" class="'+(ST.view==="app"?"on":"")+'">My app</button>'+
+        '<button data-view="office" class="'+(ST.view==="office"?"on":"")+'">Office dashboard</button>'+
+      '</div>' : '';
+    var menu = ST.menu ?
+      '<div class="menu"><div class="who"><b>'+esc(p.full_name||firstName(p.full_name,p.email))+'</b><span>'+esc(p.email||"")+'</span></div>'+
+        '<button data-act="signout">'+ic(I.out,2)+' Sign out</button></div>' : '';
+    return '<div class="topbar">'+
+      '<div class="tb-brand"><span class="tb-tile">'+ic(I.house,2.4,"#C8F24A")+'</span><span class="tb-word">List<b>Edge</b></span></div>'+
+      seg + '<div class="sp"></div>'+
+      '<div class="acct"><button class="acct-chip" data-act="menu"><span class="av">'+esc(initials(p.full_name,p.email))+'</span>'+
+        '<span class="acct-meta"><b>'+esc(firstName(p.full_name,p.email))+'</b><span>'+esc(p.role==="manager"?"Office manager":"Agent")+'</span></span></button>'+
+        menu+'</div>'+
+    '</div>';
+  }
+
+  function agentApp(){
+    var p = ST.profile;
+    return '<div class="wrap">'+
+      '<div class="greet">Kia ora, '+esc(firstName(p.full_name,p.email))+'.</div>'+
+      '<p class="greet-sub">'+esc(p.agency_name||"Your office")+'</p>'+
+      '<div class="card"><h3>Your buyer briefs <span class="soon">Coming soon</span></h3>'+
+        '<div class="empty">'+ic(I.inbox,1.8,"#A6C0B1")+'<div class="t">No buyer briefs yet</div>'+
+          '<div class="d">Post what your buyers are looking for and ListEdge matches them against private listings in other offices.</div></div></div>'+
+      '<div class="card"><h3>Listings matched to your buyers <span class="soon">Coming soon</span></h3>'+
+        '<div class="empty">'+ic(I.home,1.8,"#A6C0B1")+'<div class="t">No matches yet</div>'+
+          '<div class="d">When a listing in the network fits one of your buyer briefs, it shows up here with a way to introduce.</div></div></div>'+
+      '<p class="panel-note">Posting, matching and introductions are being switched on next. Your sign-in, office and permissions are live now.</p>'+
+    '</div>';
+  }
+
+  function officeView(){
+    return '<div class="wrap">'+
+      '<div class="secthead"><div><h2>Your office</h2><div class="office">'+esc(ST.profile.agency_name||"")+'</div></div>'+
+        '<button class="btn-primary" data-act="invite">'+ic(I.plus,2.2,"#fff")+' &nbsp;Add teammate</button></div>'+
+      '<div class="card" style="padding:8px 16px"><div class="team" id="teamList"><div class="loading">Loading your team…</div></div></div>'+
+      '<p class="panel-note" id="officeNote">Manage who in your office can use ListEdge. You can deactivate or reactivate anyone here.</p>'+
+    '</div>';
+  }
+
+  function renderApp(){
+    var isManager = ST.profile.role==="manager";
+    if(!isManager) ST.view = "app";
+    var body = ST.view==="office" ? officeView() : agentApp();
+    screen.innerHTML = topbar(isManager) + body;
+    if(ST.view==="office") loadTeam();
+  }
+
+  function loadTeam(){
+    var box = el("teamList"); if(!box) return;
+    sb.from("profiles").select("id,email,full_name,role,active,agency_id").eq("agency_id", ST.profile.agency_id)
+      .then(function(r){
+        if(r.error || !r.data){ box.innerHTML = '<div class="empty"><div class="t">Couldn’t load your team</div><div class="d">Please try again in a moment.</div></div>'; return; }
+        var rows = r.data.slice().sort(function(a,b){
+          if((b.role==="manager")-(a.role==="manager")) return (b.role==="manager")-(a.role==="manager");
+          return (a.full_name||a.email||"").localeCompare(b.full_name||b.email||"");
+        });
+        box.innerHTML = rows.map(function(m){
+          var me = m.id===ST.profile.id;
+          var rolePill = '<span class="pill '+(m.role==="manager"?"mgr":"agt")+'">'+(m.role==="manager"?"Manager":"Agent")+'</span>';
+          var statePill = '<span class="pill '+(m.active!==false?"on":"off")+'">'+(m.active!==false?"Active":"Inactive")+'</span>';
+          var act = me ? '<span class="em">You</span>' :
+            (m.active!==false
+              ? '<button class="lnk danger" data-deact="'+esc(m.id)+'">Deactivate</button>'
+              : '<button class="lnk" data-react="'+esc(m.id)+'">Reactivate</button>');
+          return '<div class="row"><span class="av">'+esc(initials(m.full_name,m.email))+'</span>'+
+            '<span class="rinfo"><div class="nm">'+esc(m.full_name||"—")+'</div><div class="em">'+esc(m.email||"")+'</div></span>'+
+            rolePill+statePill+'<span class="rowact">'+act+'</span></div>';
+        }).join("");
+      }).catch(function(){ box.innerHTML = '<div class="empty"><div class="t">Couldn’t load your team</div></div>'; });
+  }
+
+  function setActive(id, active){
+    var note = el("officeNote"); if(note){ note.textContent = (active?"Reactivating…":"Deactivating…"); }
+    sb.from("profiles").update({ active:active }).eq("id", id).then(function(r){
+      if(note){ note.textContent = r.error ? "That didn’t save — please try again." :
+        "Manage who in your office can use ListEdge. You can deactivate or reactivate anyone here."; }
+      if(!r.error) loadTeam();
+    }).catch(function(){ if(note){ note.textContent="That didn’t save — please try again."; } });
+  }
+
+  // ---- delegated events for the app chrome ----
+  screen.addEventListener("click", function(e){
+    var t = e.target;
+    var act = t.closest ? t.closest("[data-act]") : null;
+    if(act){
+      var a = act.getAttribute("data-act");
+      if(a==="menu"){ ST.menu=!ST.menu; renderApp(); return; }
+      if(a==="signout"){ signOut(); return; }
+      if(a==="invite"){ var n=el("officeNote"); if(n){ n.textContent="Adding teammates from inside ListEdge is coming next. For now, new accounts are created for your office by ListEdge."; } return; }
+    }
+    var v = t.closest ? t.closest("[data-view]") : null;
+    if(v){ ST.view = v.getAttribute("data-view"); ST.menu=false; renderApp(); return; }
+    var d = t.closest ? t.closest("[data-deact]") : null;
+    if(d){ setActive(d.getAttribute("data-deact"), false); return; }
+    var re = t.closest ? t.closest("[data-react]") : null;
+    if(re){ setActive(re.getAttribute("data-react"), true); return; }
+    // close the account menu when clicking elsewhere
+    if(ST.menu && !(t.closest && t.closest(".acct"))){ ST.menu=false; renderApp(); }
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>
