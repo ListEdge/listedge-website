@@ -114,6 +114,22 @@ module.exports = async function handler(req, res) {
       return ok();
     }
 
+    if (action === 'delete-office') {
+      if (!b.officeId) return bad(400, 'Missing office.');
+      // remove every user in the office first (their logins; profiles cascade),
+      // then delete the office itself
+      var lr = await svc('/rest/v1/profiles?select=id&agency_id=eq.' + encodeURIComponent(b.officeId), 'GET');
+      var list = await lr.json();
+      if (Array.isArray(list)) {
+        for (var i = 0; i < list.length; i++) {
+          try { await svc('/auth/v1/admin/users/' + encodeURIComponent(list[i].id), 'DELETE'); } catch (e) {}
+        }
+      }
+      var dr = await svc('/rest/v1/agencies?id=eq.' + encodeURIComponent(b.officeId), 'DELETE');
+      if (!dr.ok && dr.status !== 204) { var de = await dr.json(); return bad(400, (de && de.message) || 'Could not delete office.'); }
+      return ok();
+    }
+
     return bad(400, 'Unknown action.');
   } catch (e) {
     return bad(500, 'Something went wrong performing that action.');
