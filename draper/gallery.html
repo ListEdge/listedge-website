@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+  <meta charset="UTF-8" />
+  <base href="/draper/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery — 36 Draper Street, Richmond</title>
+  <meta name="description" content="Renders, interiors and construction progress at 36 Draper Street, Richmond, Christchurch." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="site-head">
+    <div class="wrap bar">
+      <a class="brand" href="index.html" aria-label="Draper Street home">
+        <span class="mark">KLYNE<span>›</span></span>
+        <span class="dev">Draper Street</span>
+      </a>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <nav class="nav" id="nav">
+        <a href="index.html">Home</a>
+        <a href="floor-plans.html">Floor Plans</a>
+        <a href="gallery.html" aria-current="page">Gallery</a>
+        <a href="contact.html">Contact</a>
+        <a class="tel" href="tel:+64273453219">027 345 3219</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Gallery</p>
+      <h1 class="h-section" style="margin-bottom:0">See the homes take shape</h1>
+      <p class="lede">Renders, interiors, and fortnightly progress photos from site as construction moves toward September completion.</p>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="filter-row" role="group" aria-label="Filter gallery">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="exterior">Exterior</button>
+        <button class="filter-btn" data-filter="interior">Interior</button>
+        <button class="filter-btn" data-filter="progress">On site</button>
+      </div>
+
+      <div class="grid-gallery">
+        <figure data-cat="exterior">
+          <div class="ph" data-ph>
+            <img src="images/exterior-1.jpg" alt="Street elevation" loading="lazy" />
+            <span class="ph-fallback">images/exterior-1.jpg</span>
+          </div>
+          <figcaption>Street elevation</figcaption>
+        </figure>
+        <figure data-cat="exterior">
+          <div class="ph" data-ph>
+            <img src="images/exterior-2.jpg" alt="Terrace and landscaping" loading="lazy" />
+            <span class="ph-fallback">images/exterior-2.jpg</span>
+          </div>
+          <figcaption>Terrace &amp; landscaping</figcaption>
+        </figure>
+        <figure data-cat="exterior">
+          <div class="ph" data-ph>
+            <img src="images/exterior-3.jpg" alt="Rear residence" loading="lazy" />
+            <span class="ph-fallback">images/exterior-3.jpg</span>
+          </div>
+          <figcaption>Unit 5 — rear residence</figcaption>
+        </figure>
+        <figure data-cat="interior">
+          <div class="ph" data-ph>
+            <img src="images/interior-1.jpg" alt="Living and kitchen" loading="lazy" />
+            <span class="ph-fallback">images/interior-1.jpg</span>
+          </div>
+          <figcaption>Living &amp; kitchen</figcaption>
+        </figure>
+        <figure data-cat="interior">
+          <div class="ph" data-ph>
+            <img src="images/interior-2.jpg" alt="Bedroom" loading="lazy" />
+            <span class="ph-fallback">images/interior-2.jpg</span>
+          </div>
+          <figcaption>Bedroom</figcaption>
+        </figure>
+        <figure data-cat="interior">
+          <div class="ph" data-ph>
+            <img src="images/interior-3.jpg" alt="Bathroom" loading="lazy" />
+            <span class="ph-fallback">images/interior-3.jpg</span>
+          </div>
+          <figcaption>Bathroom</figcaption>
+        </figure>
+        <figure data-cat="progress">
+          <div class="ph" data-ph>
+            <img src="images/progress-1.jpg" alt="Construction progress" loading="lazy" />
+            <span class="ph-fallback">images/progress-1.jpg</span>
+          </div>
+          <figcaption>On site — latest</figcaption>
+        </figure>
+        <figure data-cat="progress">
+          <div class="ph" data-ph>
+            <img src="images/progress-2.jpg" alt="Construction progress" loading="lazy" />
+            <span class="ph-fallback">images/progress-2.jpg</span>
+          </div>
+          <figcaption>On site</figcaption>
+        </figure>
+        <figure data-cat="progress">
+          <div class="ph" data-ph>
+            <img src="images/progress-3.jpg" alt="Construction progress" loading="lazy" />
+            <span class="ph-fallback">images/progress-3.jpg</span>
+          </div>
+          <figcaption>On site</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <img src="" alt="" />
+    <div class="lb-cap"></div>
+    <button class="lb-btn lb-prev" aria-label="Previous image">‹</button>
+    <button class="lb-btn lb-next" aria-label="Next image">›</button>
+    <button class="lb-btn lb-close" aria-label="Close">×</button>
+  </div>
+
+  <section class="section on-dark cta-band">
+    <div class="wrap">
+      <h2 class="h-section reveal">Like what you see?</h2>
+      <p class="lede reveal" style="margin-left:auto;margin-right:auto">Enquire for the full render set, or register for fortnightly progress updates straight from site.</p>
+      <div class="cta-row reveal d1">
+        <a class="btn btn-primary" href="contact.html">Enquire now <span class="chev">›</span></a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <div class="wrap row">
+      <div>
+        <div class="brand-line">KLYNE<span>›</span> REAL ESTATE</div>
+        <div class="fine">Licensed under the Real Estate Agents Act 2008</div>
+      </div>
+      <div class="fine">
+        36 Draper Street, Richmond, Christchurch ·
+        <a href="tel:+64273453219">027 345 3219</a> ·
+        <a href="contact.html">Enquire</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/site.js" defer></script>
+</body>
+</html>

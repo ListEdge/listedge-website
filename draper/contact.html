@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-NZ">
+<head>
+  <meta charset="UTF-8" />
+  <base href="/draper/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enquire — 36 Draper Street, Richmond</title>
+  <meta name="description" content="Enquire about the townhouses at 36 Draper Street, Richmond, Christchurch. Contact Harsh Kansara at Klyne Real Estate." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="site-head">
+    <div class="wrap bar">
+      <a class="brand" href="index.html" aria-label="Draper Street home">
+        <span class="mark">KLYNE<span>›</span></span>
+        <span class="dev">Draper Street</span>
+      </a>
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <nav class="nav" id="nav">
+        <a href="index.html">Home</a>
+        <a href="floor-plans.html">Floor Plans</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+        <a class="tel" href="tel:+64273453219">027 345 3219</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Enquire</p>
+      <h1 class="h-section" style="margin-bottom:0">Let's talk about Draper Street</h1>
+      <p class="lede">Send an enquiry and Harsh will come back to you with floor plans, pricing and next steps — usually the same day.</p>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap split" style="align-items:start">
+
+      <div class="form-card reveal">
+        <!-- Replace YOUR_FORM_ID with your Formspree form ID — see README -->
+        <form id="enquiry-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" novalidate>
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="f-email">Email</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="f-phone">Phone</label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" />
+          </div>
+          <div class="field">
+            <label for="f-unit">Interested in</label>
+            <select id="f-unit" name="unit">
+              <option value="Any / not sure">Any — send me everything</option>
+              <option value="Unit 1 — $545,000">Unit 1 — 2 bed · $545,000</option>
+              <option value="Unit 2 — $530,000">Unit 2 — 2 bed · $530,000</option>
+              <option value="Unit 3 — $530,000">Unit 3 — 2 bed · $530,000</option>
+              <option value="Unit 4 — $530,000">Unit 4 — 2 bed · $530,000</option>
+              <option value="Unit 5 — back-up interest">Unit 5 — 3 bed (under offer, back-up interest)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-msg">Message</label>
+            <textarea id="f-msg" name="message" placeholder="Tell us a little about what you're looking for…"></textarea>
+          </div>
+          <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+          <input type="hidden" name="_subject" value="Draper Street enquiry" />
+          <button class="btn btn-primary" type="submit">Send enquiry <span class="chev">›</span></button>
+          <p class="form-status" id="form-status" role="status"></p>
+          <p class="form-note">Your details go directly to Klyne Real Estate and are never shared with anyone else.</p>
+        </form>
+      </div>
+
+      <div>
+        <div class="agent-card reveal d1">
+          <p class="role">Your agent</p>
+          <h3>Harsh Kansara</h3>
+          <p class="org">Director — Klyne Real Estate<br />Licensed REAA 2008</p>
+          <div class="lines">
+            <div class="line"><span>Call</span><a href="tel:+64273453219">027 345 3219</a></div>
+            <div class="line"><span>Email</span><a href="mailto:harsh@klyne.nz">harsh@klyne.nz</a></div>
+            <div class="line"><span>Site</span><a href="https://klyne.nz" target="_blank" rel="noopener">klyne.nz</a></div>
+          </div>
+        </div>
+
+        <div style="margin-top:22px" class="reveal d2" id="map">
+          <iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            title="Map — 36 Draper Street, Richmond, Christchurch"
+            src="https://www.google.com/maps?q=36+Draper+Street,+Richmond,+Christchurch,+New+Zealand&output=embed"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <div class="wrap row">
+      <div>
+        <div class="brand-line">KLYNE<span>›</span> REAL ESTATE</div>
+        <div class="fine">Licensed under the Real Estate Agents Act 2008</div>
+      </div>
+      <div class="fine">
+        36 Draper Street, Richmond, Christchurch ·
+        <a href="tel:+64273453219">027 345 3219</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/site.js" defer></script>
+  <script>
+    // Pre-select the unit if arriving from a floor-plan CTA (?unit=N)
+    (function () {
+      var u = new URLSearchParams(location.search).get("unit");
+      if (!u) return;
+      var sel = document.getElementById("f-unit");
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value.indexOf("Unit " + u) === 0) { sel.selectedIndex = i; break; }
+      }
+    })();
+  </script>
+</body>
+</html>
